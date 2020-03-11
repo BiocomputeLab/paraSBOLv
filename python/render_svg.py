@@ -20,13 +20,13 @@ __license__ = 'MIT'
 __version__ = '1.0'
 
 class GlyphRenderer:
-    """ Class to load and render the parametric SVG glyphs.
+    """ Class to load and render using matplotlib parametric SVG glyphs.
     """
 
     def __init__(self, glyph_path='glyphs/', global_defaults=None):
         self.svg2mpl_style_map = {}
-        self.svg2mpl_style_map['fill'] = 'color'
-        self.svg2mpl_style_map['stroke'] = 'linecolor'
+        self.svg2mpl_style_map['fill'] = 'facecolor'
+        self.svg2mpl_style_map['stroke'] = 'edgecolor'
         self.svg2mpl_style_map['stroke-width'] = 'linewidth'
         self.glyphs_library, self.glyph_soterm_map = self.load_glyphs_from_path(glyph_path)
 
@@ -34,16 +34,16 @@ class GlyphRenderer:
         converted_val = None
         if val.startswith('rgba'):
             c_els = val[5:-1].split(',')
-            r_val = float(c_els[0])
-            g_val = float(c_els[1])
-            b_val = float(c_els[2])
+            r_val = float(c_els[0])/255.0
+            g_val = float(c_els[1])/255.0
+            b_val = float(c_els[2])/255.0
             a_val = float(c_els[3])
             converted_val = (r_val, g_val, b_val)
         elif val.startswith('rgb'):
             c_els = val[4:-1].split(',')
-            r_val = float(c_els[0])
-            g_val = float(c_els[1])
-            b_val = float(c_els[2])
+            r_val = float(c_els[0])/255.0
+            g_val = float(c_els[1])/255.0
+            b_val = float(c_els[2])/255.0
             converted_val = (r_val, g_val, b_val)
         elif val.endswith('pt'):
             try:
@@ -51,8 +51,6 @@ class GlyphRenderer:
             except ValueError:
                 converted_val = val
         else:
-            
-
             try:
                 converted_val = float(val)
             except ValueError:
@@ -65,7 +63,7 @@ class GlyphRenderer:
         for el in style_els:
             key_val = [x.strip() for x in el.split(':')]
             if key_val[0] in self.svg2mpl_style_map.keys():
-                style_data[key_val[0]] = self.__process_unknown_val(key_val[1])
+                style_data[self.svg2mpl_style_map[key_val[0]]] = self.__process_unknown_val(key_val[1])
         return style_data
 
     def __extract_tag_details(self, tag_attributes):
@@ -75,7 +73,7 @@ class GlyphRenderer:
         tag_details['class'] = None
         tag_details['id'] = None
         tag_details['defaults'] = None
-        tag_details['style'] = None
+        tag_details['style'] = {}
         tag_details['d'] = None
         # Pull out the relevant details
         for key in tag_attributes.keys():
@@ -141,11 +139,10 @@ class GlyphRenderer:
         for path in glyph['paths']:
             if path['class'] not in ['baseline', 'bounding-box']:
                 svg_text = self.__eval_svg_data(path['d'], merged_parameters)
-                paths_to_draw.append(svgpath2mpl.parse_path(svg_text))
-        # Draw glyph to the axis
-        # TODO - PARAMETERS
+                paths_to_draw.append([svgpath2mpl.parse_path(svg_text), path['style']])
+        # Draw glyph to the axis with correct styling parameters
         for path in paths_to_draw:
-            patch = patches.PathPatch(path, facecolor='white', edgecolor='black', lw=8)
+            patch = patches.PathPatch(path[0], **path[1])
             ax.add_patch(patch)
 
 ###############################################################################
@@ -166,7 +163,7 @@ renderer.draw_glyph(ax, 'Insulator', (0.5, 0.5), user_parameters)
 
 user_parameters['arrowbody_width'] = 20
 user_parameters['baseline_offset'] = -20
-renderer.draw_glyph(ax, 'Insulator', (0.5, 30), user_parameters)
+renderer.draw_glyph(ax, 'CDS', (0.5, 30), user_parameters)
 
 ax.set_ylim([0,100])
 ax.set_xlim([0,100])
