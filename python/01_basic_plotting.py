@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """
-Basic example of plotting parametrix SBOL Visual glyphs
-using matplotlib.
+Basic example of plotting parametric SBOL Visual glyphs using the parasbolv library.
 """
 
 import parasbolv as psv
@@ -30,9 +29,11 @@ user_parameters['arrowbody_width'] = 50
 renderer.draw_glyph(ax, 'RibosomeEntrySite', (10, 60), user_parameters=user_parameters)
 
 user_parameters['arrowbody_width'] = 70
+user_parameters['arrowhead_height'] = 5
+user_parameters['arrowhead_width'] = 20
 cds_style = {}
 cds_style['cds'] = {'facecolor': (0,0,1), 'edgecolor': (1,1,0), 'linewidth': 10}
-renderer.draw_glyph(ax, 'CDS', (25, 80), rotation=6.0, user_parameters=user_parameters, user_style=cds_style)
+renderer.draw_glyph(ax, 'CDS', (35, 80), rotation=(2*3.14)-(3.14/4), user_parameters=user_parameters, user_style=cds_style)
 
 ax.set_ylim([0,100])
 ax.set_xlim([0,100])
