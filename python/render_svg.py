@@ -94,6 +94,7 @@ class GlyphRenderer:
             if path['type'] not in ['baseline', 'bounding-box']:
                 svg_text = self.eval_svg_data(path['d'], merged_parameters)
                 paths_to_draw.append(svg2mpl.parse_path(svg_text))
+                print(svg2mpl.parse_path(svg_text))
         # Draw glyph to the axis
         # TODO - PARAMETERS
         for path in paths_to_draw:
@@ -114,11 +115,11 @@ fig = plt.figure(figsize=(6,6))
 ax = fig.add_axes([0.0, 0.0, 1.0, 1.0], frameon=False, aspect=1)
 
 user_parameters['arrowbody_width'] = 50
-renderer.draw_glyph(ax, 'CDS', (0.5, 0.5), user_parameters)
+renderer.draw_glyph(ax, 'Insulator', (0.5, 0.5), user_parameters)
 
 user_parameters['arrowbody_width'] = 20
 user_parameters['baseline_offset'] = -20
-renderer.draw_glyph(ax, 'CDS', (0.5, 30), user_parameters)
+renderer.draw_glyph(ax, 'Insulator', (0.5, 30), user_parameters)
 
 ax.set_ylim([0,100])
 ax.set_xlim([0,100])
