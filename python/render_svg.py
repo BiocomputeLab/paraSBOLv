@@ -5,7 +5,7 @@ a canvas. This is precisely the same approach and code used by DNAplotlib
 to parse, parameterise and render the SVG files for genetic designs.
 """
 
-import svgpath2mpl as svg2mpl
+import svgpath2mpl
 import os
 import glob
 import xml.etree.ElementTree as ET
@@ -24,14 +24,58 @@ class GlyphRenderer:
     """
 
     def __init__(self, glyph_path='glyphs/', global_defaults=None):
+        self.svg2mpl_style_map = {}
+        self.svg2mpl_style_map['fill'] = 'color'
+        self.svg2mpl_style_map['stroke'] = 'linecolor'
+        self.svg2mpl_style_map['stroke-width'] = 'linewidth'
         self.glyphs_library, self.glyph_soterm_map = self.load_glyphs_from_path(glyph_path)
-    
-    def extract_tag_details(self, tag_attributes):
+
+    def __process_unknown_val (self, val):
+        converted_val = None
+        if val.startswith('rgba'):
+            c_els = val[5:-1].split(',')
+            r_val = float(c_els[0])
+            g_val = float(c_els[1])
+            b_val = float(c_els[2])
+            a_val = float(c_els[3])
+            converted_val = (r_val, g_val, b_val)
+        elif val.startswith('rgb'):
+            c_els = val[4:-1].split(',')
+            r_val = float(c_els[0])
+            g_val = float(c_els[1])
+            b_val = float(c_els[2])
+            converted_val = (r_val, g_val, b_val)
+        elif val.endswith('pt'):
+            try:
+                converted_val = float(val[:-2])
+            except ValueError:
+                converted_val = val
+        else:
+            
+
+            try:
+                converted_val = float(val)
+            except ValueError:
+                converted_val = val
+        return converted_val
+
+    def __process_style (self, style_text):
+        style_data = {}
+        style_els = style_text.split(';')
+        for el in style_els:
+            key_val = [x.strip() for x in el.split(':')]
+            if key_val[0] in self.svg2mpl_style_map.keys():
+                style_data[key_val[0]] = self.__process_unknown_val(key_val[1])
+        return style_data
+
+    def __extract_tag_details(self, tag_attributes):
         tag_details = {}
         tag_details['glyphtype'] = None
         tag_details['soterms'] = []
-        tag_details['type'] = None
+        tag_details['class'] = None
+        tag_details['id'] = None
         tag_details['defaults'] = None
+        tag_details['style'] = None
         tag_details['d'] = None
         # Pull out the relevant details
         for key in tag_attributes.keys():
@@ -40,7 +84,11 @@ class GlyphRenderer:
             if key == 'soterms':
                 tag_details['soterms'] = tag_attributes[key].split(';')
             if key == 'class':
-                tag_details['type'] = tag_attributes[key]
+                tag_details['class'] = tag_attributes[key]
+            if key == 'id':
+                tag_details['id'] = tag_attributes[key]
+            if key == 'style':
+                tag_details['style'] = self.__process_style(tag_attributes[key])
             if 'parametric' in key and key.endswith('}d'):
                 tag_details['d'] = tag_attributes[key]
             if 'parametric' in key and key.endswith('}defaults'):
@@ -52,7 +100,7 @@ class GlyphRenderer:
                 tag_details['defaults'] = defaults
         return tag_details
 
-    def eval_svg_data(self, svg_text, parameters):
+    def __eval_svg_data(self, svg_text, parameters):
         # Use regular expression to extract and then replace with evaluated version
         # https://stackoverflow.com/questions/38734335/python-regex-replace-bracketed-text-with-contents-of-brackets
         return re.sub(r"{([^{}]+)}", lambda m: str(eval(m.group()[1:-1], parameters)), svg_text)
@@ -60,7 +108,7 @@ class GlyphRenderer:
     def load_glyph(self, filename):
         tree = ET.parse(filename)
         root = tree.getroot()
-        root_attributes = self.extract_tag_details(root.attrib)
+        root_attributes = self.__extract_tag_details(root.attrib)
         glyph_type = root_attributes['glyphtype']
         glyph_soterms = root_attributes['soterms']
         glyph_data = {}
@@ -69,7 +117,7 @@ class GlyphRenderer:
         for child in root:
             # Cycle through and find all paths
             if child.tag.endswith('path'):
-                glyph_data['paths'].append(self.extract_tag_details(child.attrib))
+                glyph_data['paths'].append(self.__extract_tag_details(child.attrib))
         return glyph_type, glyph_soterms, glyph_data
 
     def load_glyphs_from_path(self, path):
@@ -91,10 +139,9 @@ class GlyphRenderer:
                 merged_parameters[key] = user_parameters[key]
         paths_to_draw = []
         for path in glyph['paths']:
-            if path['type'] not in ['baseline', 'bounding-box']:
-                svg_text = self.eval_svg_data(path['d'], merged_parameters)
-                paths_to_draw.append(svg2mpl.parse_path(svg_text))
-                print(svg2mpl.parse_path(svg_text))
+            if path['class'] not in ['baseline', 'bounding-box']:
+                svg_text = self.__eval_svg_data(path['d'], merged_parameters)
+                paths_to_draw.append(svgpath2mpl.parse_path(svg_text))
         # Draw glyph to the axis
         # TODO - PARAMETERS
         for path in paths_to_draw:
