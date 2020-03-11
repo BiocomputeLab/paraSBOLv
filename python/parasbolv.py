@@ -106,13 +106,19 @@ class GlyphRenderer:
         # https://stackoverflow.com/questions/38734335/python-regex-replace-bracketed-text-with-contents-of-brackets
         return re.sub(r"{([^{}]+)}", lambda m: str(eval(m.group()[1:-1], parameters)), svg_text)
 
-    def __flip_and_position_glyph(self, path, baseline_y, position):
+    def __flip_position_rotate_glyph(self, path, baseline_y, position, rotation):
         new_verts = []
         new_codes = []
         for v_idx in range(np.size(path.vertices, 0)):
             cur_vert = path.vertices[v_idx]
             new_codes.append(path.codes[v_idx])
-            new_verts.append([cur_vert[0]+position[0], position[1]+baseline_y-(cur_vert[1]-baseline_y)])
+            org_x = cur_vert[0]
+            org_flipped_y = baseline_y-(cur_vert[1]-baseline_y)
+            rot_x = org_x * np.cos(rotation) - org_flipped_y * np.sin(rotation)
+            rot_y = org_x * np.sin(rotation) + org_flipped_y * np.cos(rotation)
+            final_x = rot_x+position[0]
+            final_y = rot_y+position[1]
+            new_verts.append([final_x, final_y])
         return Path(new_verts, new_codes)
 
     def load_glyph(self, filename):
@@ -140,7 +146,7 @@ class GlyphRenderer:
                 glyph_soterm_map[soterm] = glyph_type
         return glyphs_library, glyph_soterm_map
 
-    def draw_glyph(self, ax, glyph_type, position, user_parameters=None, user_style=None):
+    def draw_glyph(self, ax, glyph_type, position, rotation=0.0, user_parameters=None, user_style=None):
         glyph = self.glyphs_library[glyph_type]
         merged_parameters = glyph['defaults'].copy()
         if user_parameters is not None:
@@ -162,6 +168,6 @@ class GlyphRenderer:
         # Draw glyph to the axis with correct styling parameters
         baseline_y = glyph['defaults']['baseline_y']
         for path in paths_to_draw:
-            y_flipped_path = self.__flip_and_position_glyph(path[0], baseline_y, position)
+            y_flipped_path = self.__flip_position_rotate_glyph(path[0], baseline_y, position, rotation)
             patch = patches.PathPatch(y_flipped_path, **path[1])
             ax.add_patch(patch)
