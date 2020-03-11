@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 """
-Example of how parametric SVG can be rendered in Python using matplotlib as 
-a canvas. This is precisely the same approach and code used by DNAplotlib 
-to parse, parameterise and render the SVG files for genetic designs.
+Parametric SBOL Visual (parasbolv)
+
+A simple and lightweight library for rendering parametric SVG versions
+of the SBOL Visual glyphs. Is able to load a directory of glyphs and
+provides access to all style and geometry customisations.
 """
 
 import svgpath2mpl
