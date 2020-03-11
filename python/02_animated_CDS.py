@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 """
-Basic example of plotting parametrix SBOL Visual glyphs
-using matplotlib.
+Animated CDS with random shape and style
 """
 
 import numpy as np
@@ -15,45 +14,39 @@ __version__ = '1.0'
 
 # Fixing random state for reproducibility
 np.random.seed(1)
-
-# Renderer to create the 
 renderer = psv.GlyphRenderer(glyph_path='../glyphs/')
-
 
 def data_gen():
     for cnt in range(1000):
         t = cnt / 10
         yield t, np.sin(2*np.pi*t) * np.exp(-t/10.)
 
-
 def init():
-    ax.set_ylim(-1.1, 1.1)
-    ax.set_xlim(0, 10)
-    del xdata[:]
-    del ydata[:]
-    line.set_data(xdata, ydata)
-    return line,
+    ax.set_ylim([25,75])
+    ax.set_xlim([0,70])
+    return None
 
+user_parameters = {}
+cds_style = {}
 fig, ax = plt.subplots()
-line, = ax.plot([], [], lw=2)
-ax.grid()
-xdata, ydata = [], []
-
 
 def run(data):
     # update the data
     t, y = data
-    xdata.append(t)
-    ydata.append(y)
-    xmin, xmax = ax.get_xlim()
-
-    if t >= xmax:
-        ax.set_xlim(xmin, 2*xmax)
-        ax.figure.canvas.draw()
-    line.set_data(xdata, ydata)
-
-    return line,
+    ax.clear()
+    ax.set_ylim([25,75])
+    ax.set_xlim([0,70])
+    user_parameters['arrowbody_width'] = np.random.uniform(15, 30)
+    user_parameters['arrowbody_height'] = np.random.uniform(4, 10)
+    user_parameters['arrowhead_height'] = np.random.uniform(0, 10)
+    user_parameters['arrowhead_width'] = np.random.uniform(5, 9)
+    cds_style['cds'] = {'facecolor': (np.random.uniform(0, 1),np.random.uniform(0, 1),np.random.uniform(0, 1)), 
+                        'edgecolor': (np.random.uniform(0, 1),np.random.uniform(0, 1),np.random.uniform(0, 1)), 
+                        'linewidth': np.random.uniform(1, 10)}
+    renderer.draw_glyph(ax, 'CDS', (20, 50), user_parameters=user_parameters, user_style=cds_style)
+    return None
 
 ani = animation.FuncAnimation(fig, run, data_gen, blit=False, interval=10,
                               repeat=False, init_func=init)
+# Let the rave begin!
 plt.show()
