@@ -165,6 +165,10 @@ user_parameters['arrowbody_width'] = 20
 user_parameters['baseline_offset'] = -20
 renderer.draw_glyph(ax, 'CDS', (0.5, 30), user_parameters)
 
+user_parameters['arrowbody_width'] = 50
+user_parameters['baseline_offset'] = -40
+renderer.draw_glyph(ax, 'RibosomeEntrySite', (0.5, 30), user_parameters)
+
 ax.set_ylim([0,100])
 ax.set_xlim([0,100])
 plt.show()
