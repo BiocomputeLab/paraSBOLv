@@ -145,6 +145,29 @@ class GlyphRenderer:
             for soterm in glyph_soterms:
                 glyph_soterm_map[soterm] = glyph_type
         return glyphs_library, glyph_soterm_map
+    
+    def __bounds_from_paths_to_draw(self, paths):
+        x_min, x_max, y_min, y_max = None
+        for p in paths:
+            cur_x_min = np.min(p[0])
+            cur_x_max = np.max(p[0])
+            cur_y_min = np.min(p[1])
+            cur_y_max = np.max(p[1])
+            if x_min is None:
+                x_min = cur_x_min
+                x_max = cur_x_max
+                y_min = cur_y_min
+                y_max = cur_y_max
+            else:
+                if cur_x_min < x_min:
+                     x_min = cur_x_min
+                if cur_x_max < x_max:
+                     x_max = cur_x_max
+                if cur_y_min < y_min:
+                     y_min = cur_y_min
+                if cur_y_max < y_max:
+                     y_max = cur_y_max
+        return [x_min, y_min], [x_max, y_max]
 
     def draw_glyph(self, ax, glyph_type, position, rotation=0.0, user_parameters=None, user_style=None):
         glyph = self.glyphs_library[glyph_type]
@@ -171,3 +194,11 @@ class GlyphRenderer:
             y_flipped_path = self.__flip_position_rotate_glyph(path[0], baseline_y, position, rotation)
             patch = patches.PathPatch(y_flipped_path, **path[1])
             ax.add_patch(patch)
+        return self.__bounds_from_paths_to_draw(paths_to_draw)
+
+    def get_glyph_bounds(self, ax, glyph_type, position, rotation=0.0, user_parameters=None, user_style=None):
+
+
+
+
+

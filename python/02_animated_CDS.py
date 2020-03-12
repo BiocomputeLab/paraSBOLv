@@ -12,27 +12,15 @@ __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>'
 __license__ = 'MIT'
 __version__ = '1.0'
 
-# Fixing random state for reproducibility
+# Setup the animation
 np.random.seed(1)
 renderer = psv.GlyphRenderer(glyph_path='../glyphs/')
-
-def data_gen():
-    for cnt in range(1000):
-        t = cnt / 10
-        yield t, np.sin(2*np.pi*t) * np.exp(-t/10.)
-
-def init():
-    ax.set_ylim([25,75])
-    ax.set_xlim([0,70])
-    return None
-
 user_parameters = {}
 cds_style = {}
 fig, ax = plt.subplots()
 
 def run(data):
-    # update the data
-    t, y = data
+	# Clear the axis and then draw
     ax.clear()
     ax.set_ylim([25,75])
     ax.set_xlim([0,70])
@@ -40,13 +28,16 @@ def run(data):
     user_parameters['arrowbody_height'] = np.random.uniform(4, 10)
     user_parameters['arrowhead_height'] = np.random.uniform(0, 10)
     user_parameters['arrowhead_width'] = np.random.uniform(5, 9)
-    cds_style['cds'] = {'facecolor': (np.random.uniform(0, 1),np.random.uniform(0, 1),np.random.uniform(0, 1)), 
-                        'edgecolor': (np.random.uniform(0, 1),np.random.uniform(0, 1),np.random.uniform(0, 1)), 
+    cds_style['cds'] = {'facecolor': (np.random.uniform(0, 1),
+    	                              np.random.uniform(0, 1),
+    	                              np.random.uniform(0, 1)), 
+                        'edgecolor': (np.random.uniform(0, 1),
+                        	          np.random.uniform(0, 1),
+                        	          np.random.uniform(0, 1)), 
                         'linewidth': np.random.uniform(1, 10)}
     renderer.draw_glyph(ax, 'CDS', (20, 50), user_parameters=user_parameters, user_style=cds_style)
-    return None
 
-ani = animation.FuncAnimation(fig, run, data_gen, blit=False, interval=10,
-                              repeat=False, init_func=init)
+ani = animation.FuncAnimation(fig, run, None, blit=False, interval=10,
+                              repeat=False, init_func=None)
 # Let the rave begin!
 plt.show()
