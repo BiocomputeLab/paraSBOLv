@@ -196,7 +196,7 @@ class GlyphRenderer:
             ax.add_patch(patch)
         return self.__bounds_from_paths_to_draw(paths_to_draw)
 
-    def get_glyph_bounds(self, ax, glyph_type, position, rotation=0.0, user_parameters=None, user_style=None):
+    #def get_glyph_bounds(self, ax, glyph_type, position, rotation=0.0, user_parameters=None, user_style=None):
 
 
 
