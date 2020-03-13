@@ -3,8 +3,8 @@
 Parametric SBOL Visual (parasbolv)
 
 A simple and lightweight library for rendering parametric SVG versions
-of the SBOL Visual glyphs. Is able to load a directory of glyphs and
-provides access to all style and geometry customisations.
+of the SBOL Visual glyphs using matplotlib. Is able to load a directory 
+of glyphs and provides access to all style and geometry customisations.
 """
 
 import svgpath2mpl
@@ -121,6 +121,34 @@ class GlyphRenderer:
             new_verts.append([final_x, final_y])
         return Path(new_verts, new_codes)
 
+    def __bounds_from_paths_to_draw(self, paths):
+        x_min = None
+        x_max = None
+        y_min = None
+        y_max = None
+        for p in paths:
+            xs = p[0].vertices[:, 0]
+            ys = p[0].vertices[:, 1]
+            cur_x_min = np.min(xs)
+            cur_x_max = np.max(xs)
+            cur_y_min = np.min(ys)
+            cur_y_max = np.max(ys)
+            if x_min is None:
+                x_min = cur_x_min
+                x_max = cur_x_max
+                y_min = cur_y_min
+                y_max = cur_y_max
+            else:
+                if cur_x_min < x_min:
+                     x_min = cur_x_min
+                if cur_x_max < x_max:
+                     x_max = cur_x_max
+                if cur_y_min < y_min:
+                     y_min = cur_y_min
+                if cur_y_max < y_max:
+                     y_max = cur_y_max
+        return (x_min, y_min), (x_max, y_max)
+
     def load_glyph(self, filename):
         tree = ET.parse(filename)
         root = tree.getroot()
@@ -145,29 +173,6 @@ class GlyphRenderer:
             for soterm in glyph_soterms:
                 glyph_soterm_map[soterm] = glyph_type
         return glyphs_library, glyph_soterm_map
-    
-    def __bounds_from_paths_to_draw(self, paths):
-        x_min, x_max, y_min, y_max = None
-        for p in paths:
-            cur_x_min = np.min(p[0])
-            cur_x_max = np.max(p[0])
-            cur_y_min = np.min(p[1])
-            cur_y_max = np.max(p[1])
-            if x_min is None:
-                x_min = cur_x_min
-                x_max = cur_x_max
-                y_min = cur_y_min
-                y_max = cur_y_max
-            else:
-                if cur_x_min < x_min:
-                     x_min = cur_x_min
-                if cur_x_max < x_max:
-                     x_max = cur_x_max
-                if cur_y_min < y_min:
-                     y_min = cur_y_min
-                if cur_y_max < y_max:
-                     y_max = cur_y_max
-        return [x_min, y_min], [x_max, y_max]
 
     def draw_glyph(self, ax, glyph_type, position, rotation=0.0, user_parameters=None, user_style=None):
         glyph = self.glyphs_library[glyph_type]
@@ -193,12 +198,30 @@ class GlyphRenderer:
         for path in paths_to_draw:
             y_flipped_path = self.__flip_position_rotate_glyph(path[0], baseline_y, position, rotation)
             patch = patches.PathPatch(y_flipped_path, **path[1])
-            ax.add_patch(patch)
-        return self.__bounds_from_paths_to_draw(paths_to_draw)
+            if ax is not None:
+                ax.add_patch(patch)
+        return self.__bounds_from_paths_to_draw(paths_to_draw), self.get_baseline_end(glyph_type, position, rotation=rotation, user_parameters=user_parameters)
 
-    #def get_glyph_bounds(self, ax, glyph_type, position, rotation=0.0, user_parameters=None, user_style=None):
+    def get_glyph_bounds(self, glyph_type, position, rotation=0.0, user_parameters=None):
+        return self.draw_glyph(None, glyph_type, position, rotation=rotation, user_parameters=user_parameters)
 
-
-
-
-
+    def get_baseline_end(self, glyph_type, position, rotation=0.0, user_parameters=None):
+        glyph = self.glyphs_library[glyph_type]
+        merged_parameters = glyph['defaults'].copy()
+        if user_parameters is not None:
+            # Collate parameters (user parameters take priority) 
+            for key in user_parameters.keys():
+                merged_parameters[key] = user_parameters[key]
+        baseline_path = None
+        for path in glyph['paths']:
+            if path['class'] == 'baseline':
+                svg_text = self.__eval_svg_data(path['d'], merged_parameters)
+                baseline_path = svgpath2mpl.parse_path(svg_text)
+                break
+        if baseline_path is not None:
+            # Draw glyph to the axis with correct styling parameters
+            baseline_y = glyph['defaults']['baseline_y']
+            y_flipped_path = self.__flip_position_rotate_glyph(baseline_path, baseline_y, position, rotation)
+            return (y_flipped_path.vertices[1,0], y_flipped_path.vertices[1,1])
+        else:
+            return None

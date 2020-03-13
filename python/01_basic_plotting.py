@@ -12,6 +12,11 @@ __version__ = '1.0'
 
 renderer = psv.GlyphRenderer(glyph_path='../glyphs/')
 
+p = renderer.get_baseline_end('RibosomeEntrySite', (0.5, 40), rotation=1.0)
+print(p)
+
+print(renderer.get_glyph_bounds('RibosomeEntrySite', (0.5, 40), rotation=1.0))
+
 fig = plt.figure(figsize=(6,6))
 ax = fig.add_axes([0.0, 0.0, 1.0, 1.0], frameon=False, aspect=1)
 
@@ -33,7 +38,9 @@ user_parameters['arrowhead_height'] = 5
 user_parameters['arrowhead_width'] = 20
 cds_style = {}
 cds_style['cds'] = {'facecolor': (0,0,1), 'edgecolor': (1,1,0), 'linewidth': 10}
-renderer.draw_glyph(ax, 'CDS', (35, 80), rotation=(2*3.14)-(3.14/4), user_parameters=user_parameters, user_style=cds_style)
+bounds, end_point = renderer.draw_glyph(ax, 'CDS', (35, 80), rotation=(2*3.14)-(3.14/4), user_parameters=user_parameters, user_style=cds_style)
+
+print(bounds, end_point)
 
 ax.set_ylim([0,100])
 ax.set_xlim([0,100])
