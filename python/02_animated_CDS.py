@@ -22,6 +22,10 @@ fig, ax = plt.subplots()
 def run(data):
 	# Clear the axis and then draw
     ax.clear()
+    ax.set_aspect('equal')
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.axis('off')
     ax.set_ylim([25,75])
     ax.set_xlim([0,70])
     user_parameters['arrowbody_width'] = np.random.uniform(15, 30)

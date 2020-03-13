@@ -32,6 +32,7 @@ class GlyphRenderer:
         self.glyphs_library, self.glyph_soterm_map = self.load_glyphs_from_path(glyph_path)
 
     def __process_unknown_val (self, val):
+        # Convert an unknown value into the correct type
         converted_val = None
         if val.startswith('rgba'):
             c_els = val[5:-1].split(',')
@@ -59,6 +60,7 @@ class GlyphRenderer:
         return converted_val
 
     def __process_style (self, style_text):
+        # Convert the style text into a dictionary
         style_data = {}
         style_els = style_text.split(';')
         for el in style_els:
@@ -68,6 +70,7 @@ class GlyphRenderer:
         return style_data
 
     def __extract_tag_details(self, tag_attributes):
+        # Extract all the relevant details from an XML tag in the SVG
         tag_details = {}
         tag_details['glyphtype'] = None
         tag_details['soterms'] = []
@@ -107,6 +110,7 @@ class GlyphRenderer:
         return re.sub(r"{([^{}]+)}", lambda m: str(eval(m.group()[1:-1], parameters)), svg_text)
 
     def __flip_position_rotate_glyph(self, path, baseline_y, position, rotation):
+        # Flip paths into matplotlib default orientation and position and rotate paths 
         new_verts = []
         new_codes = []
         for v_idx in range(np.size(path.vertices, 0)):
@@ -122,6 +126,7 @@ class GlyphRenderer:
         return Path(new_verts, new_codes)
 
     def __bounds_from_paths_to_draw(self, paths):
+        # Calculate the bounding box from a set of paths
         x_min = None
         x_max = None
         y_min = None
@@ -195,12 +200,14 @@ class GlyphRenderer:
                 paths_to_draw.append([svgpath2mpl.parse_path(svg_text), merged_style])
         # Draw glyph to the axis with correct styling parameters
         baseline_y = glyph['defaults']['baseline_y']
+        all_y_flipped_paths = []
         for path in paths_to_draw:
             y_flipped_path = self.__flip_position_rotate_glyph(path[0], baseline_y, position, rotation)
+            all_y_flipped_paths.append([y_flipped_path])
             patch = patches.PathPatch(y_flipped_path, **path[1])
             if ax is not None:
                 ax.add_patch(patch)
-        return self.__bounds_from_paths_to_draw(paths_to_draw), self.get_baseline_end(glyph_type, position, rotation=rotation, user_parameters=user_parameters)
+        return self.__bounds_from_paths_to_draw(all_y_flipped_paths), self.get_baseline_end(glyph_type, position, rotation=rotation, user_parameters=user_parameters)
 
     def get_glyph_bounds(self, glyph_type, position, rotation=0.0, user_parameters=None):
         return self.draw_glyph(None, glyph_type, position, rotation=rotation, user_parameters=user_parameters)
