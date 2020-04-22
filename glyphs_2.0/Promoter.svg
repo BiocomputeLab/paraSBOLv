@@ -1,0 +1,41 @@
+<svg  version="1.1"
+      xmlns="http://www.w3.org/2000/svg"
+      xmlns:parametric="//parametric-svg.js.org/v1"
+      width="25"
+      height="60"
+      glyphtype="Promoter"
+      soterms="SO:0000167"
+      parametric:defaults="glyph_arrowhead_height=5;glyph_arrowhead_width=5;glyph_pad_top=0;height=60;pad_left=0;pad_right=0;pad_top=0;width=25;x=0;y=0">
+
+<rect class="bounding-box"
+      id="bounding-box"
+      parametric:x="{x}"
+      x="0"
+      parametric:y="{y}"
+      y="0"
+      parametric:width="{width}"
+      width="25"
+      parametric:height="{height}"
+      height="60"
+      style="fill:none;stroke:rgb(150,150,150);stroke-opacity:0.5;stroke-width:1pt;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:1.5,0.8"/>
+
+<path class="baseline"
+      id="baseline"
+      parametric:d="M{x},{y+(height/2)} L{x+width},{y+(height/2)}"
+      d="M0,30.0 L25,30.0"
+      parametric:y="{y+(height/2)}"
+      style="fill:none;stroke:black;stroke-width:1pt"/>
+
+<path class="unfilled-path" 
+      id="promoter-body" 
+      parametric:d="M{x+pad_left},{y+(height/2)} L{x+pad_left},{y+pad_top+glyph_pad_top+glyph_arrowhead_height} L{x+width-pad_right},{y+pad_top+glyph_pad_top+glyph_arrowhead_height}" 
+      d="M0,30.0 L0,5 L25,5" 
+      style="fill:none;stroke:black;stroke-width:1pt;stroke-linejoin:round;stroke-linecap:round" />
+
+<path class="unfilled-path" 
+      id="promoter-head" 
+      parametric:d="M{x+width-pad_right-glyph_arrowhead_width},{y+pad_top+glyph_pad_top} L{x+width-pad_right},{y+pad_top+glyph_pad_top+glyph_arrowhead_height} L{x+width-pad_right-glyph_arrowhead_width},{y+pad_top+glyph_pad_top+(glyph_arrowhead_height*2)}" 
+      d="M20,0 L25,5 L20,10" 
+      style="fill:none;stroke:black;stroke-width:1pt;stroke-linejoin:round;stroke-linecap:round" />
+
+</svg>

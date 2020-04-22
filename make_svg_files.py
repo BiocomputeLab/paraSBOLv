@@ -19,7 +19,7 @@ svg_height = 100
 
 # Default baseline start position
 baseline_x = 0
-baseline_y = 25
+baseline_y = 0
 
 # Standard styling used for major component types
 style_text = {}
@@ -107,67 +107,69 @@ def write_glyph_svg (filename, header_text, glyph_paths):
 # Functions to create list of elements for each glyph
 ###############################################################################
 
-def rbs_svg (baseline_x, baseline_y):
+def rbs_svg ():
 	params = {}
 	# General parameters
-	params['baseline_x'] = baseline_x
-	params['baseline_y'] = baseline_y
-	params['baseline_offset'] = 0
-	params['pad_before'] = 2
-	params['pad_after'] = 2
-	params['pad_top'] = 3
-	params['pad_bottom'] = 3
+	params['x'] = 0
+	params['y'] = 0
+	params['width'] = 26
+	params['height'] = 60
+	params['pad_left'] = 0
+	params['pad_right'] = 0
+	params['pad_top'] = 0
+	params['pad_bottom'] = 0
 	# RBS specific parameters
-	params['width'] = 15
+	params['glyph_pad_top'] = 12
+	#params['glyph_pad_bottom'] = 30
 	# Make the header text (SVG, bounding box, and baseline elements)
-	header_text = svg_header('RibosomeEntrySite', 'SO:0000139', parametric_defaults=params, width=svg_width, height=svg_height)
-	header_text += bounding_box('{baseline_x}', '{(baseline_y-baseline_offset)-(width/2.0)-pad_top}', '{pad_before+width+pad_after}', '{pad_top+(width/2.0)+pad_bottom}', params, style=style_text['bounding-box'])
-	header_text += baseline('{baseline_x}', '{(baseline_y-baseline_offset)}', '{baseline_x+pad_before+width+pad_after}', params, style=style_text['baseline'])
+	header_text = svg_header('RibosomeEntrySite', 'SO:0000139', parametric_defaults=params, width=params['width'], height=params['height'])
+	header_text += bounding_box('{x}', '{y}', '{width}', '{height}', params, style=style_text['bounding-box'])
+	header_text += baseline('{x}', '{y}', '{width}', params, style=style_text['baseline'])
 	# Hold the individual paths for the glyph
 	glyph_paths = []
 	# Generate the paths for the glyph and add to list of paths
 	rbs_path = {}
 	rbs_path['class'] = 'filled-path'
 	rbs_path['id'] = 'rbs'
-	rbs_path['parametric:d'] = 'M{baseline_x+pad_before},{(baseline_y-baseline_offset)} C{baseline_x+pad_before},{(baseline_y-baseline_offset)-(width/1.5)} {baseline_x+pad_before+width},{(baseline_y-baseline_offset)-(width/1.5)} {baseline_x+pad_before+width},{(baseline_y-baseline_offset)} L{baseline_x+pad_before},{(baseline_y-baseline_offset)}Z'
+	rbs_path['parametric:d'] = 'M{(x+pad_left)},{y+(height/2)} C{(x+pad_left)},{(y+pad_top)+glyph_pad_top} {x+width-pad_right},{(y+pad_top)+glyph_pad_top} {x+width-pad_right},{y+(height/2)} Z'
+	#L{baseline_x+pad_before},{(baseline_y-baseline_offset)}
 	rbs_path['d'] = eval_parameterised_path(rbs_path['parametric:d'], params)
 	rbs_path['style'] = style_text['filled-path']
 	glyph_paths.append(rbs_path)
 	return header_text, glyph_paths
 
-def promoter_svg (baseline_x=baseline_x, baseline_y=baseline_y):
+def promoter_svg ():
 	params = {}
 	# General parameters
-	params['baseline_x'] = baseline_x
-	params['baseline_y'] = baseline_y
-	params['baseline_offset'] = 0
-	params['pad_before'] = 2
-	params['pad_after'] = 2
-	params['pad_top'] = 3
-	params['pad_bottom'] = 3
+	params['x'] = 0
+	params['y'] = 0
+	params['width'] = 25
+	params['height'] = 60
+	params['pad_left'] = 0
+	params['pad_right'] = 0
+	params['pad_top'] = 0
 	# Promoter specific parameters
-	params['arrowbody_width'] = 15
-	params['arrowbody_height'] = 15
-	params['arrowhead_width'] = 4
-	params['arrowhead_height'] = 4
+	params['glyph_pad_top'] = 0
+	params['glyph_arrowhead_height'] = 5
+	params['glyph_arrowhead_width'] = 5
 	# Make the header text (SVG, bounding box, and baseline elements)
-	header_text = svg_header('Promoter', 'SO:0000167', parametric_defaults=params, width=svg_width, height=svg_height)
-	header_text += bounding_box('{baseline_x}', '{(baseline_y-baseline_offset)-arrowbody_height-arrowhead_height-pad_top}', '{pad_before+arrowbody_width+pad_after}', '{pad_top+arrowbody_height+arrowhead_height+pad_bottom}', params, style=style_text['bounding-box'])
-	header_text += baseline('{baseline_x}', '{baseline_y}', '{pad_before+arrowbody_width+pad_after}', params, style=style_text['baseline'])
+	header_text = svg_header('Promoter', 'SO:0000167', parametric_defaults=params, width=params['width'], height=params['height'])
+	header_text += bounding_box('{x}', '{y}', '{width}', '{height}', params, style=style_text['bounding-box'])
+	header_text += baseline('{x}', '{y}', '{width}', params, style=style_text['baseline'])
 	# Hold the individual paths for the glyph
 	glyph_paths = []
 	# Generate the paths for the glyph and add to list of paths
 	promoter_body_path = {}
 	promoter_body_path['class'] = 'unfilled-path'
 	promoter_body_path['id'] = 'promoter-body'
-	promoter_body_path['parametric:d'] = 'M{baseline_x+pad_before},{(baseline_y-baseline_offset)} L{baseline_x+pad_before},{(baseline_y-baseline_offset)-arrowbody_height} L{baseline_x+pad_before+arrowbody_width},{(baseline_y-baseline_offset)-arrowbody_height}'
+	promoter_body_path['parametric:d'] = 'M{x+pad_left},{y+(height/2)} L{x+pad_left},{y+pad_top+glyph_pad_top+glyph_arrowhead_height} L{x+width-pad_right},{y+pad_top+glyph_pad_top+glyph_arrowhead_height}'
 	promoter_body_path['d'] = eval_parameterised_path(promoter_body_path['parametric:d'], params)
 	promoter_body_path['style'] = style_text['unfilled-path']
 	glyph_paths.append(promoter_body_path)
 	promoter_head_path = {}
 	promoter_head_path['class'] = 'unfilled-path'
 	promoter_head_path['id'] = 'promoter-head'
-	promoter_head_path['parametric:d'] = 'M{baseline_x+pad_before+arrowbody_width-arrowhead_width},{(baseline_y-baseline_offset)-arrowbody_height-arrowhead_height} L{baseline_x+pad_before+arrowbody_width},{(baseline_y-baseline_offset)-arrowbody_height} L{baseline_x+pad_before+arrowbody_width-arrowhead_width},{(baseline_y-baseline_offset)-arrowbody_height+arrowhead_height}'
+	promoter_head_path['parametric:d'] = 'M{x+width-pad_right-glyph_arrowhead_width},{y+pad_top+glyph_pad_top} L{x+width-pad_right},{y+pad_top+glyph_pad_top+glyph_arrowhead_height} L{x+width-pad_right-glyph_arrowhead_width},{y+pad_top+glyph_pad_top+(glyph_arrowhead_height*2)}'
 	promoter_head_path['d'] = eval_parameterised_path(promoter_head_path['parametric:d'], params)
 	promoter_head_path['style'] = style_text['unfilled-path']
 	glyph_paths.append(promoter_head_path)
@@ -176,34 +178,33 @@ def promoter_svg (baseline_x=baseline_x, baseline_y=baseline_y):
 def terminator_svg (baseline_x=baseline_x, baseline_y=baseline_y):
 	params = {}
 	# General parameters
-	params['baseline_x'] = baseline_x
-	params['baseline_y'] = baseline_y
-	params['baseline_offset'] = 0
-	params['pad_before'] = 2
-	params['pad_after'] = 2
-	params['pad_top'] = 3
-	params['pad_bottom'] = 3
-	# Terminator specific parameters
-	params['body_height'] = 10
-	params['head_width'] = 8
+	params['x'] = 0
+	params['y'] = 0
+	params['width'] = 16
+	params['height'] = 60
+	params['pad_left'] = 0
+	params['pad_right'] = 0
+	params['pad_top'] = 0
+	# Promoter specific parameters
+	params['glyph_pad_top'] = 12
 	# Make the header text (SVG, bounding box, and baseline elements)
-	header_text = svg_header('Terminator', 'SO:0000141', parametric_defaults=params, width=svg_width, height=svg_height)
-	header_text += bounding_box('{baseline_x}', '{(baseline_y-baseline_offset)-body_height-pad_top}', '{pad_before+head_width+pad_after}', '{pad_top+body_height+pad_bottom}', params, style=style_text['bounding-box'])
-	header_text += baseline('{baseline_x}', '{baseline_y}', '{pad_before+head_width+pad_after}', params, style=style_text['baseline'])
+	header_text = svg_header('Terminator', 'SO:0000141', parametric_defaults=params, width=params['width'], height=params['height'])
+	header_text += bounding_box('{x}', '{y}', '{width}', '{height}', params, style=style_text['bounding-box'])
+	header_text += baseline('{x}', '{y}', '{width}', params, style=style_text['baseline'])
 	# Hold the individual paths for the glyph
 	glyph_paths = []
 	# Generate the paths for the glyph and add to list of paths
 	terminator_body_path = {}
 	terminator_body_path['class'] = 'unfilled-path'
 	terminator_body_path['id'] = 'terminator-body'
-	terminator_body_path['parametric:d'] = 'M{baseline_x+pad_before+(head_width/2.0)},{(baseline_y-baseline_offset)} L{baseline_x+pad_before+(head_width/2.0)},{(baseline_y-baseline_offset)-body_height}'
+	terminator_body_path['parametric:d'] = 'M{x+pad_left+((width-x-pad_left-pad_right)/2)},{y+(height/2)} L{x+pad_left+((width-x-pad_left-pad_right)/2)},{y+pad_top+glyph_pad_top}'
 	terminator_body_path['d'] = eval_parameterised_path(terminator_body_path['parametric:d'], params)
 	terminator_body_path['style'] = style_text['unfilled-path']
 	glyph_paths.append(terminator_body_path)
 	terminator_head_path = {}
 	terminator_head_path['class'] = 'unfilled-path'
 	terminator_head_path['id'] = 'terminator-head'
-	terminator_head_path['parametric:d'] = 'M{baseline_x+pad_before},{(baseline_y-baseline_offset)-body_height} L{baseline_x+pad_before+head_width},{(baseline_y-baseline_offset)-body_height}'
+	terminator_head_path['parametric:d'] = 'M{x+pad_left},{y+(pad_top+glyph_pad_top)} L{x+width-pad_right},{y+pad_top+glyph_pad_top}'
 	terminator_head_path['d'] = eval_parameterised_path(terminator_head_path['parametric:d'], params)
 	terminator_head_path['style'] = style_text['unfilled-path']
 	glyph_paths.append(terminator_head_path)
@@ -221,8 +222,8 @@ def cds_svg ():
 	params['pad_top'] = 0
 	params['pad_bottom'] = 0
 	# CDS specific parameters
-	params['glyph_pad_top'] = 15
-	params['glyph_pad_bottom'] = 15
+	params['glyph_pad_top'] = 16
+	params['glyph_pad_bottom'] = 16
 	params['glyph_arrowhead_length'] = 15
 	# Make the header text (SVG, bounding box, and baseline elements)
 	header_text = svg_header('CDS', 'SO:0000316', parametric_defaults=params, width=params['width'], height=params['height'])
@@ -1348,7 +1349,10 @@ OUTPUT_PREFIX_FULL = './glyphs_2.0/'
 INCLUDE_BOUNDING_BOX = True
 INCLUDE_BASELINE = True
 
-glyphs_to_process = [['CDS.svg', cds_svg]]
+glyphs_to_process = [['Terminator.svg', terminator_svg],
+                     ['Promoter.svg', promoter_svg],
+                     ['RibosomeEntrySite.svg', rbs_svg],
+                     ['CDS.svg', cds_svg]]
 
 for el in glyphs_to_process:
 	header_text, glyph_paths = el[1]()

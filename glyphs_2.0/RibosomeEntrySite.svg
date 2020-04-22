@@ -1,11 +1,11 @@
 <svg  version="1.1"
       xmlns="http://www.w3.org/2000/svg"
       xmlns:parametric="//parametric-svg.js.org/v1"
-      width="60"
+      width="26"
       height="60"
-      glyphtype="CDS"
-      soterms="SO:0000316"
-      parametric:defaults="glyph_arrowhead_length=15;glyph_pad_bottom=16;glyph_pad_top=16;height=60;pad_bottom=0;pad_left=0;pad_right=0;pad_top=0;width=60;x=0;y=0">
+      glyphtype="RibosomeEntrySite"
+      soterms="SO:0000139"
+      parametric:defaults="glyph_pad_top=12;height=60;pad_bottom=0;pad_left=0;pad_right=0;pad_top=0;width=26;x=0;y=0">
 
 <rect class="bounding-box"
       id="bounding-box"
@@ -14,7 +14,7 @@
       parametric:y="{y}"
       y="0"
       parametric:width="{width}"
-      width="60"
+      width="26"
       parametric:height="{height}"
       height="60"
       style="fill:none;stroke:rgb(150,150,150);stroke-opacity:0.5;stroke-width:1pt;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:1.5,0.8"/>
@@ -22,14 +22,14 @@
 <path class="baseline"
       id="baseline"
       parametric:d="M{x},{y+(height/2)} L{x+width},{y+(height/2)}"
-      d="M0,30.0 L60,30.0"
+      d="M0,30.0 L26,30.0"
       parametric:y="{y+(height/2)}"
       style="fill:none;stroke:black;stroke-width:1pt"/>
 
 <path class="filled-path" 
-      id="cds" 
-      parametric:d="M{(x+pad_left)},{(y+pad_top)+glyph_pad_top} L{(x+width-pad_right)-glyph_arrowhead_length},{(y+pad_top)+glyph_pad_top} L{(x+width-pad_right)},{(y+pad_top)+((height-pad_top-pad_bottom)/2)} L{(x+width-pad_right)-glyph_arrowhead_length},{(y+height-pad_bottom)-glyph_pad_bottom} L{(x+pad_left)},{(y+height-pad_bottom)-glyph_pad_bottom} Z" 
-      d="M0,16 L45,16 L60,30.0 L45,44 L0,44 Z" 
+      id="rbs" 
+      parametric:d="M{(x+pad_left)},{y+(height/2)} C{(x+pad_left)},{(y+pad_top)+glyph_pad_top} {x+width-pad_right},{(y+pad_top)+glyph_pad_top} {x+width-pad_right},{y+(height/2)} Z" 
+      d="M0,30.0 C0,12 26,12 26,30.0 Z" 
       style="fill:rgb(230,230,230);fill-rule:nonzero;stroke:black;stroke-width:1pt;stroke-linejoin:miter;stroke-linecap:butt" />
 
 </svg>
