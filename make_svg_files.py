@@ -46,7 +46,7 @@ def svg_header (glyphtype, soterms, parametric_defaults={}, width=100, height=10
 	output = ''
 	output += '<svg  version="1.1"\n'
 	output += '      xmlns="http://www.w3.org/2000/svg"\n'
-	output += '      xmlns:parametric="https://parametric-svg.github.io/v0.2"\n'
+	output += '      xmlns:parametric="//parametric-svg.js.org/v1"\n'
 	output += '      width="' + str(width) + '"\n'
 	output += '      height="' + str(height) + '"\n'
 	output += '      glyphtype="' + glyphtype + '"\n'
@@ -74,13 +74,13 @@ def bounding_box (x, y, width, height, params, style=style_text['bounding-box'])
 
 def baseline (x, y, width, params, style=style_text['baseline']):
 	if INCLUDE_BASELINE:
-		svg_str = 'M' + x + ',' + y + ' L' + width + ',' + y 
+		svg_str = 'M{x},{y+(height/2)} L{x+width},{y+(height/2)}'
 		output = ''
 		output += '<path class="baseline"\n'
 		output += '      id="baseline"\n'
 		output += '      parametric:d="' + svg_str + '"\n'
 		output += '      d="' + eval_parameterised_path(svg_str, params) + '"\n'
-		output += '      parametric:y="' + '{baseline_y}' + '"\n'
+		output += '      parametric:y="' + '{y+(height/2)}' + '"\n'
 		output += '      style="' + style + '"/>\n'
 		return output
 	else:
@@ -209,32 +209,32 @@ def terminator_svg (baseline_x=baseline_x, baseline_y=baseline_y):
 	glyph_paths.append(terminator_head_path)
 	return header_text, glyph_paths
 
-def cds_svg (baseline_x=baseline_x, baseline_y=baseline_y):
+def cds_svg ():
 	params = {}
 	# General parameters
-	params['baseline_x'] = baseline_x
-	params['baseline_y'] = baseline_y
-	params['baseline_offset'] = 0
-	params['pad_before'] = 2
-	params['pad_after'] = 2
-	params['pad_top'] = 3
-	params['pad_bottom'] = 3
+	params['x'] = 0
+	params['y'] = 0
+	params['width'] = 60
+	params['height'] = 60
+	params['pad_left'] = 0
+	params['pad_right'] = 0
+	params['pad_top'] = 0
+	params['pad_bottom'] = 0
 	# CDS specific parameters
-	params['arrowbody_width'] = 30
-	params['arrowbody_height'] = 7.5
-	params['arrowhead_width'] = 6
-	params['arrowhead_height'] = 0
+	params['glyph_pad_top'] = 15
+	params['glyph_pad_bottom'] = 15
+	params['glyph_arrowhead_length'] = 15
 	# Make the header text (SVG, bounding box, and baseline elements)
-	header_text = svg_header('CDS', 'SO:0000316', parametric_defaults=params, width=svg_width, height=svg_height)
-	header_text += bounding_box('{baseline_x}', '{(baseline_y-baseline_offset)-arrowbody_height-arrowhead_height-pad_top}', '{pad_before+arrowbody_width+pad_after}', '{pad_top+(arrowbody_height*2.0)+(arrowhead_height*2.0)+pad_bottom}', params, style=style_text['bounding-box'])
-	header_text += baseline('{baseline_x}', '{baseline_y}', '{pad_before+arrowbody_width+pad_after}', params, style=style_text['baseline'])
+	header_text = svg_header('CDS', 'SO:0000316', parametric_defaults=params, width=params['width'], height=params['height'])
+	header_text += bounding_box('{x}', '{y}', '{width}', '{height}', params, style=style_text['bounding-box'])
+	header_text += baseline('{x}', '{y}', '{width}', params, style=style_text['baseline'])
 	# Hold the individual paths for the glyph
 	glyph_paths = []
 	# Generate the paths for the glyph and add to list of paths
 	cds_path = {}
 	cds_path['class'] = 'filled-path'
 	cds_path['id'] = 'cds'
-	cds_path['parametric:d'] = 'M{baseline_x+pad_before},{(baseline_y-baseline_offset)} L{baseline_x+pad_before},{(baseline_y-baseline_offset)-arrowbody_height} L{baseline_x+pad_before+arrowbody_width-arrowhead_width},{(baseline_y-baseline_offset)-arrowbody_height} L{baseline_x+pad_before+arrowbody_width-arrowhead_width},{(baseline_y-baseline_offset)-arrowbody_height-arrowhead_height} L{baseline_x+pad_before+arrowbody_width},{(baseline_y-baseline_offset)} L{baseline_x+pad_before+arrowbody_width-arrowhead_width},{(baseline_y-baseline_offset)+arrowbody_height+arrowhead_height} L{baseline_x+pad_before+arrowbody_width-arrowhead_width},{(baseline_y-baseline_offset)+arrowbody_height} L{baseline_x+pad_before},{(baseline_y-baseline_offset)+arrowbody_height} Z'
+	cds_path['parametric:d'] = 'M{(x+pad_left)},{(y+pad_top)+glyph_pad_top} L{(x+width-pad_right)-glyph_arrowhead_length},{(y+pad_top)+glyph_pad_top} L{(x+width-pad_right)},{(y+pad_top)+((height-pad_top-pad_bottom)/2)} L{(x+width-pad_right)-glyph_arrowhead_length},{(y+height-pad_bottom)-glyph_pad_bottom} L{(x+pad_left)},{(y+height-pad_bottom)-glyph_pad_bottom} Z'
 	cds_path['d'] = eval_parameterised_path(cds_path['parametric:d'], params)
 	cds_path['style'] = style_text['filled-path']
 	glyph_paths.append(cds_path)
@@ -1344,9 +1344,12 @@ glyphs_to_process = [
 	['Composite.svg', composite_svg]]
 
 # Final glyphs saved here with details (e.g. baseline and bounding box)
-OUTPUT_PREFIX_FULL = './glyphs/'
+OUTPUT_PREFIX_FULL = './glyphs_2.0/'
 INCLUDE_BOUNDING_BOX = True
 INCLUDE_BASELINE = True
+
+glyphs_to_process = [['CDS.svg', cds_svg]]
+
 for el in glyphs_to_process:
-	header_text, glyph_paths = el[1](baseline_x, baseline_y)
+	header_text, glyph_paths = el[1]()
 	write_glyph_svg(OUTPUT_PREFIX_FULL+el[0], header_text, glyph_paths)
