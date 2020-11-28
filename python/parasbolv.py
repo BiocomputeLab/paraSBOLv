@@ -36,6 +36,7 @@ class GlyphRenderer:
         # Convert an unknown value into the correct type
         converted_val = None
         if val.startswith('rgba'):
+            # Convert RGBA value from 8-bit to arithmetic
             c_els = val[5:-1].split(',')
             r_val = float(c_els[0])/255.0
             g_val = float(c_els[1])/255.0
@@ -43,12 +44,14 @@ class GlyphRenderer:
             a_val = float(c_els[3])
             converted_val = (r_val, g_val, b_val)
         elif val.startswith('rgb'):
+            # Convert RGB value from 8-bit to arithmetic
             c_els = val[4:-1].split(',')
             r_val = float(c_els[0])/255.0
             g_val = float(c_els[1])/255.0
             b_val = float(c_els[2])/255.0
             converted_val = (r_val, g_val, b_val)
         elif val.endswith('pt'):
+            # Convert to float, omitting 'pt' unit
             try:
                 converted_val = float(val[:-2])
             except ValueError:
@@ -65,8 +68,9 @@ class GlyphRenderer:
         style_data = {}
         style_els = style_text.split(';')
         for el in style_els:
-            key_val = [x.strip() for x in el.split(':')]
+            key_val = [x.strip() for x in el.split(':')] # Convert style element into list
             if key_val[0] in self.svg2mpl_style_map.keys():
+                # Create new key-value pair with processed value
                 style_data[self.svg2mpl_style_map[key_val[0]]] = self.__process_unknown_val(key_val[1])
         return style_data
 
@@ -117,8 +121,10 @@ class GlyphRenderer:
         for v_idx in range(np.size(path.vertices, 0)):
             cur_vert = path.vertices[v_idx]
             new_codes.append(path.codes[v_idx])
+            # Assign x and flipped y of origin in accordance with matplotlib default orientation
             org_x = cur_vert[0]
             org_flipped_y = baseline_y-(cur_vert[1]-baseline_y)
+            # Rotate using trig functions
             rot_x = org_x * np.cos(rotation) - org_flipped_y * np.sin(rotation)
             rot_y = org_x * np.sin(rotation) + org_flipped_y * np.cos(rotation)
             final_x = rot_x+position[0]
@@ -133,6 +139,7 @@ class GlyphRenderer:
         y_min = None
         y_max = None
         for p in paths:
+            # Find min and max x/y values of all vertices
             xs = p[0].vertices[:, 0]
             ys = p[0].vertices[:, 1]
             cur_x_min = np.min(xs)
@@ -240,6 +247,7 @@ def __find_bound_of_bounds (bounds_list):
     y_min = bounds_list[0][0][1]
     x_max = bounds_list[0][1][0]
     y_max = bounds_list[0][1][1]
+    # Find min and max x/y values
     for b in bounds_list:
         if b[0][0] < x_min:
             x_min = b[0][0]
@@ -252,6 +260,7 @@ def __find_bound_of_bounds (bounds_list):
     return [(x_min, y_min), (x_max, y_max)]
 
 def render_part_list (part_list, glyph_path='glyphs/', padding=0.2):
+    # Render multiple glyphs
     renderer = GlyphRenderer(glyph_path=glyph_path)
     fig, ax = plt.subplots()
     ax.set_aspect('equal')
@@ -263,6 +272,7 @@ def render_part_list (part_list, glyph_path='glyphs/', padding=0.2):
     start_position = part_position
     bounds_list = []
     for part in part_list:
+        # Draw and find bounds of each glyph
         bounds, part_position = renderer.draw_glyph(ax, part[0], part_position, user_parameters=part[1], user_style=part[2])
         bounds_list.append(bounds)
     # Automatically find bounds for plot and resize axes
