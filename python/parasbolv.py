@@ -16,6 +16,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
 import matplotlib.patches as patches
+import matplotlib.font_manager as font_manager
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>'
 __license__ = 'MIT'
@@ -36,6 +37,7 @@ class GlyphRenderer:
         # Convert an unknown value into the correct type
         converted_val = None
         if val.startswith('rgba'):
+            # Convert RGBA value from 8-bit to arithmetic
             c_els = val[5:-1].split(',')
             r_val = float(c_els[0])/255.0
             g_val = float(c_els[1])/255.0
@@ -43,12 +45,14 @@ class GlyphRenderer:
             a_val = float(c_els[3])
             converted_val = (r_val, g_val, b_val)
         elif val.startswith('rgb'):
+            # Convert RGB value from 8-bit to arithmetic
             c_els = val[4:-1].split(',')
             r_val = float(c_els[0])/255.0
             g_val = float(c_els[1])/255.0
             b_val = float(c_els[2])/255.0
             converted_val = (r_val, g_val, b_val)
         elif val.endswith('pt'):
+            # Convert to float, omitting 'pt' unit
             try:
                 converted_val = float(val[:-2])
             except ValueError:
@@ -65,8 +69,9 @@ class GlyphRenderer:
         style_data = {}
         style_els = style_text.split(';')
         for el in style_els:
-            key_val = [x.strip() for x in el.split(':')]
+            key_val = [x.strip() for x in el.split(':')] # Convert style element into list
             if key_val[0] in self.svg2mpl_style_map.keys():
+                # Create new key-value pair with processed value
                 style_data[self.svg2mpl_style_map[key_val[0]]] = self.__process_unknown_val(key_val[1])
         return style_data
 
@@ -117,8 +122,10 @@ class GlyphRenderer:
         for v_idx in range(np.size(path.vertices, 0)):
             cur_vert = path.vertices[v_idx]
             new_codes.append(path.codes[v_idx])
+            # Assign x and flipped y of origin in accordance with matplotlib default orientation
             org_x = cur_vert[0]
             org_flipped_y = baseline_y-(cur_vert[1]-baseline_y)
+            # Rotate using trig functions
             rot_x = org_x * np.cos(rotation) - org_flipped_y * np.sin(rotation)
             rot_y = org_x * np.sin(rotation) + org_flipped_y * np.cos(rotation)
             final_x = rot_x+position[0]
@@ -133,6 +140,7 @@ class GlyphRenderer:
         y_min = None
         y_max = None
         for p in paths:
+            # Find min and max x/y values of all vertices
             xs = p[0].vertices[:, 0]
             ys = p[0].vertices[:, 1]
             cur_x_min = np.min(xs)
@@ -184,7 +192,12 @@ class GlyphRenderer:
         glyph = self.glyphs_library[glyph_type]
         merged_parameters = glyph['defaults'].copy()
         if user_parameters is not None:
-            # Collate parameters (user parameters take priority) 
+            # Find label
+            label = None
+            if 'label' in user_parameters:
+                label = user_parameters['label']
+                user_parameters.pop('label') #Needed? or remove?
+            # Collate parameters (user parameters take priority)
             for key in user_parameters.keys():
                 merged_parameters[key] = user_parameters[key]
         paths_to_draw = []
@@ -208,7 +221,51 @@ class GlyphRenderer:
             patch = patches.PathPatch(y_flipped_path, **path[1])
             if ax is not None:
                 ax.add_patch(patch)
+        if label is not None:
+            # Draw label
+            ax.text(**self.process_label_params(label, all_y_flipped_paths), ha='center', va='center')
         return self.__bounds_from_paths_to_draw(all_y_flipped_paths), self.get_baseline_end(glyph_type, position, rotation=rotation, user_parameters=user_parameters)
+
+    def process_label_params(self, label, all_y_flipped_paths):
+        color = (0,0,0)
+        xy_skew = (0,0)
+        finalfont = font_manager.FontProperties()
+        # Collate parameters (user parameters take priority)
+        if 'color' in label:
+            color = label['color']
+        if 'xy_skew' in label:
+            xy_skew = label['xy_skew']
+        if 'userfont' in label:
+            finalfont = font_manager.FontProperties(**label['userfont'])        
+        all_path_vertices = []
+        for path in all_y_flipped_paths:
+            # Find vertices of each path
+            path_vertices = path[0].vertices.copy()
+            all_path_vertices.append(path_vertices)
+        textpos_x, textpos_y = self.calculate_centroid_of_paths(all_path_vertices, xy_skew)
+        return {'x':textpos_x, 'y':textpos_y, 's':label['text'], 'color':color, 'fontproperties':finalfont}
+
+    def calculate_centroid_of_paths(self, all_path_vertices, xy_skew):
+        vertices = []
+        if len(all_path_vertices) == 1:
+            vertices = all_path_vertices[0]
+        else:
+            vertices_to_array = []
+            for path_vertices in all_path_vertices:
+                # Find centroid of each path
+                length = path_vertices.shape[0]
+                sum_x = np.sum(path_vertices[:, 0])
+                sum_y = np.sum(path_vertices[:, 1])
+                vertices_to_array.append([sum_x/length, sum_y/length])
+            vertices = np.array(vertices_to_array)            
+        # Find centroid of single path/centroid of multiple centroids
+        length = vertices.shape[0]
+        sum_x = np.sum(vertices[:, 0])
+        sum_y = np.sum(vertices[:, 1])
+        # Collate original and relative values
+        textpos_x = xy_skew[0] + sum_x/length
+        textpos_y = xy_skew[1] + sum_y/length
+        return textpos_x, textpos_y
 
     def get_glyph_bounds(self, glyph_type, position, rotation=0.0, user_parameters=None):
         return self.draw_glyph(None, glyph_type, position, rotation=rotation, user_parameters=user_parameters)
@@ -240,6 +297,7 @@ def __find_bound_of_bounds (bounds_list):
     y_min = bounds_list[0][0][1]
     x_max = bounds_list[0][1][0]
     y_max = bounds_list[0][1][1]
+    # Find min and max x/y values
     for b in bounds_list:
         if b[0][0] < x_min:
             x_min = b[0][0]
@@ -252,6 +310,7 @@ def __find_bound_of_bounds (bounds_list):
     return [(x_min, y_min), (x_max, y_max)]
 
 def render_part_list (part_list, glyph_path='glyphs/', padding=0.2):
+    # Render multiple glyphs
     renderer = GlyphRenderer(glyph_path=glyph_path)
     fig, ax = plt.subplots()
     ax.set_aspect('equal')
@@ -263,6 +322,7 @@ def render_part_list (part_list, glyph_path='glyphs/', padding=0.2):
     start_position = part_position
     bounds_list = []
     for part in part_list:
+        # Draw and find bounds of each glyph
         bounds, part_position = renderer.draw_glyph(ax, part[0], part_position, user_parameters=part[1], user_style=part[2])
         bounds_list.append(bounds)
     # Automatically find bounds for plot and resize axes
