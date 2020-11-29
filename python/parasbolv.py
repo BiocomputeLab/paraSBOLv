@@ -16,6 +16,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
 import matplotlib.patches as patches
+import matplotlib.font_manager as font_manager
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>'
 __license__ = 'MIT'
@@ -191,7 +192,12 @@ class GlyphRenderer:
         glyph = self.glyphs_library[glyph_type]
         merged_parameters = glyph['defaults'].copy()
         if user_parameters is not None:
-            # Collate parameters (user parameters take priority) 
+            # Find label
+            label = None
+            if 'label' in user_parameters:
+                label = user_parameters['label']
+                user_parameters.pop('label') #Needed? or remove?
+            # Collate parameters (user parameters take priority)
             for key in user_parameters.keys():
                 merged_parameters[key] = user_parameters[key]
         paths_to_draw = []
@@ -215,7 +221,51 @@ class GlyphRenderer:
             patch = patches.PathPatch(y_flipped_path, **path[1])
             if ax is not None:
                 ax.add_patch(patch)
+        if label is not None:
+            # Draw label
+            ax.text(**self.process_label_params(label, all_y_flipped_paths), ha='center', va='center')
         return self.__bounds_from_paths_to_draw(all_y_flipped_paths), self.get_baseline_end(glyph_type, position, rotation=rotation, user_parameters=user_parameters)
+
+    def process_label_params(self, label, all_y_flipped_paths):
+        color = (0,0,0)
+        xy_relative_pos = (0,0)
+        finalfont = font_manager.FontProperties()
+        # Collate parameters (user parameters take priority)
+        if 'color' in label:
+            color = label['color']
+        if 'xy_relative_pos' in label:
+            xy_relative_pos = label['xy_relative_pos']
+        if 'userfont' in label:
+            finalfont = font_manager.FontProperties(**label['userfont'])        
+        all_path_vertices = []
+        for path in all_y_flipped_paths:
+            # Find vertices of each path
+            path_vertices = path[0].vertices.copy()
+            all_path_vertices.append(path_vertices)
+        textpos_x, textpos_y = self.calculate_centroid_of_paths(all_path_vertices, xy_relative_pos)
+        return {'x':textpos_x, 'y':textpos_y, 's':label['text'], 'color':color, 'fontproperties':finalfont}
+
+    def calculate_centroid_of_paths(self, all_path_vertices, xy_relative_pos):
+        vertices = []
+        if len(all_path_vertices) == 1:
+            vertices = all_path_vertices[0]
+        else:
+            vertices_to_array = []
+            for path_vertices in all_path_vertices:
+                # Find centroid of each path
+                length = path_vertices.shape[0]
+                sum_x = np.sum(path_vertices[:, 0])
+                sum_y = np.sum(path_vertices[:, 1])
+                vertices_to_array.append([sum_x/length, sum_y/length])
+            vertices = np.array(vertices_to_array)            
+        # Find centroid of single path/centroid of multiple centroids
+        length = vertices.shape[0]
+        sum_x = np.sum(vertices[:, 0])
+        sum_y = np.sum(vertices[:, 1])
+        # Collate original and relative values
+        textpos_x = xy_relative_pos[0] + sum_x/length
+        textpos_y = xy_relative_pos[1] + sum_y/length
+        return textpos_x, textpos_y
 
     def get_glyph_bounds(self, glyph_type, position, rotation=0.0, user_parameters=None):
         return self.draw_glyph(None, glyph_type, position, rotation=rotation, user_parameters=user_parameters)
