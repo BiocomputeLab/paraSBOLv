@@ -33,7 +33,7 @@ user_parameters['label'] = {'text':'gene',
 }
 renderer.draw_glyph(ax, 'CDS', (55, 60), user_parameters=user_parameters, user_style=cds_style)
 
-# Draw a skewed label
+# Draw skewed labels
 dnalocation_style = {}
 dnalocation_style['location-top-path'] = {'facecolor': (1,0,0), 'edgecolor': (0,0,0), 'linewidth': 3}
 user_parameters['label'] = {'text':'label',
