@@ -196,7 +196,6 @@ class GlyphRenderer:
             label = None
             if 'label' in user_parameters:
                 label = user_parameters['label']
-                user_parameters.pop('label') #Needed? or remove?
             # Collate parameters (user parameters take priority)
             for key in user_parameters.keys():
                 merged_parameters[key] = user_parameters[key]
