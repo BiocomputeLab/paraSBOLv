@@ -12,6 +12,7 @@ import os
 import glob
 import xml.etree.ElementTree as ET
 import re
+from math import cos, sin, pi
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.path import Path
@@ -220,9 +221,10 @@ class GlyphRenderer:
             patch = patches.PathPatch(y_flipped_path, **path[1])
             if ax is not None:
                 ax.add_patch(patch)
-        if label is not None:
-            # Draw label
-            ax.text(**self.process_label_params(label, all_y_flipped_paths), ha='center', va='center')
+        if user_parameters is not None:
+            if label is not None:
+                # Draw label
+                ax.text(**self.process_label_params(label, all_y_flipped_paths), ha='center', va='center')
         return self.__bounds_from_paths_to_draw(all_y_flipped_paths), self.get_baseline_end(glyph_type, position, rotation=rotation, user_parameters=user_parameters)
 
     def process_label_params(self, label, all_y_flipped_paths):
@@ -290,6 +292,183 @@ class GlyphRenderer:
         else:
             return None
 
+    def process_interaction_params(self, sending_params, receiving_params):
+        # Collate parameters from both interaction ends to return combined parameters
+        # For parameters applied to both ends, the 'receiving' end takes priority
+        default_parameters = {'color': (0,0,0),
+                              'heightskew': 0,
+                              'headheight': 2,
+                              'headwidth': 2,
+                              'z_priority': 0,
+                              'linewidth': 1,
+                              'sending_xy_skew': (0,0),
+                              'receiving_xy_skew': (0,0)}
+        if sending_params is None or receiving_params is None:
+            if sending_params is None and receiving_params is not None:
+                # Complete and return receiving parameters
+                for key in default_parameters:
+                    if key not in receiving_params:
+                        receiving_params[key] = default_parameters[key]
+                if 'xy_skew' in receiving_params:
+                    receiving_params['sending_xy_skew'] = receiving_params['xy_skew']
+                return receiving_params
+            if sending_params is not None and receiving_params is None:
+                # Complete and return sending parameters
+                for key in default_parameters:
+                    if key not in sending_params:
+                        sending_params[key] = default_parameters[key]
+                if 'xy_skew' in sending_params:
+                    sending_params['sending_xy_skew'] = receiving_params['xy_skew']                
+                return sending_params
+            else:
+                return None
+        else:
+            parameters = default_parameters.copy()
+            for key in sending_params:
+                if key in default_parameters:
+                    parameters[key] = sending_params[key]
+            for key in receiving_params:
+                if key in default_parameters:
+                    parameters[key] = receiving_params[key]
+            # xy_skew is the only parameter accepted seperately
+            if 'xy_skew' in sending_params:
+                parameters['sending_xy_skew'] = sending_params['xy_skew']
+            if 'xy_skew' in receiving_params:
+                parameters['receiving_xy_skew'] = receiving_params['xy_skew']
+            if 'z_priority' in parameters:
+                # Amplify z_priority to ensure all interaction components can be grouped on Z axis
+                parameters['z_priority'] *= 100
+            return parameters
+
+    def draw_interaction(self, ax, sending_bounds, receiving_bounds, interaction_type, parameters):
+        # Assign pad height
+        y_pad = (sending_bounds[1][1] / 2) + parameters['heightskew']
+        if receiving_bounds[1][1] > sending_bounds[1][1]:
+            y_pad = (receiving_bounds[1][1] / 2) + parameters['heightskew']
+        # Find interaction origin and endpoint
+        int_origin_x = sending_bounds[0][0] + abs((sending_bounds[1][0] - sending_bounds[0][0]) / 2) + parameters['sending_xy_skew'][0]
+        int_origin_y = sending_bounds[1][1] + y_pad / 3 + parameters['sending_xy_skew'][1]
+        int_end_x = receiving_bounds[0][0] + abs((receiving_bounds[1][0] - receiving_bounds[0][0]) / 2) + parameters['receiving_xy_skew'][0]
+        int_end_y = receiving_bounds[1][1] + y_pad + parameters['receiving_xy_skew'][1]
+        # Determine max height
+        max_height = int_origin_y + y_pad
+        if int_end_y > int_origin_y:
+            max_height = int_end_y + y_pad
+        # Draw headless interaction with slightly lower z priority than head to prevent visual overlapping
+        plt.plot([int_origin_x,
+                  int_origin_x,
+                  int_end_x,
+                  int_end_x],
+                 [int_origin_y,
+                  max_height,
+                  max_height,
+                  int_end_y],
+                 color = parameters['color'],
+                 lw = parameters['linewidth'],
+                 zorder = parameters['z_priority'] - 5)
+        # Draw head
+        if interaction_type == 'control':
+            plt.plot([int_end_x,
+                      int_end_x + parameters['headwidth']/2,
+                      int_end_x,
+                      int_end_x - parameters['headwidth']/2,
+                      int_end_x],
+                     [int_end_y,
+                      int_end_y - parameters['headheight']/2,
+                      int_end_y - parameters['headheight'],
+                      int_end_y - parameters['headheight']/2,
+                      int_end_y],
+                     color = parameters['color'],
+                     lw = parameters['linewidth'],
+                     zorder = parameters['z_priority'])
+        elif interaction_type == 'degradation':
+            # Plot arrow
+            path = Path([[int_end_x, int_end_y],
+                         [int_end_x + parameters['headwidth']/2, int_end_y],
+                         [int_end_x, int_end_y - parameters['headheight']],
+                         [int_end_x - parameters['headwidth']/2, int_end_y],
+                         [int_end_x, int_end_y]],
+                         [1,2,2,2,2])
+            patch = patches.PathPatch(path,
+                                      facecolor=parameters['color'],
+                                      edgecolor = parameters['color'],
+                                      lw = parameters['linewidth'],
+                                      zorder = parameters['z_priority'])
+            ax.add_patch(patch)
+            # Plot circle
+            circle_origin_y = int_end_y - parameters['headheight'] * 2
+            r = parameters['headwidth'] / 2
+            patch = patches.Circle((int_end_x, circle_origin_y),
+                                   radius = r,
+                                   facecolor='white',
+                                   edgecolor = parameters['color'],
+                                   lw = parameters['linewidth'],
+                                   zorder = parameters['z_priority'])
+            ax.add_patch(patch)
+            # Plot line within circle
+            deg315 = 315 * pi / 180
+            deg225 = 225 * pi / 180
+            x1 = int_end_x + (r * cos(deg315))
+            y1 = circle_origin_y + (r * cos(deg315))
+            x2 = int_end_x + (r * cos(deg225))
+            y2 = circle_origin_y + (r * cos(deg225))
+            plt.plot([x1, x2],
+                     [y1, y2],
+                     color = parameters['color'],
+                     lw = parameters['linewidth'],
+                     zorder = parameters['z_priority'] + 500)
+        elif interaction_type == 'inhibition':
+            plt.plot([int_end_x - parameters['headwidth'] / 2,
+                      int_end_x + parameters['headwidth'] / 2],
+                     [int_end_y,
+                      int_end_y],
+                      color = parameters['color'],
+                      lw = parameters['linewidth'],
+                      zorder = parameters['z_priority'])
+        elif interaction_type == 'process':
+            path = Path([[int_end_x, int_end_y],
+                         [int_end_x + parameters['headwidth']/2, int_end_y],
+                         [int_end_x, int_end_y - parameters['headheight']],
+                         [int_end_x - parameters['headwidth']/2, int_end_y],
+                         [int_end_x, int_end_y]],
+                         [1,2,2,2,2])
+            patch = patches.PathPatch(path,
+                                      facecolor=parameters['color'],
+                                      edgecolor = parameters['color'],
+                                      lw = parameters['linewidth'],
+                                      zorder = parameters['z_priority'])
+            ax.add_patch(patch)
+        elif interaction_type == 'stimulation':
+            path = Path([[int_end_x, int_end_y],
+                         [int_end_x + parameters['headwidth']/2, int_end_y],
+                         [int_end_x, int_end_y - parameters['headheight']],
+                         [int_end_x - parameters['headwidth']/2, int_end_y],
+                         [int_end_x, int_end_y]],
+                         [1,2,2,2,2])
+            patch = patches.PathPatch(path,
+                                      facecolor='white',
+                                      edgecolor = parameters['color'],
+                                      lw = parameters['linewidth'],
+                                      zorder = parameters['z_priority'])
+            ax.add_patch(patch)
+        # Find bounds of interaction
+        minimum_y = int_origin_y - parameters['headheight'] 
+        if int_origin_y > int_end_y:
+            minimum_y = int_end_y - parameters['headheight']
+        if interaction_type == 'degradation':
+            # Degradation has smaller y-min
+            minimum_y -= (parameters['headheight'] + parameters['headwidth'] / 2)
+        # Assign the bounds
+        top_right_bound = (int_origin_x, max_height)
+        bottom_left_bound = (int_end_x - parameters['headwidth'], minimum_y)
+        if int_end_x > int_origin_x:
+            # Reassign bound corners if interaction end comes after its start
+            top_right_bound = (int_end_x + parameters['headwidth'], max_height)
+            bottom_left_bound = (int_origin_x - parameters['headwidth'], minimum_y)
+        return (bottom_left_bound, top_right_bound)
+            
+
+
 def __find_bound_of_bounds (bounds_list):
     # Set initial guess
     x_min = bounds_list[0][0][0]
@@ -320,10 +499,51 @@ def render_part_list (part_list, glyph_path='glyphs/', padding=0.2):
     part_position = (0, 0)
     start_position = part_position
     bounds_list = []
+    interaction_pairs = {}
     for part in part_list:
         # Draw and find bounds of each glyph
         bounds, part_position = renderer.draw_glyph(ax, part[0], part_position, user_parameters=part[1], user_style=part[2])
         bounds_list.append(bounds)
+        if part[3] is not None:
+            # Find interaction pairs
+            interaction = part[3]
+            if 'interaction_type' in interaction and 'interaction_key' in interaction and 'interaction_direction' in interaction:
+                if 'interaction_parameters' not in interaction:
+                    # Check for interaction parameters
+                    interaction['interaction_parameters'] = None
+                if interaction['interaction_key'] not in interaction_pairs:
+                    # Create list for new interaction key
+                    interaction_pairs[interaction['interaction_key']] = {'send': [], 'receive': []}
+                # Pair interaction with its corresponding key
+                key_dict = interaction_pairs[interaction['interaction_key']]
+                key_dict[interaction['interaction_direction']].append([(bounds[0],bounds[1]),
+                                                                      interaction['interaction_parameters'],
+                                                                      interaction['interaction_direction']])
+                if interaction['interaction_key'] in interaction_pairs:
+                    # Determine direction of the interaction
+                    if interaction['interaction_direction'] == 'send':
+                        # Draw interaction(s)
+                        for recipient in interaction_pairs[interaction['interaction_key']]['receive']:
+                            receiving_bounds = recipient[0]
+                            interaction_parameters = renderer.process_interaction_params(interaction['interaction_parameters'], recipient[1])
+                            bounds = renderer.draw_interaction(ax,
+                                                               bounds,
+                                                               receiving_bounds,
+                                                               interaction['interaction_type'],
+                                                               interaction_parameters)
+                            bounds_list.append(bounds)
+                    elif interaction['interaction_direction'] == 'receive':
+                        # Draw interaction(s)
+                        for sender in interaction_pairs[interaction['interaction_key']]['send']:
+                            sending_bounds = sender[0]
+                            interaction_parameters = renderer.process_interaction_params(sender[1], interaction['interaction_parameters'])
+                            bounds = renderer.draw_interaction(ax,
+                                                               sending_bounds,
+                                                               bounds,
+                                                               interaction['interaction_type'],
+                                                               interaction_parameters)
+                            bounds_list.append(bounds)
+
     # Automatically find bounds for plot and resize axes
     final_bounds = __find_bound_of_bounds(bounds_list)
     width = (final_bounds[1][0] - final_bounds[0][0])/60.0
