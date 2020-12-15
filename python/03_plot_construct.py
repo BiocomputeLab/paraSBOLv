@@ -14,17 +14,28 @@ __version__ = '1.0'
 part_list = []
 part_list.append( ['CDS', 
                    {'arrowbody_width': 20, 'arrowbody_height': 5, 'arrowhead_height': 0, 'arrowhead_width': 5}, 
-                   {'cds': {'facecolor': (0.5,0.5,0.5), 'edgecolor': (1,0,0), 'linewidth': 2}}
+                   {'cds': {'facecolor': (0.5,0.5,0.5), 'edgecolor': (1,0,0), 'linewidth': 2}},
+                   {'interaction_type':'inhibition',
+                    'interaction_key':'key1',
+                    'interaction_direction':'send'
+                   }
                   ] )
 part_list.append( ['CDS', 
                    {'arrowbody_width': 40, 'arrowbody_height': 5, 'arrowhead_height': 2, 'arrowhead_width': 10}, 
-                   {'cds': {'facecolor': (1,1,1), 'edgecolor': (0,0,1), 'linewidth': 2}}
+                   {'cds': {'facecolor': (1,1,1), 'edgecolor': (0,0,1), 'linewidth': 2}},
+                   None,
                   ] )
 part_list.append( ['CDS', 
-                   None, 
-                   None
+                   None,
+                   None,
+                   {'interaction_type':'inhibition',
+                    'interaction_key':'key1',
+                    'interaction_direction':'receive',
+                    'interaction_parameters': {'color': (1,0,0),
+                                               'headwidth': 6}
+                   }
                   ] )
 fig, ax, baseline_start, baseline_end = psv.render_part_list(part_list,glyph_path='../glyphs/', padding=0.2)
 ax.plot([baseline_start[0], baseline_end[0]], [baseline_start[1], baseline_end[1]], color=(0,0,0), linewidth=1.5, zorder=0)
 fig.savefig('03_plot_construct.pdf', transparent=True, dpi=300)
-plt.close('all')
+plt.show()
