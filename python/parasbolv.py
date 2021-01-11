@@ -376,7 +376,7 @@ def draw_interaction (ax, sending_bounds, receiving_bounds, interaction_type, pa
                   int_end_y],
                  color = parameters['color'],
                  lw = parameters['linewidth'],
-                 zorder = parameters['z_priority'] - 5) # Slightly lower zorder than head to prevent overlap
+                 zorder = parameters['zorder'] - 5) # Slightly lower zorder than head to prevent overlap
         # Draw head
         if interaction_type == 'control':
             plt.plot([int_end_x,
@@ -391,7 +391,7 @@ def draw_interaction (ax, sending_bounds, receiving_bounds, interaction_type, pa
                       int_end_y],
                      color = parameters['color'],
                      lw = parameters['linewidth'],
-                     zorder = parameters['z_priority'])
+                     zorder = parameters['zorder'])
         elif interaction_type == 'degradation':
             # Plot arrow
             path = Path([[int_end_x, int_end_y],
@@ -404,7 +404,7 @@ def draw_interaction (ax, sending_bounds, receiving_bounds, interaction_type, pa
                                       facecolor=parameters['color'],
                                       edgecolor = parameters['color'],
                                       lw = parameters['linewidth'],
-                                      zorder = parameters['z_priority'])
+                                      zorder = parameters['zorder'])
             ax.add_patch(patch)
             # Plot circle
             circle_origin_y = int_end_y - parameters['headheight'] * 2
@@ -414,7 +414,7 @@ def draw_interaction (ax, sending_bounds, receiving_bounds, interaction_type, pa
                                    facecolor='white',
                                    edgecolor = parameters['color'],
                                    lw = parameters['linewidth'],
-                                   zorder = parameters['z_priority'])
+                                   zorder = parameters['zorder'])
             ax.add_patch(patch)
             # Plot line within circle
             deg315 = 315 * pi / 180
@@ -427,7 +427,7 @@ def draw_interaction (ax, sending_bounds, receiving_bounds, interaction_type, pa
                      [y1, y2],
                      color = parameters['color'],
                      lw = parameters['linewidth'],
-                     zorder = parameters['z_priority'] + 500)
+                     zorder = parameters['zorder'] + 500)
         elif interaction_type == 'inhibition':
             plt.plot([int_end_x - parameters['headwidth'] / 2,
                       int_end_x + parameters['headwidth'] / 2],
@@ -435,7 +435,7 @@ def draw_interaction (ax, sending_bounds, receiving_bounds, interaction_type, pa
                       int_end_y],
                       color = parameters['color'],
                       lw = parameters['linewidth'],
-                      zorder = parameters['z_priority'])
+                      zorder = parameters['zorder'])
         elif interaction_type == 'process':
             path = Path([[int_end_x, int_end_y],
                          [int_end_x + parameters['headwidth']/2, int_end_y],
@@ -447,7 +447,7 @@ def draw_interaction (ax, sending_bounds, receiving_bounds, interaction_type, pa
                                       facecolor=parameters['color'],
                                       edgecolor = parameters['color'],
                                       lw = parameters['linewidth'],
-                                      zorder = parameters['z_priority'])
+                                      zorder = parameters['zorder'])
             ax.add_patch(patch)
         elif interaction_type == 'stimulation':
             path = Path([[int_end_x, int_end_y],
@@ -460,7 +460,7 @@ def draw_interaction (ax, sending_bounds, receiving_bounds, interaction_type, pa
                                       facecolor='white',
                                       edgecolor = parameters['color'],
                                       lw = parameters['linewidth'],
-                                      zorder = parameters['z_priority'])
+                                      zorder = parameters['zorder'])
             ax.add_patch(patch)
         # Find bounds of interaction
         minimum_y = int_origin_y - parameters['headheight'] 
@@ -483,7 +483,7 @@ def process_interaction_params(parameters):
                         'heightskew': 0,
                         'headheight': 2,
                         'headwidth': 2,
-                        'z_priority': 0,
+                        'zorder': 0,
                         'linewidth': 1,
                         'sending_xy_skew': (0,0),
                         'receiving_xy_skew': (0,0)}
@@ -493,6 +493,6 @@ def process_interaction_params(parameters):
     for key in final_parameters:
         if key in parameters:
             final_parameters[key] = parameters[key]
-    # Amplify z_priority to ensure all drawings composing the interaction can be grouped on Z axis
-    final_parameters['z_priority'] *= 100
+    # Amplify zorder to ensure all drawings composing the interaction can be grouped on Z axis
+    final_parameters['zorder'] *= 100
     return final_parameters
