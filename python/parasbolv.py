@@ -6,7 +6,7 @@ A simple and lightweight library for rendering parametric SVG versions
 of the SBOL Visual glyphs using matplotlib. Is able to load a directory 
 of glyphs and provides access to all style and geometry customisations.
 """
-
+import warnings
 import svgpath2mpl
 import os
 import glob
@@ -190,7 +190,13 @@ class GlyphRenderer:
         return glyphs_library, glyph_soterm_map
 
     def draw_glyph(self, ax, glyph_type, position, rotation=0.0, user_parameters=None, user_style=None):
-        glyph = self.glyphs_library[glyph_type]
+	    # Check glyph type exists	
+        try:	
+            glyph = self.glyphs_library[glyph_type]	
+        except:	
+            class Invalid_glyph_type(Exception):	
+                pass	
+            raise Invalid_glyph_type(f"""'{glyph_type}' is not a valid glyph.""")
         merged_parameters = glyph['defaults'].copy()
         if user_parameters is not None:
             # Find label
@@ -199,7 +205,17 @@ class GlyphRenderer:
                 label = user_parameters['label']
             # Collate parameters (user parameters take priority)
             for key in user_parameters.keys():
+                if key not in glyph['defaults'] and key != 'label':
+                    warnings.warn(f"""Parameter '{key}' is not valid for '{glyph_type}'.""")
                 merged_parameters[key] = user_parameters[key]
+	    # Find invalid path ids	
+        if user_style is not None:	
+            path_ids = []	
+            for path in glyph['paths']:	
+                path_ids.append(path['id'])	
+            for key in user_style.keys():	
+                if key not in path_ids:	
+                    warnings.warn(f"""'{key}' is not a valid path ID for the '{glyph_type}' glyph.""")
         paths_to_draw = []
         for path in glyph['paths']:
             if path['class'] not in ['baseline', 'bounding-box']:
@@ -207,9 +223,14 @@ class GlyphRenderer:
                 if path['id'] is not None and user_style is not None and path['id'] in user_style.keys():
                     # Merge the styling dictionaries (user takes preference)
                     merged_style = user_style[path['id']].copy()
-                    for k in path['style'].keys():
-                        if k not in merged_style.keys():
-                            merged_style[k] =  path['style'][k]
+                    for style_el in path['style'].keys():
+                        if style_el not in merged_style.keys():
+                            merged_style[style_el] =  path['style'][style_el]
+                    for style_el in merged_style.copy():
+                        # Find and remove invalid style elements
+                        if style_el not in path['style'].keys():
+                            merged_style.pop(style_el)
+                            warnings.warn(f"""Style parameter '{style_el}' is not valid for '{path["id"]}'.""")
                 svg_text = self.__eval_svg_data(path['d'], merged_parameters)
                 paths_to_draw.append([svgpath2mpl.parse_path(svg_text), merged_style])
         # Draw glyph to the axis with correct styling parameters
@@ -328,12 +349,16 @@ def render_part_list (part_list, glyph_path='glyphs/', padding=0.2, interaction_
         bounds_list.append(bounds)
     interaction_bounds_list = []
     if interaction_list is not None:
-        # Draw Interactions
+        interaction_types = ['control','degradation','inhibition','process','stimulation']
         for interaction in interaction_list:
-            sending_bounds = bounds_list[interaction[0]]
-            receiving_bounds = bounds_list[interaction[1]]
-            bounds = draw_interaction(ax, sending_bounds, receiving_bounds, interaction[2], interaction[3])
-            interaction_bounds_list.append(bounds)
+            if interaction[2] in interaction_types:
+                # Draw Interactions
+                sending_bounds = bounds_list[interaction[0]]
+                receiving_bounds = bounds_list[interaction[1]]
+                bounds = draw_interaction(ax, sending_bounds, receiving_bounds, interaction[2], interaction[3])
+                interaction_bounds_list.append(bounds)
+            else:
+                warnings.warn(f"""'{interaction[2]}' is not a valid interaction type.""")
     # Unify glyph and interaction bounds 
     for interaction_bounds in interaction_bounds_list:
         bounds_list.append(interaction_bounds)
@@ -490,9 +515,11 @@ def process_interaction_params(parameters):
     if parameters is None:
         return final_parameters
     # Collate interaction parameters
-    for key in final_parameters:
-        if key in parameters:
+    for key in parameters:
+        if key in final_parameters:
             final_parameters[key] = parameters[key]
+        else:
+            warnings.warn(f"""'{key}' is not a valid interaction parameter.""")
     # Amplify zorder to ensure all drawings composing the interaction can be grouped on Z axis
     final_parameters['zorder'] *= 100
     return final_parameters
