@@ -338,6 +338,19 @@ def __find_bound_of_bounds (bounds_list):
             y_max = b[1][1]
     return [(x_min, y_min), (x_max, y_max)]
 
+def render_reverse_part_list (part_list, glyph_path='glyphs/', padding=0.2, interaction_list=None):
+    # Render reverse of part list
+    part_list.reverse()
+    # Rotate glyphs 180°
+    for glyph in part_list:
+        user_parameters = glyph[1]
+        if user_parameters is None:
+            user_parameters = {}
+            glyph[1] = user_parameters
+        user_parameters['rotation'] = pi
+    fig, ax, baseline_start, baseline_end = render_part_list(part_list, glyph_path=glyph_path, padding=padding, interaction_list=interaction_list)
+    return fig, ax, baseline_start, baseline_end
+
 def render_part_list (part_list, glyph_path='glyphs/', padding=0.2, interaction_list=None):
     # Render multiple glyphs
     renderer = GlyphRenderer(glyph_path=glyph_path)
