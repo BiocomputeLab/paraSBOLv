@@ -251,12 +251,16 @@ class GlyphRenderer:
     def process_label_params(self, label, all_y_flipped_paths):
         color = (0,0,0)
         xy_skew = (0,0)
+        rotation = 0
         finalfont = font_manager.FontProperties()
         # Collate parameters (user parameters take priority)
         if 'color' in label:
             color = label['color']
         if 'xy_skew' in label:
             xy_skew = label['xy_skew']
+        if 'rotation' in label:
+            # Convert to degrees
+            rotation = (180/pi) * label['rotation']
         if 'userfont' in label:
             finalfont = font_manager.FontProperties(**label['userfont'])        
         all_path_vertices = []
@@ -265,7 +269,7 @@ class GlyphRenderer:
             path_vertices = path[0].vertices.copy()
             all_path_vertices.append(path_vertices)
         textpos_x, textpos_y = self.calculate_centroid_of_paths(all_path_vertices, xy_skew)
-        return {'x':textpos_x, 'y':textpos_y, 's':label['text'], 'color':color, 'fontproperties':finalfont}
+        return {'x':textpos_x, 'y':textpos_y, 's':label['text'], 'color':color, 'fontproperties':finalfont, 'rotation':rotation}
 
     def calculate_centroid_of_paths(self, all_path_vertices, xy_skew):
         vertices = []
