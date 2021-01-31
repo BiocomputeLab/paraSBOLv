@@ -203,6 +203,9 @@ class GlyphRenderer:
             label = None
             if 'label' in user_parameters:
                 label = user_parameters['label']
+            # Find rotation in user_parameters (keyword arg takes priority)
+            if rotation == 0.0 and 'rotation' in user_parameters:
+                rotation = user_parameters['rotation']
             # Collate parameters (user parameters take priority)
             for key in user_parameters.keys():
                 if key not in glyph['defaults'] and key != 'label':
@@ -251,7 +254,7 @@ class GlyphRenderer:
     def process_label_params(self, label, all_y_flipped_paths):
         color = (0,0,0)
         xy_skew = (0,0)
-        rotation = 0
+        rotation = 0.0
         finalfont = font_manager.FontProperties()
         # Collate parameters (user parameters take priority)
         if 'color' in label:
