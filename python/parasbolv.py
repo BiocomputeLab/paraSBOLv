@@ -339,9 +339,7 @@ def __find_bound_of_bounds (bounds_list):
     return [(x_min, y_min), (x_max, y_max)]
 
 def render_reverse_part_list (part_list, glyph_path='glyphs/', padding=0.2, interaction_list=None):
-    # Render reverse of part list
-    part_list.reverse()
-    # Rotate glyphs 180°
+    # Rotate glyphs 180° and reverse order
     for glyph in part_list:
         user_parameters = glyph[1]
         if user_parameters is None:
