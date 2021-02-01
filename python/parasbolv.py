@@ -345,7 +345,10 @@ def render_reverse_part_list (part_list, glyph_path='glyphs/', padding=0.2, inte
         if user_parameters is None:
             user_parameters = {}
             glyph[1] = user_parameters
-        user_parameters['rotation'] = pi
+        if 'rotation' in user_parameters:
+            user_parameters['rotation'] += pi
+        elif 'rotation' not in user_parameters:
+            user_parameters['rotation'] = pi
     if interaction_list is not None:
         for interaction in interaction_list:
             if interaction[3] is None:
@@ -661,4 +664,3 @@ def process_interaction_params(parameters):
     # Amplify zorder to ensure all drawings composing the interaction can be grouped on Z axis
     final_parameters['zorder'] *= 100
     return final_parameters
-					  
