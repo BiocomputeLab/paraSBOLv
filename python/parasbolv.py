@@ -511,20 +511,20 @@ def draw_degradation(ax, int_end_x, int_end_y, parameters):
                             [int_end_x, int_end_y]],
                             [1,2,2,2,2])
                 patch = patches.PathPatch(path,
-                                        facecolor=parameters['color'],
-                                        edgecolor = parameters['color'],
-                                        lw = parameters['linewidth'],
-                                        zorder = parameters['zorder'])
+                                          facecolor=parameters['color'],
+                                          edgecolor = parameters['color'],
+                                          lw = parameters['linewidth'],
+                                          zorder = parameters['zorder'])
                 ax.add_patch(patch)
                 # Plot circle
                 circle_origin_y = int_end_y - parameters['headheight'] * 2
                 r = parameters['headwidth'] / 2
                 patch = patches.Circle((int_end_x, circle_origin_y),
-                                    radius = r,
-                                    facecolor='white',
-                                    edgecolor = parameters['color'],
-                                    lw = parameters['linewidth'],
-                                    zorder = parameters['zorder'])
+                                       radius = r,
+                                       facecolor='white',
+                                       edgecolor = parameters['color'],
+                                       lw = parameters['linewidth'],
+                                       zorder = parameters['zorder'])
                 ax.add_patch(patch)
                 # Plot line within circle
                 deg315 = 315 * pi / 180
@@ -534,10 +534,10 @@ def draw_degradation(ax, int_end_x, int_end_y, parameters):
                 x2 = int_end_x + (r * cos(deg225))
                 y2 = circle_origin_y + (r * cos(deg225))
                 plt.plot([x1, x2],
-                        [y1, y2],
-                        color = parameters['color'],
-                        lw = parameters['linewidth'],
-                        zorder = parameters['zorder'] + 500)
+                         [y1, y2],
+                         color = parameters['color'],
+                         lw = parameters['linewidth'],
+                         zorder = parameters['zorder'] + 500)
     elif parameters['direction'] == 'reverse':
                 # Plot arrow
                 path = Path([[int_end_x, int_end_y],
@@ -556,11 +556,11 @@ def draw_degradation(ax, int_end_x, int_end_y, parameters):
                 circle_origin_y = int_end_y + parameters['headheight'] * 2
                 r = parameters['headwidth'] / 2
                 patch = patches.Circle((int_end_x, circle_origin_y),
-                                    radius = r,
-                                    facecolor='white',
-                                    edgecolor = parameters['color'],
-                                    lw = parameters['linewidth'],
-                                    zorder = parameters['zorder'])
+                                       radius = r,
+                                       facecolor='white',
+                                       edgecolor = parameters['color'],
+                                       lw = parameters['linewidth'],
+                                       zorder = parameters['zorder'])
                 ax.add_patch(patch)
                 # Plot line within circle
                 deg315 = 315 * pi / 180
@@ -570,19 +570,19 @@ def draw_degradation(ax, int_end_x, int_end_y, parameters):
                 x2 = int_end_x + (r * cos(deg225))
                 y2 = circle_origin_y + (r * cos(deg225))
                 plt.plot([x1, x2],
-                        [y1, y2],
-                        color = parameters['color'],
-                        lw = parameters['linewidth'],
-                        zorder = parameters['zorder'] + 500)
+                         [y1, y2],
+                         color = parameters['color'],
+                         lw = parameters['linewidth'],
+                         zorder = parameters['zorder'] + 500)
 
 def draw_inhibition(ax, int_end_x, int_end_y, parameters):
     plt.plot([int_end_x - parameters['headwidth'] / 2,
-                          int_end_x + parameters['headwidth'] / 2],
-                         [int_end_y,
-                          int_end_y],
-                         color = parameters['color'],
-                         lw = parameters['linewidth'],
-                         zorder = parameters['zorder'])
+              int_end_x + parameters['headwidth'] / 2],
+             [int_end_y,
+              int_end_y],
+             color = parameters['color'],
+             lw = parameters['linewidth'],
+             zorder = parameters['zorder'])
 
 def draw_process(ax, int_end_x, int_end_y, parameters):
     if parameters['direction'] == 'forward':
@@ -593,10 +593,10 @@ def draw_process(ax, int_end_x, int_end_y, parameters):
                             [int_end_x, int_end_y]],
                             [1,2,2,2,2])
                 patch = patches.PathPatch(path,
-                                        facecolor=parameters['color'],
-                                        edgecolor = parameters['color'],
-                                        lw = parameters['linewidth'],
-                                        zorder = parameters['zorder'])
+                                          facecolor=parameters['color'],
+                                          edgecolor = parameters['color'],
+                                          lw = parameters['linewidth'],
+                                          zorder = parameters['zorder'])
                 ax.add_patch(patch)
     elif parameters['direction'] == 'reverse':
                 path = Path([[int_end_x, int_end_y],
@@ -606,10 +606,10 @@ def draw_process(ax, int_end_x, int_end_y, parameters):
                             [int_end_x, int_end_y]],
                             [1,2,2,2,2])
                 patch = patches.PathPatch(path,
-                                        facecolor=parameters['color'],
-                                        edgecolor = parameters['color'],
-                                        lw = parameters['linewidth'],
-                                        zorder = parameters['zorder'])
+                                          facecolor=parameters['color'],
+                                          edgecolor = parameters['color'],
+                                          lw = parameters['linewidth'],
+                                          zorder = parameters['zorder'])
                 ax.add_patch(patch)
 
 def draw_stimulation(ax, int_end_x, int_end_y, parameters):
@@ -661,3 +661,4 @@ def process_interaction_params(parameters):
     # Amplify zorder to ensure all drawings composing the interaction can be grouped on Z axis
     final_parameters['zorder'] *= 100
     return final_parameters
+					  
