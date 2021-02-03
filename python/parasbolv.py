@@ -203,9 +203,12 @@ class GlyphRenderer:
             label = None
             if 'label' in user_parameters:
                 label = user_parameters['label']
+            # Find rotation in user_parameters (keyword arg takes priority)
+            if rotation == 0.0 and 'rotation' in user_parameters:
+                rotation = user_parameters['rotation']
             # Collate parameters (user parameters take priority)
             for key in user_parameters.keys():
-                if key not in glyph['defaults'] and key != 'label':
+                if key not in glyph['defaults'] and key != 'label' and key != 'rotation':
                     warnings.warn(f"""Parameter '{key}' is not valid for '{glyph_type}'.""")
                 merged_parameters[key] = user_parameters[key]
 	    # Find invalid path ids	
@@ -251,12 +254,16 @@ class GlyphRenderer:
     def process_label_params(self, label, all_y_flipped_paths):
         color = (0,0,0)
         xy_skew = (0,0)
+        rotation = 0.0
         finalfont = font_manager.FontProperties()
         # Collate parameters (user parameters take priority)
         if 'color' in label:
             color = label['color']
         if 'xy_skew' in label:
             xy_skew = label['xy_skew']
+        if 'rotation' in label:
+            # Convert to degrees
+            rotation = (180/pi) * label['rotation']
         if 'userfont' in label:
             finalfont = font_manager.FontProperties(**label['userfont'])        
         all_path_vertices = []
@@ -265,7 +272,7 @@ class GlyphRenderer:
             path_vertices = path[0].vertices.copy()
             all_path_vertices.append(path_vertices)
         textpos_x, textpos_y = self.calculate_centroid_of_paths(all_path_vertices, xy_skew)
-        return {'x':textpos_x, 'y':textpos_y, 's':label['text'], 'color':color, 'fontproperties':finalfont}
+        return {'x':textpos_x, 'y':textpos_y, 's':label['text'], 'color':color, 'fontproperties':finalfont, 'rotation':rotation}
 
     def calculate_centroid_of_paths(self, all_path_vertices, xy_skew):
         vertices = []
@@ -331,6 +338,31 @@ def __find_bound_of_bounds (bounds_list):
             y_max = b[1][1]
     return [(x_min, y_min), (x_max, y_max)]
 
+def render_reverse_part_list (part_list, glyph_path='glyphs/', padding=0.2, interaction_list=None):
+    # Rotate glyphs 180° and reverse order
+    for glyph in part_list:
+        user_parameters = glyph[1]
+        if user_parameters is None:
+            user_parameters = {}
+            glyph[1] = user_parameters
+        if 'rotation' in user_parameters:
+            user_parameters['rotation'] += pi
+        elif 'rotation' not in user_parameters:
+            user_parameters['rotation'] = pi
+    if interaction_list is not None:
+        for interaction in interaction_list:
+            if interaction[3] is None:
+                interaction[3] = {}
+            if 'direction' in interaction[3]:
+                if interaction[3]['direction'] == 'forward':
+                    interaction[3]['direction'] = 'reverse'
+                if interaction[3]['direction'] == 'reverse':
+                    interaction[3]['direction'] == 'forward'
+            if 'direction' not in interaction[3]:
+                interaction[3]['direction'] = 'reverse'
+    fig, ax, baseline_start, baseline_end = render_part_list(part_list, glyph_path=glyph_path, padding=padding, interaction_list=interaction_list)
+    return fig, ax, baseline_start, baseline_end
+
 def render_part_list (part_list, glyph_path='glyphs/', padding=0.2, interaction_list=None):
     # Render multiple glyphs
     renderer = GlyphRenderer(glyph_path=glyph_path)
@@ -381,15 +413,24 @@ def draw_interaction (ax, sending_bounds, receiving_bounds, interaction_type, pa
         y_pad = (sending_bounds[1][1] / 2) + parameters['heightskew']
         if receiving_bounds[1][1] > sending_bounds[1][1]:
             y_pad = (receiving_bounds[1][1] / 2) + parameters['heightskew']
+        if parameters['direction'] == 'reverse':
+            y_pad *= -1
         # Find interaction origin and endpoint
         int_origin_x = sending_bounds[0][0] + abs((sending_bounds[1][0] - sending_bounds[0][0]) / 2) + parameters['sending_xy_skew'][0]
-        int_origin_y = sending_bounds[1][1] + y_pad / 3 + parameters['sending_xy_skew'][1]
         int_end_x = receiving_bounds[0][0] + abs((receiving_bounds[1][0] - receiving_bounds[0][0]) / 2) + parameters['receiving_xy_skew'][0]
+        int_origin_y = sending_bounds[1][1] + (y_pad / 3) + parameters['sending_xy_skew'][1]
         int_end_y = receiving_bounds[1][1] + y_pad + parameters['receiving_xy_skew'][1]
-        # Determine max height
+        if parameters['direction'] == 'reverse':
+            int_origin_y -= (sending_bounds[1][1] - sending_bounds[0][1]) 
+            int_end_y -= (receiving_bounds[1][1] - receiving_bounds[0][1])
+        # Determine max/min height
         max_height = int_origin_y + y_pad
         if int_end_y > int_origin_y:
             max_height = int_end_y + y_pad
+        if parameters['direction'] == 'reverse':
+            max_height = int_origin_y + y_pad
+            if int_end_y < int_origin_y:
+                max_height = int_end_y + y_pad
         # Draw headless interaction
         plt.plot([int_origin_x,
                   int_origin_x,
@@ -399,94 +440,24 @@ def draw_interaction (ax, sending_bounds, receiving_bounds, interaction_type, pa
                   max_height,
                   max_height,
                   int_end_y],
-                 color = parameters['color'],
-                 lw = parameters['linewidth'],
-                 zorder = parameters['zorder'] - 5) # Slightly lower zorder than head to prevent overlap
-        # Draw head
+                color = parameters['color'],
+                lw = parameters['linewidth'],
+                zorder = parameters['zorder'] - 5) # Slightly lower zorder than head to prevent overlap
+        # Control
         if interaction_type == 'control':
-            plt.plot([int_end_x,
-                      int_end_x + parameters['headwidth']/2,
-                      int_end_x,
-                      int_end_x - parameters['headwidth']/2,
-                      int_end_x],
-                     [int_end_y,
-                      int_end_y - parameters['headheight']/2,
-                      int_end_y - parameters['headheight'],
-                      int_end_y - parameters['headheight']/2,
-                      int_end_y],
-                     color = parameters['color'],
-                     lw = parameters['linewidth'],
-                     zorder = parameters['zorder'])
+            draw_control(ax, int_end_x, int_end_y, parameters)
+        # Degradation
         elif interaction_type == 'degradation':
-            # Plot arrow
-            path = Path([[int_end_x, int_end_y],
-                         [int_end_x + parameters['headwidth']/2, int_end_y],
-                         [int_end_x, int_end_y - parameters['headheight']],
-                         [int_end_x - parameters['headwidth']/2, int_end_y],
-                         [int_end_x, int_end_y]],
-                         [1,2,2,2,2])
-            patch = patches.PathPatch(path,
-                                      facecolor=parameters['color'],
-                                      edgecolor = parameters['color'],
-                                      lw = parameters['linewidth'],
-                                      zorder = parameters['zorder'])
-            ax.add_patch(patch)
-            # Plot circle
-            circle_origin_y = int_end_y - parameters['headheight'] * 2
-            r = parameters['headwidth'] / 2
-            patch = patches.Circle((int_end_x, circle_origin_y),
-                                   radius = r,
-                                   facecolor='white',
-                                   edgecolor = parameters['color'],
-                                   lw = parameters['linewidth'],
-                                   zorder = parameters['zorder'])
-            ax.add_patch(patch)
-            # Plot line within circle
-            deg315 = 315 * pi / 180
-            deg225 = 225 * pi / 180
-            x1 = int_end_x + (r * cos(deg315))
-            y1 = circle_origin_y + (r * cos(deg315))
-            x2 = int_end_x + (r * cos(deg225))
-            y2 = circle_origin_y + (r * cos(deg225))
-            plt.plot([x1, x2],
-                     [y1, y2],
-                     color = parameters['color'],
-                     lw = parameters['linewidth'],
-                     zorder = parameters['zorder'] + 500)
+            draw_degradation(ax, int_end_x, int_end_y, parameters)
+        # Inhibition
         elif interaction_type == 'inhibition':
-            plt.plot([int_end_x - parameters['headwidth'] / 2,
-                      int_end_x + parameters['headwidth'] / 2],
-                     [int_end_y,
-                      int_end_y],
-                      color = parameters['color'],
-                      lw = parameters['linewidth'],
-                      zorder = parameters['zorder'])
+            draw_inhibition(ax, int_end_x, int_end_y, parameters)
+        # Process
         elif interaction_type == 'process':
-            path = Path([[int_end_x, int_end_y],
-                         [int_end_x + parameters['headwidth']/2, int_end_y],
-                         [int_end_x, int_end_y - parameters['headheight']],
-                         [int_end_x - parameters['headwidth']/2, int_end_y],
-                         [int_end_x, int_end_y]],
-                         [1,2,2,2,2])
-            patch = patches.PathPatch(path,
-                                      facecolor=parameters['color'],
-                                      edgecolor = parameters['color'],
-                                      lw = parameters['linewidth'],
-                                      zorder = parameters['zorder'])
-            ax.add_patch(patch)
+            draw_process(ax, int_end_x, int_end_y, parameters)
+        # Stimulation
         elif interaction_type == 'stimulation':
-            path = Path([[int_end_x, int_end_y],
-                         [int_end_x + parameters['headwidth']/2, int_end_y],
-                         [int_end_x, int_end_y - parameters['headheight']],
-                         [int_end_x - parameters['headwidth']/2, int_end_y],
-                         [int_end_x, int_end_y]],
-                         [1,2,2,2,2])
-            patch = patches.PathPatch(path,
-                                      facecolor='white',
-                                      edgecolor = parameters['color'],
-                                      lw = parameters['linewidth'],
-                                      zorder = parameters['zorder'])
-            ax.add_patch(patch)
+            draw_stimulation(ax, int_end_x, int_end_y, parameters)
         # Find bounds of interaction
         minimum_y = int_origin_y - parameters['headheight'] 
         if int_origin_y > int_end_y:
@@ -503,12 +474,182 @@ def draw_interaction (ax, sending_bounds, receiving_bounds, interaction_type, pa
             bottom_left_bound = (int_origin_x - parameters['headwidth'], minimum_y)
         return (bottom_left_bound, top_right_bound)
 
+def draw_control(ax, int_end_x, int_end_y, parameters):
+    if parameters['direction'] == 'forward':
+                plt.plot([int_end_x,
+                          int_end_x + parameters['headwidth']/2,
+                          int_end_x,
+                          int_end_x - parameters['headwidth']/2,
+                          int_end_x],
+                         [int_end_y,
+                          int_end_y - parameters['headheight']/2,
+                          int_end_y - parameters['headheight'],
+                          int_end_y - parameters['headheight']/2,
+                          int_end_y],
+                         color = parameters['color'],
+                         lw = parameters['linewidth'],
+                         zorder = parameters['zorder'])
+    elif parameters['direction'] == 'reverse':
+                plt.plot([int_end_x,
+                          int_end_x + parameters['headwidth']/2,
+                          int_end_x,
+                          int_end_x - parameters['headwidth']/2,
+                          int_end_x],
+                         [int_end_y,
+                          int_end_y + parameters['headheight']/2,
+                          int_end_y + parameters['headheight'],
+                          int_end_y + parameters['headheight']/2,
+                          int_end_y],
+                         color = parameters['color'],
+                         lw = parameters['linewidth'],
+                         zorder = parameters['zorder'])
+
+def draw_degradation(ax, int_end_x, int_end_y, parameters):
+    if parameters['direction'] == 'forward':
+                # Plot arrow
+                path = Path([[int_end_x, int_end_y],
+                            [int_end_x + parameters['headwidth']/2, int_end_y],
+                            [int_end_x, int_end_y - parameters['headheight']],
+                            [int_end_x - parameters['headwidth']/2, int_end_y],
+                            [int_end_x, int_end_y]],
+                            [1,2,2,2,2])
+                patch = patches.PathPatch(path,
+                                          facecolor=parameters['color'],
+                                          edgecolor = parameters['color'],
+                                          lw = parameters['linewidth'],
+                                          zorder = parameters['zorder'])
+                ax.add_patch(patch)
+                # Plot circle
+                circle_origin_y = int_end_y - parameters['headheight'] * 2
+                r = parameters['headwidth'] / 2
+                patch = patches.Circle((int_end_x, circle_origin_y),
+                                       radius = r,
+                                       facecolor='white',
+                                       edgecolor = parameters['color'],
+                                       lw = parameters['linewidth'],
+                                       zorder = parameters['zorder'])
+                ax.add_patch(patch)
+                # Plot line within circle
+                deg315 = 315 * pi / 180
+                deg225 = 225 * pi / 180
+                x1 = int_end_x + (r * cos(deg315))
+                y1 = circle_origin_y + (r * cos(deg315))
+                x2 = int_end_x + (r * cos(deg225))
+                y2 = circle_origin_y + (r * cos(deg225))
+                plt.plot([x1, x2],
+                         [y1, y2],
+                         color = parameters['color'],
+                         lw = parameters['linewidth'],
+                         zorder = parameters['zorder'] + 500)
+    elif parameters['direction'] == 'reverse':
+                # Plot arrow
+                path = Path([[int_end_x, int_end_y],
+                            [int_end_x + parameters['headwidth']/2, int_end_y],
+                            [int_end_x, int_end_y + parameters['headheight']],
+                            [int_end_x - parameters['headwidth']/2, int_end_y],
+                            [int_end_x, int_end_y]],
+                            [1,2,2,2,2])
+                patch = patches.PathPatch(path,
+                                          facecolor=parameters['color'],
+                                          edgecolor = parameters['color'],
+                                          lw = parameters['linewidth'],
+                                          zorder = parameters['zorder'])
+                ax.add_patch(patch)
+                # Plot circle
+                circle_origin_y = int_end_y + parameters['headheight'] * 2
+                r = parameters['headwidth'] / 2
+                patch = patches.Circle((int_end_x, circle_origin_y),
+                                       radius = r,
+                                       facecolor='white',
+                                       edgecolor = parameters['color'],
+                                       lw = parameters['linewidth'],
+                                       zorder = parameters['zorder'])
+                ax.add_patch(patch)
+                # Plot line within circle
+                deg315 = 315 * pi / 180
+                deg225 = 225 * pi / 180
+                x1 = int_end_x + (r * cos(deg315))
+                y1 = circle_origin_y + (r * cos(deg315))
+                x2 = int_end_x + (r * cos(deg225))
+                y2 = circle_origin_y + (r * cos(deg225))
+                plt.plot([x1, x2],
+                         [y1, y2],
+                         color = parameters['color'],
+                         lw = parameters['linewidth'],
+                         zorder = parameters['zorder'] + 500)
+
+def draw_inhibition(ax, int_end_x, int_end_y, parameters):
+    plt.plot([int_end_x - parameters['headwidth'] / 2,
+              int_end_x + parameters['headwidth'] / 2],
+             [int_end_y,
+              int_end_y],
+             color = parameters['color'],
+             lw = parameters['linewidth'],
+             zorder = parameters['zorder'])
+
+def draw_process(ax, int_end_x, int_end_y, parameters):
+    if parameters['direction'] == 'forward':
+                path = Path([[int_end_x, int_end_y],
+                            [int_end_x + parameters['headwidth']/2, int_end_y],
+                            [int_end_x, int_end_y - parameters['headheight']],
+                            [int_end_x - parameters['headwidth']/2, int_end_y],
+                            [int_end_x, int_end_y]],
+                            [1,2,2,2,2])
+                patch = patches.PathPatch(path,
+                                          facecolor=parameters['color'],
+                                          edgecolor = parameters['color'],
+                                          lw = parameters['linewidth'],
+                                          zorder = parameters['zorder'])
+                ax.add_patch(patch)
+    elif parameters['direction'] == 'reverse':
+                path = Path([[int_end_x, int_end_y],
+                            [int_end_x + parameters['headwidth']/2, int_end_y],
+                            [int_end_x, int_end_y + parameters['headheight']],
+                            [int_end_x - parameters['headwidth']/2, int_end_y],
+                            [int_end_x, int_end_y]],
+                            [1,2,2,2,2])
+                patch = patches.PathPatch(path,
+                                          facecolor=parameters['color'],
+                                          edgecolor = parameters['color'],
+                                          lw = parameters['linewidth'],
+                                          zorder = parameters['zorder'])
+                ax.add_patch(patch)
+
+def draw_stimulation(ax, int_end_x, int_end_y, parameters):
+    if parameters['direction'] == 'forward':
+                path = Path([[int_end_x, int_end_y],
+                            [int_end_x + parameters['headwidth']/2, int_end_y],
+                            [int_end_x, int_end_y - parameters['headheight']],
+                            [int_end_x - parameters['headwidth']/2, int_end_y],
+                            [int_end_x, int_end_y]],
+                            [1,2,2,2,2])
+                patch = patches.PathPatch(path,
+                                          facecolor='white',
+                                          edgecolor = parameters['color'],
+                                          lw = parameters['linewidth'],
+                                          zorder = parameters['zorder'])
+                ax.add_patch(patch)
+    elif parameters['direction'] == 'reverse':
+                path = Path([[int_end_x, int_end_y],
+                            [int_end_x + parameters['headwidth']/2, int_end_y],
+                            [int_end_x, int_end_y + parameters['headheight']],
+                            [int_end_x - parameters['headwidth']/2, int_end_y],
+                            [int_end_x, int_end_y]],
+                            [1,2,2,2,2])
+                patch = patches.PathPatch(path,
+                                          facecolor='white',
+                                          edgecolor = parameters['color'],
+                                          lw = parameters['linewidth'],
+                                          zorder = parameters['zorder'])
+                ax.add_patch(patch)
+
 def process_interaction_params(parameters):
     final_parameters = {'color': (0,0,0),
                         'heightskew': 0,
                         'headheight': 2,
                         'headwidth': 2,
                         'zorder': 0,
+                        'direction': 'forward',
                         'linewidth': 1,
                         'sending_xy_skew': (0,0),
                         'receiving_xy_skew': (0,0)}

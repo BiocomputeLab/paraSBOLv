@@ -9,13 +9,14 @@ import matplotlib.pyplot as plt
 renderer = psv.GlyphRenderer(glyph_path='../glyphs/')
 
 fig = plt.figure(figsize=(6,6))
-ax = fig.add_axes([0.0, 0.0, 1.0, 1.0], frameon=True, aspect=1)
+ax = fig.add_axes([0.0, 0.0, 1.0, 1.0], frameon=False, aspect=1)
 
 user_parameters = {}
 
 # Draw labelled CDS
-user_parameters['label'] = {'text':'label'}
-renderer.draw_glyph(ax, 'CDS', (10, 80), user_parameters=user_parameters)
+user_parameters['label'] = {'text':'label',
+                            'rotation':(3.14 / 4)}
+renderer.draw_glyph(ax, 'CDS', (15, 60), user_parameters=user_parameters, rotation=3.14 / 4)
 
 # Draw fancily labelled CDS using matplotlib font parameters
 cds_style = {}
@@ -38,7 +39,8 @@ dnalocation_style = {}
 dnalocation_style['location-top-path'] = {'facecolor': (1,0,0), 'edgecolor': (0,0,0), 'linewidth': 3}
 user_parameters['label'] = {'text':'label',
                             'color':(1,0,0),
-                            'xy_skew':(-7,-5)
+                            'rotation':(-3.14 / 4),
+                            'xy_skew':(-7,10)
 }
 renderer.draw_glyph(ax, 'DNA Location', (15, 15), user_parameters=user_parameters, user_style=dnalocation_style)
 
@@ -53,7 +55,8 @@ renderer.draw_glyph(ax, 'Signature', (40, 15), user_parameters=user_parameters, 
 dnalocation_style['location-top-path'] = {'facecolor': (0,1,0), 'edgecolor': (0,0,0), 'linewidth': 3}
 user_parameters['label'] = {'text':'label',
                             'color':(0,0.75,0),
-                            'xy_skew':(8,9)
+                            'rotation':(-3.14 / 4),
+                            'xy_skew':(8,-3)
 }
 renderer.draw_glyph(ax, 'DNA Location', (75, 15), user_parameters=user_parameters, user_style=dnalocation_style)
 
