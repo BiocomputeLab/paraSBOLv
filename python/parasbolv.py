@@ -338,7 +338,7 @@ def __find_bound_of_bounds (bounds_list):
             y_max = b[1][1]
     return [(x_min, y_min), (x_max, y_max)]
 
-def render_reverse_part_list (part_list, glyph_path='glyphs/', padding=0.2, interaction_list=None):
+def render_reverse_part_list (part_list, glyph_path='glyphs/', padding=0.2, interaction_list=None, module_list=None):
     # Rotate glyphs 180° and reverse order
     for glyph in part_list:
         user_parameters = glyph[1]
@@ -360,10 +360,10 @@ def render_reverse_part_list (part_list, glyph_path='glyphs/', padding=0.2, inte
                     interaction[3]['direction'] == 'forward'
             if 'direction' not in interaction[3]:
                 interaction[3]['direction'] = 'reverse'
-    fig, ax, baseline_start, baseline_end = render_part_list(part_list, glyph_path=glyph_path, padding=padding, interaction_list=interaction_list)
+    fig, ax, baseline_start, baseline_end = render_part_list(part_list, glyph_path=glyph_path, padding=padding, interaction_list=interaction_list, module_list=module_list)
     return fig, ax, baseline_start, baseline_end
 
-def render_part_list (part_list, glyph_path='glyphs/', padding=0.2, interaction_list=None):
+def render_part_list (part_list, glyph_path='glyphs/', padding=0.2, interaction_list=None, module_list=None):
     # Render multiple glyphs
     renderer = GlyphRenderer(glyph_path=glyph_path)
     fig, ax = plt.subplots()
@@ -384,16 +384,38 @@ def render_part_list (part_list, glyph_path='glyphs/', padding=0.2, interaction_
         interaction_types = ['control','degradation','inhibition','process','stimulation']
         for interaction in interaction_list:
             if interaction[2] in interaction_types:
-                # Draw Interactions
+                # Draw interactions
                 sending_bounds = bounds_list[interaction[0]]
                 receiving_bounds = bounds_list[interaction[1]]
                 bounds = draw_interaction(ax, sending_bounds, receiving_bounds, interaction[2], interaction[3])
                 interaction_bounds_list.append(bounds)
             else:
                 warnings.warn(f"""'{interaction[2]}' is not a valid interaction type.""")
-    # Unify glyph and interaction bounds 
+    module_bounds_list = []
+    if module_list is not None:
+        for module in module_list:
+            start_glyph = module[0]
+            end_glyph = module[1]
+            if module[0] > module[1]:
+            # Ensure start_glyph comes before end_glyph in the plot
+                start_glyph = module[1]
+                end_glyph = module[0]
+            elif part_list[start_glyph][1] is not None and part_list[end_glyph][1] is not None:
+            # Check if plot is flipped, then correct
+                if 'rotation' in part_list[start_glyph][1] and 'rotation' in part_list[end_glyph][1]:
+                    if part_list[start_glyph][1]['rotation'] == pi and part_list[end_glyph][1]['rotation'] == pi:
+                        start_glyph = module[1]
+                        end_glyph = module[0]
+            start_bounds = bounds_list[start_glyph]
+            end_bounds = bounds_list[end_glyph]
+            # Draw modules
+            bounds = draw_module(ax, start_bounds, end_bounds, module[2], module[3])
+            module_bounds_list.append(bounds)
+    # Unify interaction and module bounds with glyph bounds
     for interaction_bounds in interaction_bounds_list:
         bounds_list.append(interaction_bounds)
+    for module_bounds in module_bounds_list:
+        bounds_list.append(module_bounds)
     # Automatically find bounds for plot and resize axes
     final_bounds = __find_bound_of_bounds(bounds_list)
     width = (final_bounds[1][0] - final_bounds[0][0])/60.0
@@ -406,6 +428,23 @@ def render_part_list (part_list, glyph_path='glyphs/', padding=0.2, interaction_
     ax.set_ylim([final_bounds[0][1]-fig_pad, final_bounds[1][1]+fig_pad])
     fig.set_size_inches( (width, height) )
     return fig, ax, start_position, part_position
+
+def draw_module (ax, start_bounds, end_bounds, x_strech, y_strech):
+    x_pad = (end_bounds[0][0] - start_bounds[0][0]) / 10
+    y_pad = (end_bounds[1][1] - start_bounds[0][1])
+    # Bottom left coords
+    x1 = ((start_bounds[0][0]) - x_pad) - x_strech
+    y1 = ((start_bounds[0][1]) - y_pad) - y_strech
+    # Top right coords
+    x2 = ((end_bounds[1][0]) + x_pad) + x_strech
+    y2 = ((end_bounds[1][1]) + y_pad) + y_strech
+    # Draw module
+    plt.plot([x1,x2,x2,x1,x1],
+             [y1,y1,y2,y2,y1],
+             '--',
+             color='black')
+    return ((x1,y1), (x2,y2))
+
 
 def draw_interaction (ax, sending_bounds, receiving_bounds, interaction_type, parameters):
         parameters = process_interaction_params(parameters)
