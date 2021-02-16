@@ -208,7 +208,7 @@ class GlyphRenderer:
                 rotation = user_parameters['rotation']
             # Collate parameters (user parameters take priority)
             for key in user_parameters.keys():
-                if key not in glyph['defaults'] and key != 'label' and key != 'rotation':
+                if key not in glyph['defaults'] and key != 'label' and key != 'rotation' and key != 'y_offset':
                     warnings.warn(f"""Parameter '{key}' is not valid for '{glyph_type}'.""")
                 merged_parameters[key] = user_parameters[key]
 	    # Find invalid path ids	
@@ -376,9 +376,17 @@ def render_part_list (part_list, glyph_path='glyphs/', padding=0.2, interaction_
     start_position = part_position
     bounds_list = []
     for part in part_list:
-        # Draw and find bounds of each glyph
-        bounds, part_position = renderer.draw_glyph(ax, part[0], part_position, user_parameters=part[1], user_style=part[2])
-        bounds_list.append(bounds)
+        # Draw glyphs
+        if part[1] is not None and 'y_offset' in part[1]:
+            pre_part_position = part_position
+            part_position = (part_position[0], part_position[1] + part[1]['y_offset'])
+            bounds, part_position = renderer.draw_glyph(ax, part[0], part_position, user_parameters=part[1], user_style=part[2])
+            bounds_list.append(bounds)
+            # Correct part_position to remove y_offset
+            part_position = (part_position[0], pre_part_position[1])
+        else:
+            bounds, part_position = renderer.draw_glyph(ax, part[0], part_position, user_parameters=part[1], user_style=part[2])
+            bounds_list.append(bounds)
     interaction_bounds_list = []
     if interaction_list is not None:
         interaction_types = ['control','degradation','inhibition','process','stimulation']
