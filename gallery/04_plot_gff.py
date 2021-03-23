@@ -9,10 +9,6 @@ from operator import itemgetter
 import parasbolv as psv
 import matplotlib.pyplot as plt
 
-__author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>'
-__license__ = 'MIT'
-__version__ = '1.0'
-
 # Mapping from GFF annotation type to parasbolv glyph
 gffsvgtype_map = {}
 gffsvgtype_map['gene'] = 'CDS'
