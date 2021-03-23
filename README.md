@@ -1,6 +1,6 @@
 # paraSBOLv
 
-A lightweight Python library designed to simplify the rendering of highly-customisable [parametric Scalable Vector Graphic](http://parametric-svg.js.org) (SVG) based SBOL Visual glyphs.
+A lightweight Python library designed to simplify the rendering of highly-customisable SBOL Visual glyphs and diagrams. To do this, `paraSBOLv` uses the Parametric Scalable Vector Graphic (SVG) format to enable the encoding of shape geometry and allowed parametric variations on this. The best way to learn how to use `paraSBOLv` is to dive into our [`gallery`](./gallery/) of examples.
 
 ## Dependancies
 
