@@ -30,12 +30,12 @@ part_list.append( ['CDS',
                   ] )
 
 # Draw part list
-fig, ax, baseline_start, baseline_end = psv.render_part_list(part_list, glyph_path='../glyphs/', padding=0.2)
+fig, ax, baseline_start, baseline_end, bounds = psv.render_part_list(part_list, glyph_path='../glyphs/', padding=0.2)
 ax.plot([baseline_start[0], baseline_end[0]], [baseline_start[1], baseline_end[1]], color=(0,0,0), linewidth=1.5, zorder=0)
 fig.savefig('03_plot_construct_1.pdf', transparent=True, dpi=300)
 
 # Draw reversed part list
-fig, ax, baseline_start, baseline_end = psv.render_reverse_part_list(part_list, glyph_path='../glyphs/', padding=0.2)
+fig, ax, baseline_start, baseline_end, bounds = psv.render_reverse_part_list(part_list, glyph_path='../glyphs/', padding=0.2)
 ax.plot([baseline_start[0], baseline_end[0]], [baseline_start[1], baseline_end[1]], color=(0,0,0), linewidth=1.5, zorder=0)
 fig.savefig('03_plot_construct_2.pdf', transparent=True, dpi=300)
 

@@ -342,7 +342,21 @@ def __find_bound_of_bounds (bounds_list):
             y_max = b[1][1]
     return [(x_min, y_min), (x_max, y_max)]
 
-def render_reverse_part_list (part_list, glyph_path='glyphs/', padding=0.2, interaction_list=None, module_list=None):
+def render_rotated_part_list (part_list, glyph_path='glyphs/', rotation = 0.0, fig=None, ax=None, start_position=None, extra_bounds_list=[], padding=0.2, interaction_list=None, module_list=None):
+    # Rotate glyphs
+    for glyph in part_list:
+        user_parameters = glyph[1]
+        if user_parameters is None:
+            user_parameters = {}
+            glyph[1] = user_parameters
+        if 'rotation' in user_parameters:
+            user_parameters['rotation'] += rotation
+        elif 'rotation' not in user_parameters:
+            user_parameters['rotation'] = rotation
+    fig, ax, baseline_start, baseline_end, bounds = render_part_list(part_list, glyph_path=glyph_path, padding=padding, fig=fig, ax=ax, start_position=start_position, extra_bounds_list=extra_bounds_list, interaction_list=interaction_list, module_list=module_list)
+    return fig, ax, baseline_start, baseline_end, bounds
+
+def render_reverse_part_list (part_list, glyph_path='glyphs/', fig=None, ax=None, start_position=None, extra_bounds_list=[], padding=0.2, interaction_list=None, module_list=None):
     # Rotate glyphs 180° and reverse order
     for glyph in part_list:
         user_parameters = glyph[1]
@@ -364,20 +378,22 @@ def render_reverse_part_list (part_list, glyph_path='glyphs/', padding=0.2, inte
                     interaction[3]['direction'] == 'forward'
             if 'direction' not in interaction[3]:
                 interaction[3]['direction'] = 'reverse'
-    fig, ax, baseline_start, baseline_end = render_part_list(part_list, glyph_path=glyph_path, padding=padding, interaction_list=interaction_list, module_list=module_list)
-    return fig, ax, baseline_start, baseline_end
+    fig, ax, baseline_start, baseline_end, bounds = render_part_list(part_list, glyph_path=glyph_path, padding=padding, fig=fig, ax=ax, start_position=start_position, extra_bounds_list=extra_bounds_list, interaction_list=interaction_list, module_list=module_list)
+    return fig, ax, baseline_start, baseline_end, bounds
 
-def render_part_list (part_list, glyph_path='glyphs/', padding=0.2, interaction_list=None, module_list=None):
+def render_part_list (part_list, glyph_path='glyphs/', fig=None, ax=None, start_position=None, extra_bounds_list=[], padding=0.2, interaction_list=None, module_list=None):
     # Render multiple glyphs
     renderer = GlyphRenderer(glyph_path=glyph_path)
-    fig, ax = plt.subplots()
+    if fig == None or ax == None:
+        fig, ax = plt.subplots()
     ax.set_aspect('equal')
     ax.set_xticks([])
     ax.set_yticks([])
     ax.axis('off')
     plt.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
-    part_position = (0, 0)
-    start_position = part_position
+    if start_position is None:
+        start_position = (0, 0)
+    part_position = start_position
     bounds_list = []
     for part in part_list:
         # Draw glyphs
@@ -423,11 +439,13 @@ def render_part_list (part_list, glyph_path='glyphs/', padding=0.2, interaction_
             # Draw modules
             bounds = draw_module(ax, start_bounds, end_bounds, module[2], module[3])
             module_bounds_list.append(bounds)
-    # Unify interaction and module bounds with glyph bounds
+    # Unify interaction, module and extra bounds with glyph bounds
     for interaction_bounds in interaction_bounds_list:
         bounds_list.append(interaction_bounds)
     for module_bounds in module_bounds_list:
         bounds_list.append(module_bounds)
+    for extra_bounds in extra_bounds_list:
+        bounds_list.append(extra_bounds)
     # Automatically find bounds for plot and resize axes
     final_bounds = __find_bound_of_bounds(bounds_list)
     width = (final_bounds[1][0] - final_bounds[0][0])/60.0
@@ -439,7 +457,7 @@ def render_part_list (part_list, glyph_path='glyphs/', padding=0.2, interaction_
     ax.set_xlim([final_bounds[0][0]-fig_pad, final_bounds[1][0]+fig_pad])
     ax.set_ylim([final_bounds[0][1]-fig_pad, final_bounds[1][1]+fig_pad])
     fig.set_size_inches( (width, height) )
-    return fig, ax, start_position, part_position
+    return fig, ax, start_position, part_position, final_bounds
 
 def draw_module (ax, start_bounds, end_bounds, x_strech, y_strech):
     x_pad = (end_bounds[0][0] - start_bounds[0][0]) / 10
