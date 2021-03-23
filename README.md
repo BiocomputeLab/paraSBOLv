@@ -10,8 +10,6 @@ Lightweight Python library designed to simplify the rendering of highly-customis
 
 If you use this tool to create diagrams or as a basis for new software please cite the following paper that provides an overview of the tool and possible use cases. Without citation support of this tool become difficult.
 
-```
-Clark C., Scott-Brown J. & Gorochowski T.E. "paraSBOLv: a foundation for standard-compliant genetic design visualisation tools" (in prep.)
-```
+`Clark C., Scott-Brown J. & Gorochowski T.E. "paraSBOLv: a foundation for standard-compliant genetic design visualisation tools" (in prep.)`
 
 Also, if you have examples of `paraSBOLv` use that you would like publicised then please contact us and we will add you to our library of tools built using this library.
