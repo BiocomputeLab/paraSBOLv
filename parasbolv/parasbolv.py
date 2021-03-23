@@ -22,10 +22,10 @@ import matplotlib.pyplot as plt
 from matplotlib.path import Path
 import matplotlib.patches as patches
 import matplotlib.font_manager as font_manager
-import pkgutil
 from parasbolv.svgpath2mpl import parse_path
 
-__author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Charlie Clark <charlieclark1.e.e.2019@bristol.ac.uk>'
+__author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, \
+               Charlie Clark <charlieclark1.e.e.2019@bristol.ac.uk>'
 __license__ = 'MIT'
 __version__ = '0.1'
 
