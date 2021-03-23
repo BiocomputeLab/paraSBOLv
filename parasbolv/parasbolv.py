@@ -1,11 +1,15 @@
 #!/usr/bin/env python
+
 """
-Parametric SBOL Visual (parasbolv)
+Parametric SBOL Visual (paraSBOLv)
 
 A simple and lightweight library for rendering parametric SVG versions
-of the SBOL Visual glyphs using matplotlib. Is able to load a directory 
-of glyphs and provides access to all style and geometry customisations.
+of the SBOL Visual symbols using matplotlib. Is able to load a directory 
+of glyphs and provides access to all style and geometry customisations,
+plus provides a number of helper functions to handle part lists, modules 
+and interactions
 """
+
 import warnings
 import svgpath2mpl
 import os
@@ -19,9 +23,9 @@ from matplotlib.path import Path
 import matplotlib.patches as patches
 import matplotlib.font_manager as font_manager
 
-__author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>'
+__author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Charlie Clark <charlieclark1.e.e.2019@bristol.ac.uk>'
 __license__ = 'MIT'
-__version__ = '1.0'
+__version__ = '0.1'
 
 class GlyphRenderer:
     """ Class to load and render using matplotlib parametric SVG glyphs.
