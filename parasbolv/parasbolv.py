@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Parametric SBOL Visual (paraSBOLv)
+paraSBOLv
 
 A simple and lightweight library for rendering parametric SVG versions
 of the SBOL Visual symbols using matplotlib. Is able to load a directory 
