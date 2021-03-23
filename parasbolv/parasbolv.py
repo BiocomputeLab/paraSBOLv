@@ -11,8 +11,8 @@ and interactions
 """
 
 import warnings
-import svgpath2mpl
 import os
+import sys
 import glob
 import xml.etree.ElementTree as ET
 import re
@@ -22,6 +22,8 @@ import matplotlib.pyplot as plt
 from matplotlib.path import Path
 import matplotlib.patches as patches
 import matplotlib.font_manager as font_manager
+import pkgutil
+from parasbolv.svgpath2mpl import parse_path
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, Charlie Clark <charlieclark1.e.e.2019@bristol.ac.uk>'
 __license__ = 'MIT'
@@ -31,12 +33,15 @@ class GlyphRenderer:
     """ Class to load and render using matplotlib parametric SVG glyphs.
     """
 
-    def __init__(self, glyph_path='glyphs/', global_defaults=None):
+    def __init__(self, glyph_path=None, global_defaults=None):
         self.svg2mpl_style_map = {}
         self.svg2mpl_style_map['fill'] = 'facecolor'
         self.svg2mpl_style_map['stroke'] = 'edgecolor'
         self.svg2mpl_style_map['stroke-width'] = 'linewidth'
-        self.glyphs_library, self.glyph_soterm_map = self.load_glyphs_from_path(glyph_path)
+        if glyph_path is None:
+            self.glyphs_library, self.glyph_soterm_map = self.load_package_glyphs()
+        else:
+            self.glyphs_library, self.glyph_soterm_map = self.load_glyphs_from_path(glyph_path)
 
     def __process_unknown_val (self, val):
         # Convert an unknown value into the correct type
@@ -183,6 +188,12 @@ class GlyphRenderer:
                 glyph_data['paths'].append(self.__extract_tag_details(child.attrib))
         return glyph_type, glyph_soterms, glyph_data
 
+    def load_package_glyphs(self):
+        # Find the directory with the packaged glyphs
+        d = os.path.dirname(sys.modules[__name__].__file__)
+        path = os.path.join(d, 'glyphs')
+        return self.load_glyphs_from_path(path)
+
     def load_glyphs_from_path(self, path):
         glyphs_library = {}
         glyph_soterm_map = {}
@@ -239,7 +250,8 @@ class GlyphRenderer:
                             merged_style.pop(style_el)
                             warnings.warn(f"""Style parameter '{style_el}' is not valid for '{path["id"]}'.""")
                 svg_text = self.__eval_svg_data(path['d'], merged_parameters)
-                paths_to_draw.append([svgpath2mpl.parse_path(svg_text), merged_style])
+                # Call to svgpath2mpl
+                paths_to_draw.append([parse_path(svg_text), merged_style])
         # Draw glyph to the axis with correct styling parameters
         baseline_y = glyph['defaults']['baseline_y']
         all_y_flipped_paths = []
@@ -314,7 +326,8 @@ class GlyphRenderer:
         for path in glyph['paths']:
             if path['class'] == 'baseline':
                 svg_text = self.__eval_svg_data(path['d'], merged_parameters)
-                baseline_path = svgpath2mpl.parse_path(svg_text)
+                # Call to svgpath2mpl
+                baseline_path = parse_path(svg_text)
                 break
         if baseline_path is not None:
             # Draw glyph to the axis with correct styling parameters

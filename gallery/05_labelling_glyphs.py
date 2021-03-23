@@ -6,7 +6,7 @@ Add customisable labels in or around glyphs.
 import parasbolv as psv
 import matplotlib.pyplot as plt
 
-renderer = psv.GlyphRenderer(glyph_path='../glyphs/')
+renderer = psv.GlyphRenderer()
 
 fig = plt.figure(figsize=(6,6))
 ax = fig.add_axes([0.0, 0.0, 1.0, 1.0], frameon=False, aspect=1)

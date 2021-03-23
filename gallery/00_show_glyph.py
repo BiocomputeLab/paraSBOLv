@@ -10,7 +10,7 @@ __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>'
 __license__ = 'MIT'
 __version__ = '1.0'
 
-renderer = psv.GlyphRenderer(glyph_path='../glyphs_2.0/')
+renderer = psv.GlyphRenderer()
 
 fig = plt.figure(figsize=(6,6))
 ax = fig.add_axes([0.0, 0.0, 1.0, 1.0], frameon=False, aspect=1)

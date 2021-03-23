@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """
 Copyright (c) 2016, Nezar Abdennur
 All rights reserved.
@@ -29,7 +28,6 @@ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
-
 """
 SVGPATH2MPL
 ~~~~~~~~~~~
@@ -41,7 +39,7 @@ Path specification at <https://www.w3.org/TR/SVG/paths.html>.
 :copyright: (c) 2016, Nezar Abdennur.
 :license: BSD.
 """
-from __future__ import division, print_function
+#from __future__ import division, print_function
 from math import sin, cos, sqrt, degrees, radians, acos
 import re
 
