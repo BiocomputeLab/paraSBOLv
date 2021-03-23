@@ -13,11 +13,11 @@ __version__ = '1.0'
 # Basic data type to hold the parts
 part_list = []
 part_list.append( ['CDS', 
-                   {'arrowbody_width': 20, 'arrowbody_height': 5, 'arrowhead_height': 0, 'arrowhead_width': 5}, 
+                   {'arrowhead_width': 6}, 
                    {'cds': {'facecolor': (0.5,0.5,0.5), 'edgecolor': (1,0,0), 'linewidth': 2}}
                   ] )
 part_list.append( ['CDS', 
-                   {'arrowbody_width': 40, 'arrowbody_height': 5, 'arrowhead_height': 2, 'arrowhead_width': 10}, 
+                   {'arrowbody_height': 15, 'arrowhead_width': 6}, 
                    {'cds': {'facecolor': (1,1,1), 'edgecolor': (0,0,1), 'linewidth': 2}}
                   ] )
 part_list.append( ['Promoter', 
