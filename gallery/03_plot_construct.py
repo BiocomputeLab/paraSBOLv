@@ -26,7 +26,7 @@ part_list.append( ['CDS',
                   ] )
 
 # Create renderer
-renderer = psv.GlyphRenderer(glyph_path='../glyphs/')
+renderer = psv.GlyphRenderer()
 
 # Draw construct
 construct = psv.construct(part_list, renderer)
