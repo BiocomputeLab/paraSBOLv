@@ -1,18 +1,14 @@
 #!/usr/bin/env python
-
 """
-paraSBOLv
+Parametric SBOL Visual (parasbolv)
 
 A simple and lightweight library for rendering parametric SVG versions
-of the SBOL Visual symbols using matplotlib. Is able to load a directory 
-of glyphs and provides access to all style and geometry customisations,
-plus provides a number of helper functions to handle part lists, modules 
-and interactions
+of the SBOL Visual glyphs using matplotlib. Is able to load a directory 
+of glyphs and provides access to all style and geometry customisations.
 """
-
 import warnings
+import svgpath2mpl
 import os
-import sys
 import glob
 import xml.etree.ElementTree as ET
 import re
@@ -22,26 +18,21 @@ import matplotlib.pyplot as plt
 from matplotlib.path import Path
 import matplotlib.patches as patches
 import matplotlib.font_manager as font_manager
-from parasbolv.svgpath2mpl import parse_path
 
-__author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, \
-               Charlie Clark <charlieclark1.e.e.2019@bristol.ac.uk>'
+__author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>'
 __license__ = 'MIT'
-__version__ = '0.1'
+__version__ = '1.0'
 
 class GlyphRenderer:
     """ Class to load and render using matplotlib parametric SVG glyphs.
     """
 
-    def __init__(self, glyph_path=None, global_defaults=None):
+    def __init__(self, glyph_path='glyphs/', global_defaults=None):
         self.svg2mpl_style_map = {}
         self.svg2mpl_style_map['fill'] = 'facecolor'
         self.svg2mpl_style_map['stroke'] = 'edgecolor'
         self.svg2mpl_style_map['stroke-width'] = 'linewidth'
-        if glyph_path is None:
-            self.glyphs_library, self.glyph_soterm_map = self.load_package_glyphs()
-        else:
-            self.glyphs_library, self.glyph_soterm_map = self.load_glyphs_from_path(glyph_path)
+        self.glyphs_library, self.glyph_soterm_map = self.load_glyphs_from_path(glyph_path)
 
     def __process_unknown_val (self, val):
         # Convert an unknown value into the correct type
@@ -188,12 +179,6 @@ class GlyphRenderer:
                 glyph_data['paths'].append(self.__extract_tag_details(child.attrib))
         return glyph_type, glyph_soterms, glyph_data
 
-    def load_package_glyphs(self):
-        # Find the directory with the packaged glyphs
-        d = os.path.dirname(sys.modules[__name__].__file__)
-        path = os.path.join(d, 'glyphs')
-        return self.load_glyphs_from_path(path)
-
     def load_glyphs_from_path(self, path):
         glyphs_library = {}
         glyph_soterm_map = {}
@@ -250,8 +235,7 @@ class GlyphRenderer:
                             merged_style.pop(style_el)
                             warnings.warn(f"""Style parameter '{style_el}' is not valid for '{path["id"]}'.""")
                 svg_text = self.__eval_svg_data(path['d'], merged_parameters)
-                # Call to svgpath2mpl
-                paths_to_draw.append([parse_path(svg_text), merged_style])
+                paths_to_draw.append([svgpath2mpl.parse_path(svg_text), merged_style])
         # Draw glyph to the axis with correct styling parameters
         baseline_y = glyph['defaults']['baseline_y']
         all_y_flipped_paths = []
@@ -326,8 +310,7 @@ class GlyphRenderer:
         for path in glyph['paths']:
             if path['class'] == 'baseline':
                 svg_text = self.__eval_svg_data(path['d'], merged_parameters)
-                # Call to svgpath2mpl
-                baseline_path = parse_path(svg_text)
+                baseline_path = svgpath2mpl.parse_path(svg_text)
                 break
         if baseline_path is not None:
             # Draw glyph to the axis with correct styling parameters
@@ -355,21 +338,7 @@ def __find_bound_of_bounds (bounds_list):
             y_max = b[1][1]
     return [(x_min, y_min), (x_max, y_max)]
 
-def render_rotated_part_list (part_list, glyph_path='glyphs/', rotation = 0.0, fig=None, ax=None, start_position=None, extra_bounds_list=[], padding=0.2, interaction_list=None, module_list=None):
-    # Rotate glyphs
-    for glyph in part_list:
-        user_parameters = glyph[1]
-        if user_parameters is None:
-            user_parameters = {}
-            glyph[1] = user_parameters
-        if 'rotation' in user_parameters:
-            user_parameters['rotation'] += rotation
-        elif 'rotation' not in user_parameters:
-            user_parameters['rotation'] = rotation
-    fig, ax, baseline_start, baseline_end, bounds = render_part_list(part_list, glyph_path=glyph_path, padding=padding, fig=fig, ax=ax, start_position=start_position, extra_bounds_list=extra_bounds_list, interaction_list=interaction_list, module_list=module_list)
-    return fig, ax, baseline_start, baseline_end, bounds
-
-def render_reverse_part_list (part_list, glyph_path='glyphs/', fig=None, ax=None, start_position=None, extra_bounds_list=[], padding=0.2, interaction_list=None, module_list=None):
+def render_reverse_part_list (part_list, renderer, padding=0.2, interaction_list=None, additional_bounds_list = None, module_list=None):
     # Rotate glyphs 180° and reverse order
     for glyph in part_list:
         user_parameters = glyph[1]
@@ -391,13 +360,109 @@ def render_reverse_part_list (part_list, glyph_path='glyphs/', fig=None, ax=None
                     interaction[3]['direction'] == 'forward'
             if 'direction' not in interaction[3]:
                 interaction[3]['direction'] = 'reverse'
-    fig, ax, baseline_start, baseline_end, bounds = render_part_list(part_list, glyph_path=glyph_path, padding=padding, fig=fig, ax=ax, start_position=start_position, extra_bounds_list=extra_bounds_list, interaction_list=interaction_list, module_list=module_list)
-    return fig, ax, baseline_start, baseline_end, bounds
+    fig, ax, baseline_start, baseline_end = render_part_list(part_list, renderer, padding=padding, interaction_list=interaction_list, additional_bounds_list=additional_bounds_list, module_list=module_list)
+    return fig, ax, baseline_start, baseline_end
 
-def render_part_list (part_list, glyph_path='glyphs/', fig=None, ax=None, start_position=None, extra_bounds_list=[], padding=0.2, interaction_list=None, module_list=None):
+class construct(object):
+
+    # Create and modify constructs
+
+    def __init__ (self, part_list, renderer, padding=0.2, fig=None, ax=None, start_position=None, additional_bounds_list=None, interaction_list=None, module_list=None, orientation = 0.0):
+        self.renderer = renderer
+        self.padding = padding
+        self.fig = fig
+        self.ax = ax
+        if self.fig is None or self.ax is  None:
+            self.fig, self.ax = plt.subplots()
+        self.start_position = start_position
+        self.additional_bounds_list = additional_bounds_list
+        
+        # Data structure
+        self.part_list = part_list
+        self.interaction_list = interaction_list
+        self.module_list = module_list
+        self.bounds = None
+        self.update_bounds()
+        self.orientation = orientation # Radians
+
+    # Automatically update construct orientation
+    @property
+    def orientation(self):
+        return self._orientation
+    @orientation.setter
+    def orientation(self, value):
+        self.set_orientation(value)
+
+    '''
+    # Automatically update construct bounds
+    @property
+    def start_position(self):
+        return self._start_position
+    @start_position.setter
+    def start_position(self, value):
+        self.update_bounds()
+    '''
+    
+    def set_orientation (self, rotation):
+        part_list = self.part_list
+        # Rotate construct
+        for glyph in part_list:
+            user_parameters = glyph[1]
+            if user_parameters is None:
+                user_parameters = {}
+                glyph[1] = user_parameters
+            if 'rotation' in user_parameters:
+                user_parameters['rotation'] = rotation
+            elif 'rotation' not in user_parameters:
+                user_parameters['rotation'] = rotation
+
+        # Needs functionality to rotate interactions accordingly
+        '''
+        if interaction_list is not None:
+            for interaction in interaction_list:
+                if interaction[3] is None:
+                    interaction[3] = {}
+                if 'direction' in interaction[3]:
+                    if interaction[3]['direction'] == 'forward':
+                        interaction[3]['direction'] = 'reverse'
+                    if interaction[3]['direction'] == 'reverse':
+                        interaction[3]['direction'] == 'forward'
+                if 'direction' not in interaction[3]:
+                    interaction[3]['direction'] = 'reverse'
+        '''
+        self.part_list = part_list
+
+    def update_bounds (self):
+        # Update bounds to account for changes to the construct
+        self.bounds = self.draw(draw_for_bounds = True)[4]
+        self.bounds = ((self.bounds[0], self.bounds[1]))
+
+    def draw (self, draw_for_bounds = False):
+        # Draw the construct
+        bounds_to_add = []
+        '''
+        if self.bounds is not None:
+            # Include construct bounds
+            bounds_to_add.append(self.bounds)
+        '''
+        if self.additional_bounds_list is not None:
+            # Include additional bounds
+            for additional_bounds in self.additional_bounds_list:
+                bounds_to_add.append(additional_bounds)
+        if draw_for_bounds == False:
+            fig, ax, baseline_start, baseline_end, bounds = render_part_list(self.part_list, self.renderer, padding=self.padding, fig=self.fig, ax=self.ax, start_position=self.start_position, additional_bounds_list = bounds_to_add, interaction_list=self.interaction_list, module_list=self.module_list)
+            return fig, ax, baseline_start, baseline_end, bounds
+        elif draw_for_bounds == True:
+            # Temporary rendering pathway to generate bounds
+            temp_fig, temp_ax = plt.subplots()
+            fig, ax, baseline_start, baseline_end, bounds = render_part_list(self.part_list, self.renderer, padding=self.padding, fig=temp_fig, ax=temp_ax, start_position=self.start_position, additional_bounds_list = bounds_to_add, interaction_list=self.interaction_list, module_list=self.module_list)
+            plt.close()
+            return fig, ax, baseline_start, baseline_end, bounds
+
+
+def render_part_list (part_list, renderer, padding=0.2, fig = None, ax = None, start_position=None, additional_bounds_list = None, interaction_list=None, module_list=None):
     # Render multiple glyphs
-    renderer = GlyphRenderer(glyph_path=glyph_path)
-    if fig == None or ax == None:
+    if fig is None or ax is None:
         fig, ax = plt.subplots()
     ax.set_aspect('equal')
     ax.set_xticks([])
@@ -452,13 +517,13 @@ def render_part_list (part_list, glyph_path='glyphs/', fig=None, ax=None, start_
             # Draw modules
             bounds = draw_module(ax, start_bounds, end_bounds, module[2], module[3])
             module_bounds_list.append(bounds)
-    # Unify interaction, module and extra bounds with glyph bounds
+    # Unify interaction and module bounds with glyph bounds
     for interaction_bounds in interaction_bounds_list:
         bounds_list.append(interaction_bounds)
     for module_bounds in module_bounds_list:
         bounds_list.append(module_bounds)
-    for extra_bounds in extra_bounds_list:
-        bounds_list.append(extra_bounds)
+    for additional_bounds in additional_bounds_list:
+        bounds_list.append(additional_bounds)
     # Automatically find bounds for plot and resize axes
     final_bounds = __find_bound_of_bounds(bounds_list)
     width = (final_bounds[1][0] - final_bounds[0][0])/60.0
