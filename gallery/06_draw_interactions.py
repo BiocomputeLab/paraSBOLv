@@ -48,7 +48,7 @@ interaction_list.append([2, 3, 'inhibition', {'color': (0, 0.75, 0),
                                               'receiving_xy_skew': (0,0)}])
 
 # Create renderer
-renderer = psv.GlyphRenderer(glyph_path='../glyphs/')
+renderer = psv.GlyphRenderer()
 
 # Plot Construct
 construct = psv.construct(part_list, renderer, interaction_list=interaction_list)
