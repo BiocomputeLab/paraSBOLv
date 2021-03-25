@@ -8,9 +8,13 @@ import parasbolv as psv
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
+__author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>'
+__license__ = 'MIT'
+__version__ = '1.0'
+
 # Setup the animation
 np.random.seed(1)
-renderer = psv.GlyphRenderer()
+renderer = psv.GlyphRenderer(glyph_path='../glyphs/')
 user_parameters = {}
 cds_style = {}
 fig, ax = plt.subplots()

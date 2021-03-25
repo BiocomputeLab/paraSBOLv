@@ -6,7 +6,7 @@ Add customisable labels in or around glyphs.
 import parasbolv as psv
 import matplotlib.pyplot as plt
 
-renderer = psv.GlyphRenderer()
+renderer = psv.GlyphRenderer(glyph_path='../glyphs/')
 
 fig = plt.figure(figsize=(6,6))
 ax = fig.add_axes([0.0, 0.0, 1.0, 1.0], frameon=False, aspect=1)
@@ -18,7 +18,7 @@ user_parameters['label'] = {'text':'label',
                             'rotation':(3.14 / 4)}
 renderer.draw_glyph(ax, 'CDS', (15, 60), user_parameters=user_parameters, rotation=3.14 / 4)
 
-# Draw fancily labelled CDS using matplotlib font parameters
+# Draw fancily labelled CDS using Matplotlib font parameters
 cds_style = {}
 cds_style['cds'] = {'facecolor': (0,0,1), 'edgecolor': (0,0,0.5), 'linewidth': 5}
 

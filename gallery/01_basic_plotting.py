@@ -6,7 +6,11 @@ Basic example of plotting parametric SBOL Visual glyphs using the parasbolv libr
 import parasbolv as psv
 import matplotlib.pyplot as plt
 
-renderer = psv.GlyphRenderer()
+__author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>'
+__license__ = 'MIT'
+__version__ = '1.0'
+
+renderer = psv.GlyphRenderer(glyph_path='../glyphs/')
 
 p = renderer.get_baseline_end('RibosomeEntrySite', (0.5, 40), rotation=1.0)
 print(renderer.get_glyph_bounds('RibosomeEntrySite', (0.5, 40), rotation=1.0))

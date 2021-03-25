@@ -47,16 +47,17 @@ interaction_list.append([2, 3, 'inhibition', {'color': (0, 0.75, 0),
                                               'sending_xy_skew': (0,0),
                                               'receiving_xy_skew': (0,0)}])
 
-# Forward plot
-fig, ax, baseline_start, baseline_end, bounds = psv.render_part_list(part_list, glyph_path='../glyphs/', padding=0.2, interaction_list=interaction_list)
-ax.plot([baseline_start[0], baseline_end[0]], [baseline_start[1], baseline_end[1]], color=(0,0,0), linewidth=1.5, zorder=0)
-fig.savefig('06_draw_interactions_1.pdf', transparent=True, dpi=300)
-# Reverse plot
-fig, ax, baseline_start, baseline_end, bounds = psv.render_reverse_part_list(part_list, glyph_path='../glyphs/', padding=0.2, interaction_list=interaction_list)
-ax.plot([baseline_start[0], baseline_end[0]], [baseline_start[1], baseline_end[1]], color=(0,0,0), linewidth=1.5, zorder=0)
-fig.savefig('06_draw_interactions_2.pdf', transparent=True, dpi=300)
+# Create renderer
+renderer = psv.GlyphRenderer(glyph_path='../glyphs/')
 
-# Can also manually plot interactions:
-# interaction_bounds = psv.draw_interaction(ax, ((50, 15), (55, 15)), ((60, 15), (65, 15)), 'process', None)
+# Plot Construct
+construct = psv.construct(part_list, renderer, interaction_list=interaction_list)
+fig, ax, baseline_start, baseline_end, bounds = construct.draw()
+ax.plot([baseline_start[0], baseline_end[0]], [baseline_start[1], baseline_end[1]], color=(0,0,0), linewidth=1.5, zorder=0)
+
+fig.savefig('06_draw_interactions_1.pdf', transparent=True, dpi=300)
+
+# You can also manually plot interactions:
+# interaction_bounds = psv.draw_interaction(ax, ((50, 15), (50, 15)), ((60, 15), (60, 15)), 'process', None)
 
 plt.show()
