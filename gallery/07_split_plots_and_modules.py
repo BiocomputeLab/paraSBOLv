@@ -44,7 +44,7 @@ module_list.append([0, 1, 0, -10])
 module_list.append([6, 7, 0, -60])
 
 # Create renderer
-renderer = psv.GlyphRenderer(glyph_path='../glyphs/')
+renderer = psv.GlyphRenderer()
 
 # Draw construct
 construct = psv.construct(part_list, renderer, module_list = module_list)
