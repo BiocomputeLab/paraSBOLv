@@ -6,10 +6,6 @@ Demonstrate how to plot lists of parts
 import parasbolv as psv
 import matplotlib.pyplot as plt
 
-__author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>'
-__license__ = 'MIT'
-__version__ = '1.0'
-
 # Basic data type to hold the parts
 part_list = []
 part_list.append( ['CDS', 
