@@ -9,10 +9,6 @@ from operator import itemgetter
 import parasbolv as psv
 import matplotlib.pyplot as plt
 
-__author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>'
-__license__ = 'MIT'
-__version__ = '1.0'
-
 # Mapping from GFF annotation type to parasbolv glyph
 gffsvgtype_map = {}
 gffsvgtype_map['gene'] = 'CDS'
@@ -65,7 +61,7 @@ def load_part_list_from_gff (filename, chrom, type_map=gffsvgtype_map, region=No
 
 part_list = load_part_list_from_gff('./04_plot_gff.gff', 'chrom1', type_map=gffsvgtype_map)
 
-renderer = psv.GlyphRenderer(glyph_path='../glyphs/')
+renderer = psv.GlyphRenderer()
 
 construct = psv.construct(part_list, renderer)
 fig, ax, baseline_start, baseline_end, bounds = construct.draw()
