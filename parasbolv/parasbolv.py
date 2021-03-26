@@ -355,31 +355,6 @@ def __find_bound_of_bounds (bounds_list):
             y_max = b[1][1]
     return [(x_min, y_min), (x_max, y_max)]
 
-def render_reverse_part_list (part_list, renderer, padding=0.2, interaction_list=None, additional_bounds_list = None, module_list=None):
-    # Rotate glyphs 180° and reverse order
-    for glyph in part_list:
-        user_parameters = glyph[1]
-        if user_parameters is None:
-            user_parameters = {}
-            glyph[1] = user_parameters
-        if 'rotation' in user_parameters:
-            user_parameters['rotation'] += pi
-        elif 'rotation' not in user_parameters:
-            user_parameters['rotation'] = pi
-    if interaction_list is not None:
-        for interaction in interaction_list:
-            if interaction[3] is None:
-                interaction[3] = {}
-            if 'direction' in interaction[3]:
-                if interaction[3]['direction'] == 'forward':
-                    interaction[3]['direction'] = 'reverse'
-                if interaction[3]['direction'] == 'reverse':
-                    interaction[3]['direction'] == 'forward'
-            if 'direction' not in interaction[3]:
-                interaction[3]['direction'] = 'reverse'
-    fig, ax, baseline_start, baseline_end = render_part_list(part_list, renderer, padding=padding, interaction_list=interaction_list, additional_bounds_list=additional_bounds_list, module_list=module_list)
-    return fig, ax, baseline_start, baseline_end
-
 class construct(object):
 
     # Create and modify constructs
