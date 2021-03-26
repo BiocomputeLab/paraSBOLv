@@ -2,6 +2,7 @@
 
 """
 paraSBOLv
+
 A simple and lightweight library for rendering parametric SVG versions
 of the SBOL Visual symbols using matplotlib. Is able to load a directory 
 of glyphs and provides access to all style and geometry customisations,
