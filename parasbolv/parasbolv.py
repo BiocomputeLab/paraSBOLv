@@ -509,7 +509,7 @@ def render_part_list (part_list, renderer, padding=0.2, fig = None, ax = None, s
             # Draw modules
             bounds = draw_module(ax, start_bounds, end_bounds, module[2], module[3])
             module_bounds_list.append(bounds)
-    # Unify interaction and module bounds with glyph bounds
+    # Unify interaction, module, and additional bounds with glyph bounds
     for interaction_bounds in interaction_bounds_list:
         bounds_list.append(interaction_bounds)
     for module_bounds in module_bounds_list:
