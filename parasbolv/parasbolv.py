@@ -316,7 +316,8 @@ class GlyphRenderer:
         for path in glyph['paths']:
             if path['class'] == 'baseline':
                 svg_text = self.__eval_svg_data(path['d'], merged_parameters)
-                baseline_path = svgpath2mpl.parse_path(svg_text)
+                # Call to svgpath2mpl
+                baseline_path = parse_path(svg_text)
                 break
         if baseline_path is not None:
             # Draw glyph to the axis with correct styling parameters
