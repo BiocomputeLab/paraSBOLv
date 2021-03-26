@@ -24,9 +24,9 @@ def run(data):
     ax.axis('off')
     ax.set_ylim([25,75])
     ax.set_xlim([0,70])
-    user_parameters['arrowbody_width'] = np.random.uniform(15, 30)
+    user_parameters['height'] = np.random.uniform(10, 20)
+    user_parameters['width'] = np.random.uniform(10, 20)
     user_parameters['arrowbody_height'] = np.random.uniform(4, 10)
-    user_parameters['arrowhead_height'] = np.random.uniform(0, 10)
     user_parameters['arrowhead_width'] = np.random.uniform(5, 9)
     cds_style['cds'] = {'facecolor': (np.random.uniform(0, 1),
     	                              np.random.uniform(0, 1),
