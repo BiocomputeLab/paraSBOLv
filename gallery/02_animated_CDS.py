@@ -10,7 +10,7 @@ import matplotlib.animation as animation
 
 # Setup the animation
 np.random.seed(1)
-renderer = psv.GlyphRenderer(glyph_path='../glyphs/')
+renderer = psv.GlyphRenderer()
 user_parameters = {}
 cds_style = {}
 fig, ax = plt.subplots()
