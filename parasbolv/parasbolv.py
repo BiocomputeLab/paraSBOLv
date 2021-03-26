@@ -33,12 +33,15 @@ class GlyphRenderer:
     """ Class to load and render using matplotlib parametric SVG glyphs.
     """
 
-    def __init__(self, glyph_path='glyphs/', global_defaults=None):
+    def __init__(self, glyph_path='None', global_defaults=None):
         self.svg2mpl_style_map = {}
         self.svg2mpl_style_map['fill'] = 'facecolor'
         self.svg2mpl_style_map['stroke'] = 'edgecolor'
         self.svg2mpl_style_map['stroke-width'] = 'linewidth'
-        self.glyphs_library, self.glyph_soterm_map = self.load_glyphs_from_path(glyph_path)
+        if glyph_path is None:
+            self.glyphs_library, self.glyph_soterm_map = self.load_package_glyphs()
+        else:
+            self.glyphs_library, self.glyph_soterm_map = self.load_glyphs_from_path(glyph_path)
 
     def __process_unknown_val (self, val):
         # Convert an unknown value into the correct type
@@ -184,6 +187,12 @@ class GlyphRenderer:
             if child.tag.endswith('path'):
                 glyph_data['paths'].append(self.__extract_tag_details(child.attrib))
         return glyph_type, glyph_soterms, glyph_data
+
+    def load_package_glyphs(self):
+        # Find the directory with the packaged glyphs
+        d = os.path.dirname(sys.modules[__name__].__file__)
+        path = os.path.join(d, 'glyphs')
+        return self.load_glyphs_from_path(path)
 
     def load_glyphs_from_path(self, path):
         glyphs_library = {}
