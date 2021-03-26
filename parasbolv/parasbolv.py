@@ -33,7 +33,7 @@ class GlyphRenderer:
     """ Class to load and render using matplotlib parametric SVG glyphs.
     """
 
-    def __init__(self, glyph_path='None', global_defaults=None):
+    def __init__(self, glyph_path=None, global_defaults=None):
         self.svg2mpl_style_map = {}
         self.svg2mpl_style_map['fill'] = 'facecolor'
         self.svg2mpl_style_map['stroke'] = 'edgecolor'
@@ -250,7 +250,8 @@ class GlyphRenderer:
                             merged_style.pop(style_el)
                             warnings.warn(f"""Style parameter '{style_el}' is not valid for '{path["id"]}'.""")
                 svg_text = self.__eval_svg_data(path['d'], merged_parameters)
-                paths_to_draw.append([svgpath2mpl.parse_path(svg_text), merged_style])
+                # Call to svgpath2mpl
+                paths_to_draw.append([parse_path(svg_text), merged_style])
         # Draw glyph to the axis with correct styling parameters
         baseline_y = glyph['defaults']['baseline_y']
         all_y_flipped_paths = []
