@@ -10,18 +10,20 @@ plus provides a number of helper functions to handle part lists, modules
 and interactions
 """
 
-import warnings
+import warnings 
 import os
 import sys
 import glob
 import xml.etree.ElementTree as ET
 import re
 from math import cos, sin, pi
+
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.path import Path
 import matplotlib.patches as patches
 import matplotlib.font_manager as font_manager
+from matplotlib.path import Path
+
 from parasbolv.svgpath2mpl import parse_path
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, \
