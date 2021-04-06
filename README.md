@@ -4,7 +4,7 @@ A lightweight Python library designed to simplify the rendering of highly-custom
 
 ## Dependancies
 
-`paraSBOLv` does not require any other dependancies when installed. However, internally it does make use of the wonderful [`svgpath2mpl`](https://github.com/nvictus/svgpath2mpl) library to handle the generation of [`matplotlib`](https://matplotlib.org) compatible paths from an SVG path string. Do check this out if you'd like to know more about using SVG with [`matplotlib`](https://matplotlib.org).
+`paraSBOLv` does not require any other dependancies when installed. However, internally it does make use of the [`svgpath2mpl`](https://github.com/nvictus/svgpath2mpl) library to handle the generation of [`matplotlib`](https://matplotlib.org) compatible paths from an SVG path string. Do check this out if you'd like to know more about using SVG with [`matplotlib`](https://matplotlib.org).
 
 ## Support
 
