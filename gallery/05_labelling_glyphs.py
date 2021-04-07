@@ -18,7 +18,7 @@ user_parameters['label'] = {'text':'label',
                             'rotation':(3.14 / 4)}
 renderer.draw_glyph(ax, 'CDS', (15, 60), user_parameters=user_parameters, rotation=3.14 / 4)
 
-# Draw fancily labelled CDS using matplotlib font parameters
+# Draw fancily labelled CDS using Matplotlib font parameters
 cds_style = {}
 cds_style['cds'] = {'facecolor': (0,0,1), 'edgecolor': (0,0,0.5), 'linewidth': 5}
 

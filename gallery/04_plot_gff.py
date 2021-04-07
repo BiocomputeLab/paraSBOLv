@@ -60,7 +60,13 @@ def load_part_list_from_gff (filename, chrom, type_map=gffsvgtype_map, region=No
     return part_list
 
 part_list = load_part_list_from_gff('./04_plot_gff.gff', 'chrom1', type_map=gffsvgtype_map)
-fig, ax, baseline_start, baseline_end, bounds = psv.render_part_list(part_list,glyph_path='../glyphs/', padding=0.3)
+
+renderer = psv.GlyphRenderer()
+
+construct = psv.construct(part_list, renderer)
+fig, ax, baseline_start, baseline_end, bounds = construct.draw()
 ax.plot([baseline_start[0], baseline_end[0]], [baseline_start[1], baseline_end[1]], color=(0,0,0), linewidth=1.5, zorder=0)
+
 fig.savefig('04_plot_gff.pdf', transparent=True, dpi=300)
+
 plt.show()
