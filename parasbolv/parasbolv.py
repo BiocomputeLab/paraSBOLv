@@ -426,7 +426,7 @@ class Construct(object):
                 right vertex.
     '''
 
-    def __init__ (self, part_list, renderer, padding=0.2, fig=None, ax=None, start_position=None, additional_bounds_list=None, interaction_list=None, module_list=None, orientation = 0.0):
+    def __init__ (self, part_list, renderer, padding=0.2, fig=None, ax=None, start_position=(0, 0), additional_bounds_list=None, interaction_list=None, module_list=None, orientation = 0.0):
         self.renderer = renderer
         self.padding = padding
         self.fig = fig
@@ -453,20 +453,10 @@ class Construct(object):
     def orientation(self, value):
         self._orientation = value
         self.set_orientation(value)
-
-    '''
-    # Automatically update construct bounds
-    @property
-    def start_position(self):
-        return self._start_position
-    @start_position.setter
-    def start_position(self, value):
-        self.update_bounds()
-    '''
     
     def set_orientation (self, rotation):
+        # Set the orientation of the construct
         part_list = self.part_list
-        # Rotate construct
         for glyph in part_list:
             user_parameters = glyph[1]
             if user_parameters is None:
@@ -479,7 +469,7 @@ class Construct(object):
         self.part_list = part_list
 
     def reverse_interactions (self):
-        # Draw interactions from opposite side
+        # Reverse the side from which interactions are drawn from
         if self.interaction_list is not None:
             for interaction in self.interaction_list:
                 if interaction[3] is None:
@@ -493,7 +483,7 @@ class Construct(object):
                     interaction[3]['direction'] = 'reverse'
 
     def update_bounds (self):
-        # Update bounds to account for changes to the construct
+        # Update the bounds of the construct
         self.bounds = self.draw(draw_for_bounds = True)[4]
         self.bounds = ((self.bounds[0], self.bounds[1]))
 
@@ -520,7 +510,7 @@ class Construct(object):
             return fig, ax, baseline_start, baseline_end, bounds
 
 
-def render_part_list (part_list, renderer, padding=0.2, fig = None, ax = None, rotation = 0.0, start_position=None, additional_bounds_list = None, interaction_list=None, module_list=None):
+def render_part_list (part_list, renderer, padding=0.2, fig = None, ax = None, rotation = 0.0, start_position=(0, 0), additional_bounds_list = None, interaction_list=None, module_list=None):
     # Render multiple glyphs
     if fig is None or ax is None:
         fig, ax = plt.subplots()
@@ -529,8 +519,6 @@ def render_part_list (part_list, renderer, padding=0.2, fig = None, ax = None, r
     ax.set_yticks([])
     ax.axis('off')
     plt.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
-    if start_position is None:
-        start_position = (0, 0)
     part_position = start_position
     bounds_list = []
     for part in part_list:
@@ -625,7 +613,7 @@ def draw_interaction (ax, sending_bounds, receiving_bounds, interaction_type, pa
         initial_distance = parameters['heightskew'] * 1.5
         y_pad = parameters['heightskew'] * 2
         if interaction_type == 'degradation': # Degradation is bigger than the other interactions
-            initial_distance = parameters['heightskew'] * 3
+            initial_distance = parameters['heightskew'] * 3 
         # Find centroid of glyph bounds
         origin_cent = (sending_bounds[0][0] + (sending_bounds[1][0] - sending_bounds[0][0])/2, sending_bounds[0][1] + (sending_bounds[1][1] - sending_bounds[0][1])/2)
         end_cent = (receiving_bounds[0][0] + (receiving_bounds[1][0] - receiving_bounds[0][0])/2, receiving_bounds[0][1] + (receiving_bounds[1][1] - receiving_bounds[0][1])/2)        
