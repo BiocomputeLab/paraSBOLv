@@ -358,72 +358,71 @@ def __find_bound_of_bounds (bounds_list):
     return [(x_min, y_min), (x_max, y_max)]
 
 class Construct(object):
+    """A modifiable construct consisting of
+       SBOL glyphs, interactions and modules.
 
-    """
-    A modifiable construct consisting of
-    SBOL glyphs, interactions and modules.
-    
-    Attributes:
-        renderer: GlyphRenderer object defined above.
-        
-        padding: Scale of the space added to axis limits.
-	
-        fig, ax:
-        https://matplotlib.org/3.3.4/api/_as_gen/matplotlib.figure.Figure.html
-	
-        start_position: Tuple representing the
-                        origin of the construct, format (x, y).
-        
-        additional_bounds_list: Contains additional bounds
-				to be incorporated into the
-				construct bounds when using
-				self.draw() and self.update_
-				bounds().
-	
-        part_list: Contains all glyphs in the construct.
-                   Each glyph is represented by a list
-                   containing three elements:
-                       0: Glyph type represented by a string.
-                       1: user_parameters dictionary.
-                       2: style_parameters dictionary.
-	
-        interaction_list: Specifies interactions between
-                          construct glyphs. Each interaction
-                          is represented by a list containing
-                          four elements:
-                              0: Origin glyph of the
-                                 interaction, represented by
-                                 the glyph's index.
-                              1: Receiving glyph of the
-                                 interaction, represented
-                                 similarly.
-                              2: Interaction type represented
-                                 by a string.
-                              3: interaction_parameters
-                                 dictionary.
-	
-        module_list: Specifies modules within the construct.
-                     Each module is represented by a list
-                     containing four elements:
-                         0: First glyph within the module,
-                            represented by the index
-                            of the glyph.
-                         1: Final glyph of the module,
-                            represented similarly.
-                         2: x_stretch, an integer to
-                            strech/squash the module
-                            in the x direction.
-                         3: y_strech, functions similar to
-                            x_strech but in the y direction.
-	
-        orientation: Float representing the orientation
-                     of the construct in radians. 
-        
-        bounds: Tuple representing the bounds of the construct,
-                formatted as ((x1,y1), (x2,y2)) where (x1,y1)
-                are the coordinates of the lower left vertex
-                and (x2, y2) are the coordinates of the top
-                right vertex.
+       Attributes
+       ----------
+       renderer: GlyphRenderer object defined above.
+
+       padding: Scale of the space added to axis limits.
+
+       fig, ax:
+       https://matplotlib.org/3.3.4/api/_as_gen/matplotlib.figure.Figure.html
+
+       start_position: Tuple representing the
+                       origin of the construct, format (x, y).
+
+       additional_bounds_list: Contains additional bounds
+			to be incorporated into the
+			construct bounds when using
+			self.draw() and self.update_
+			bounds().
+
+       part_list: Contains all glyphs in the construct.
+                  Each glyph is represented by a list
+                  containing three elements:
+                      0: Glyph type represented by a string.
+                      1: user_parameters dictionary.
+                      2: style_parameters dictionary.
+
+       interaction_list: Specifies interactions between
+                         construct glyphs. Each interaction
+                         is represented by a list containing
+                         four elements:
+                             0: Origin glyph of the
+                                interaction, represented by
+                                the glyph's index.
+                             1: Receiving glyph of the
+                                interaction, represented
+                                similarly.
+                             2: Interaction type represented
+                                by a string.
+                             3: interaction_parameters
+                                dictionary.
+
+       module_list: Specifies modules within the construct.
+                    Each module is represented by a list
+                    containing four elements:
+                        0: First glyph within the module,
+                           represented by the index
+                           of the glyph.
+                        1: Final glyph of the module,
+                           represented similarly.
+                        2: x_stretch, an integer to
+                           strech/squash the module
+                           in the x direction.
+                        3: y_strech, functions similar to
+                           x_strech but in the y direction.
+
+       orientation: Float representing the orientation
+                    of the construct in radians.
+
+       bounds: Tuple representing the bounds of the construct,
+               formatted as ((x1,y1), (x2,y2)) where (x1,y1)
+               are the coordinates of the lower left vertex
+               and (x2, y2) are the coordinates of the top
+               right vertex.
     """
 
     def __init__ (self, part_list, renderer, padding=0.2, fig=None, ax=None, start_position=(0, 0), additional_bounds_list=None, interaction_list=None, module_list=None, orientation = 0.0):
@@ -455,7 +454,18 @@ class Construct(object):
         self.set_orientation(value)
     
     def set_orientation (self, rotation):
-        # Set the orientation of the construct
+        """Sets the orientation of the construct.
+
+        NOTE: the self.orientation attribute
+        should be modified instead of directly
+        calling this method.
+
+        Parameters
+        ----------
+        rotation: float
+            Rotation value in Radians to be applied
+            to the construct.
+        """
         part_list = self.part_list
         for glyph in part_list:
             user_parameters = glyph[1]
@@ -469,7 +479,8 @@ class Construct(object):
         self.part_list = part_list
 
     def reverse_interactions (self):
-        # Reverse the side from which interactions are drawn from
+        """Reverses the side interactions are drawn on.
+        """
         if self.interaction_list is not None:
             for interaction in self.interaction_list:
                 if interaction[3] is None:
@@ -483,18 +494,23 @@ class Construct(object):
                     interaction[3]['direction'] = 'reverse'
 
     def update_bounds (self):
-        # Update the bounds of the construct
+        """Updates the bounds of the constuct.
+        """
         self.bounds = self.draw(draw_for_bounds = True)[4]
         self.bounds = ((self.bounds[0], self.bounds[1]))
 
     def draw (self, draw_for_bounds = False):
+        """Draws the construct using Matplotlib.
+
+        Parameters
+        ----------
+        draw_for_bounds: bool, optional
+            Indicates if the construct is being
+            drawn to update the self.bounds 
+            attribute.
+        """
         # Draw the construct
         bounds_to_add = []
-        '''
-        if self.bounds is not None:
-            # Include construct bounds
-            bounds_to_add.append(self.bounds)
-        '''
         if self.additional_bounds_list is not None:
             # Include additional bounds
             for additional_bounds in self.additional_bounds_list:
@@ -714,7 +730,7 @@ def draw_degradation(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
                             lw = parameters['linewidth'],
                             zorder = parameters['zorder'])
     ax.add_patch(patch)
-    # Plot line within circle
+    # Line within circle
     bearing1 = (360 - rotation) + 45
     bearing2 = (360 - rotation) + 225
     end1 = (origin[0] + (parameters['headwidth'] / 2) * sin(bearing1*pi/180), origin[1] + (parameters['headwidth'] / 2) * cos(bearing1*pi/180))
