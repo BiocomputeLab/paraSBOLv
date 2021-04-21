@@ -357,9 +357,72 @@ def __find_bound_of_bounds (bounds_list):
             y_max = b[1][1]
     return [(x_min, y_min), (x_max, y_max)]
 
-class construct(object):
+class Construct(object):
 
-    # Create and modify constructs
+        '''
+    A modifiable construct consisting of
+    SBOL glyphs, interactions and modules.
+    
+    Attributes:
+        renderer: GlyphRenderer object defined above.
+        
+        padding: Scale of the space added to axis limits.
+        fig, ax:
+        https://matplotlib.org/3.3.4/api/_as_gen/matplotlib.figure.Figure.html
+        start_position: Tuple representing the
+                        origin of the construct, format (x, y).
+        
+        additional_bounds_list: Contains additional bounds
+				to be incorporated into the
+				construct bounds when using
+				self.draw() and self.update_
+				bounds().
+	
+        part_list: Contains all glyphs in the construct.
+                   Each glyph is represented by a list
+                   containing three elements:
+                       0: Glyph type represented by a string.
+                       1: user_parameters dictionary.
+                       2: style_parameters dictionary.
+	
+        interaction_list: Specifies interactions between
+                          construct glyphs. Each interaction
+                          is represented by a list containing
+                          four elements:
+                              0: Origin glyph of the
+                                 interaction, represented by
+                                 the glyph's index.
+                              1: Receiving glyph of the
+                                 interaction, represented
+                                 similarly.
+                              2: Interaction type represented
+                                 by a string.
+                              3: interaction_parameters
+                                 dictionary.
+	
+        module_list: Specifies modules within the construct.
+                     Each module is represented by a list
+                     containing four elements:
+                         0: First glyph within the module,
+                            represented by the index
+                            of the glyph.
+                         1: Final glyph of the module,
+                            represented similarly.
+                         2: x_stretch, an integer to
+                            strech/squash the module
+                            in the x direction.
+                         3: y_strech, functions similar to
+                            x_strech but in the y direction.
+	
+        orientation: Float representing the orientation
+                     of the construct in radians. 
+        
+        bounds: Tuple representing the bounds of the construct,
+                formatted as ((x1,y1), (x2,y2)) where (x1,y1)
+                are the coordinates of the lower left vertex
+                and (x2, y2) are the coordinates of the top
+                right vertex.
+    '''
 
     def __init__ (self, part_list, renderer, padding=0.2, fig=None, ax=None, start_position=None, additional_bounds_list=None, interaction_list=None, module_list=None, orientation = 0.0):
         self.renderer = renderer
