@@ -367,8 +367,10 @@ class Construct(object):
         renderer: GlyphRenderer object defined above.
         
         padding: Scale of the space added to axis limits.
+	
         fig, ax:
         https://matplotlib.org/3.3.4/api/_as_gen/matplotlib.figure.Figure.html
+	
         start_position: Tuple representing the
                         origin of the construct, format (x, y).
         
