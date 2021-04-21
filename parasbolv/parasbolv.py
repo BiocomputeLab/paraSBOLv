@@ -359,7 +359,7 @@ def __find_bound_of_bounds (bounds_list):
 
 class Construct(object):
 
-        '''
+    """
     A modifiable construct consisting of
     SBOL glyphs, interactions and modules.
     
@@ -424,7 +424,7 @@ class Construct(object):
                 are the coordinates of the lower left vertex
                 and (x2, y2) are the coordinates of the top
                 right vertex.
-    '''
+    """
 
     def __init__ (self, part_list, renderer, padding=0.2, fig=None, ax=None, start_position=(0, 0), additional_bounds_list=None, interaction_list=None, module_list=None, orientation = 0.0):
         self.renderer = renderer
