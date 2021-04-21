@@ -36,6 +36,15 @@ class GlyphRenderer:
     """
 
     def __init__(self, glyph_path=None, global_defaults=None):
+        """
+        Parameters
+        ----------
+        glyph_path: str
+            File path at which the glyph SVG files are stored,
+            relative to the directory in which parasbolv.py is
+            contained.
+        global_defaults: 
+        """
         self.svg2mpl_style_map = {}
         self.svg2mpl_style_map['fill'] = 'facecolor'
         self.svg2mpl_style_map['stroke'] = 'edgecolor'
@@ -46,7 +55,14 @@ class GlyphRenderer:
             self.glyphs_library, self.glyph_soterm_map = self.load_glyphs_from_path(glyph_path)
 
     def __process_unknown_val (self, val):
-        # Convert an unknown value into the correct type
+        """Convert an unknown value into the correct type.
+
+        Parameters
+        ----------
+        val: string
+            Represents an unknown value
+            such as colour or line width.
+        """
         converted_val = None
         if val.startswith('rgba'):
             # Convert RGBA value from 8-bit to arithmetic
@@ -77,6 +93,14 @@ class GlyphRenderer:
         return converted_val
 
     def __process_style (self, style_text):
+        """Convert style text into a dictionary.
+
+        Parameters
+        ----------
+        style_text: str
+            Contains concatenated SVG style information
+            such as `fill`, `stroke` and `stroke-width`.
+        """
         # Convert the style text into a dictionary
         style_data = {}
         style_els = style_text.split(';')
@@ -88,7 +112,14 @@ class GlyphRenderer:
         return style_data
 
     def __extract_tag_details(self, tag_attributes):
-        # Extract all the relevant details from an XML tag in the SVG
+        """Extract all the relevant details from an XML tag in the SVG.
+
+        Parameters
+        ----------
+        tag_attributes: dict
+            Dictionary derived from XML structure
+            containing SVG parameters.
+        """
         tag_details = {}
         tag_details['glyphtype'] = None
         tag_details['soterms'] = []
@@ -123,11 +154,33 @@ class GlyphRenderer:
         return tag_details
 
     def __eval_svg_data(self, svg_text, parameters):
-        # Use regular expression to extract and then replace with evaluated version
-        # https://stackoverflow.com/questions/38734335/python-regex-replace-bracketed-text-with-contents-of-brackets
+        """Extracts and then replaces equation with evaluated version using regular expression.
+
+        See: https://stackoverflow.com/questions/38734335/python-regex-replace-bracketed-text-with-contents-of-brackets
+
+        Parameters
+        ----------
+        svg_text: str
+            SVG text containing unsubstituted values.
+        parameters: dict
+            Contains parameter values to be substituted
+            into `svg_text` for evaluation.
+        """
         return re.sub(r"{([^{}]+)}", lambda m: str(eval(m.group()[1:-1], parameters)), svg_text)
 
     def __flip_position_rotate_glyph(self, path, baseline_y, position, rotation):
+        """Flips paths into matplotlib default orientation and position, and rotates paths.
+
+        Parameters
+        ----------
+        path: Matplotlib Path object - https://matplotlib.org/stable/api/path_api.html
+            Path to be transformed.
+        baseline_y: float
+        position: tuple
+            Path position, format (x,y).
+        rotation: float
+            Rotation value in radians.
+        """
         # Flip paths into matplotlib default orientation and position and rotate paths 
         new_verts = []
         new_codes = []
@@ -146,7 +199,13 @@ class GlyphRenderer:
         return Path(new_verts, new_codes)
 
     def __bounds_from_paths_to_draw(self, paths):
-        # Calculate the bounding box from a set of paths
+        """Calculate the bounding box from a set of paths.
+
+        Parameters
+        ----------
+        paths: list
+           List containing Matplotlib Path objects.
+        """
         x_min = None
         x_max = None
         y_min = None
@@ -176,6 +235,13 @@ class GlyphRenderer:
         return (x_min, y_min), (x_max, y_max)
 
     def load_glyph(self, filename):
+        """Loads glyph information from an SVG file.
+
+        Parameters
+        ----------
+        filename: str
+            Absolute file path of SVG file.
+        """
         tree = ET.parse(filename)
         root = tree.getroot()
         root_attributes = self.__extract_tag_details(root.attrib)
@@ -191,12 +257,20 @@ class GlyphRenderer:
         return glyph_type, glyph_soterms, glyph_data
 
     def load_package_glyphs(self):
-        # Find the directory with the packaged glyphs
+        """Finds the directory with packaged glyphs and loads them.
+        """
         d = os.path.dirname(sys.modules[__name__].__file__)
         path = os.path.join(d, 'glyphs')
         return self.load_glyphs_from_path(path)
 
     def load_glyphs_from_path(self, path):
+        """Loads glyph information from SVG files in a directory.
+
+        Parameters
+        ----------
+        path: str
+            Absolute file path of directory containing glyphs.
+        """
         glyphs_library = {}
         glyph_soterm_map = {}
         for infile in glob.glob( os.path.join(path, '*.svg') ):
@@ -207,8 +281,25 @@ class GlyphRenderer:
         return glyphs_library, glyph_soterm_map
 
     def draw_glyph(self, ax, glyph_type, position, rotation=0.0, user_parameters=None, user_style=None):
-	    # Check glyph type exists	
-        try:	
+        """Draws a glyph to Matploblib Axes.
+
+        Parameters
+        ----------
+        ax: Ax object
+            https://matplotlib.org/stable/api/axes_api.html
+        glyph_type: str
+            Name of the glyph being drawn.
+        position: tuple
+            Position to draw to, format (x,y).
+        rotation: float
+            Rotation of glyph in radians.
+        user_parameters: dict
+            Dictionary containing sizing/label parameters of glyph.
+        user_style: dict
+            Dictionary containing style parameters of glyph.
+        """
+        try:
+        # Check glyph type exists	
             glyph = self.glyphs_library[glyph_type]	
         except:	
             class Invalid_glyph_type(Exception):	
@@ -269,7 +360,16 @@ class GlyphRenderer:
                 ax.text(**self.process_label_params(label, all_y_flipped_paths), ha='center', va='center')
         return self.__bounds_from_paths_to_draw(all_y_flipped_paths), self.get_baseline_end(glyph_type, position, rotation=rotation, user_parameters=user_parameters)
 
-    def process_label_params(self, label, all_y_flipped_paths):
+    def process_label_params(self, label, paths):
+        """Formats and completes label parameters.
+
+        Parameters
+        ----------
+        label: dict
+            Dictionary containing label parameters.
+        paths: list
+            List of paths composing the glyph.
+        """
         color = (0,0,0)
         xy_skew = (0,0)
         rotation = 0.0
@@ -285,7 +385,7 @@ class GlyphRenderer:
         if 'userfont' in label:
             finalfont = font_manager.FontProperties(**label['userfont'])        
         all_path_vertices = []
-        for path in all_y_flipped_paths:
+        for path in paths:
             # Find vertices of each path
             path_vertices = path[0].vertices.copy()
             all_path_vertices.append(path_vertices)
@@ -293,6 +393,16 @@ class GlyphRenderer:
         return {'x':textpos_x, 'y':textpos_y, 's':label['text'], 'color':color, 'fontproperties':finalfont, 'rotation':rotation}
 
     def calculate_centroid_of_paths(self, all_path_vertices, xy_skew):
+        """Calculates central point of paths provided.
+
+        Parameters
+        ----------
+        all_path_vertices: list
+            Contains vertices of every path.
+        xy_skew: tuple
+            Skew of centroid in x and y
+            directions, format (x,y).
+        """
         vertices = []
         if len(all_path_vertices) == 1:
             vertices = all_path_vertices[0]
@@ -315,9 +425,35 @@ class GlyphRenderer:
         return textpos_x, textpos_y
 
     def get_glyph_bounds(self, glyph_type, position, rotation=0.0, user_parameters=None):
+        """Returns bounds of glyph.
+
+        Parameters
+        ----------
+        glyph_type: str
+            Type of glyph.
+        position: tuple
+            Position of glyph, format (x,y).
+        rotation: float
+            Rotation of glyph in radians.
+        user_parameters: dict
+            Dictionary containing sizing/label parameters of glyph.
+        """
         return self.draw_glyph(None, glyph_type, position, rotation=rotation, user_parameters=user_parameters)
 
     def get_baseline_end(self, glyph_type, position, rotation=0.0, user_parameters=None):
+        """Finds the point following a glyph from which the baseline should end.
+
+        Parameters
+        ----------
+        glyph_type: str
+            Type of glyph.
+        position: tuple
+            Position of glyph, format (x,y).
+        rotation: float
+            Rotation of glyph in radians.
+        user_parameters: dict
+            Dictionary containing sizing/label parameters of glyph.
+        """
         glyph = self.glyphs_library[glyph_type]
         merged_parameters = glyph['defaults'].copy()
         if user_parameters is not None:
@@ -340,6 +476,13 @@ class GlyphRenderer:
             return None
 
 def __find_bound_of_bounds (bounds_list):
+    """Find the bounding box of a list of bounds.
+
+    Parameters
+    ----------
+    bounds_list: list
+        List containing bounds to find bounding box of.
+    """
     # Set initial guess
     x_min = bounds_list[0][0][0]
     y_min = bounds_list[0][0][1]
@@ -463,7 +606,7 @@ class Construct(object):
         Parameters
         ----------
         rotation: float
-            Rotation value in Radians to be applied
+            Rotation value in radians to be applied
             to the construct.
         """
         part_list = self.part_list
