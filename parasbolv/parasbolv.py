@@ -728,9 +728,20 @@ def render_part_list (part_list, renderer, padding=0.2, fig = None, ax = None, r
         interaction_types = ['control','degradation','inhibition','process','stimulation']
         for interaction in interaction_list:
             if interaction[2] in interaction_types:
+                # Find bounds of glyphs
+                n = 0
+                for part in part_list:
+                    if part is interaction[0]:
+                        sending_bounds = bounds_list[n]
+                        break
+                    n += 1
+                n = 0
+                for part in part_list:
+                    if part is interaction[1]:
+                        receiving_bounds = bounds_list[n]
+                        break
+                    n += 1
                 # Draw interactions
-                sending_bounds = bounds_list[interaction[0]]
-                receiving_bounds = bounds_list[interaction[1]]
                 bounds = draw_interaction(ax, sending_bounds, receiving_bounds, interaction[2], interaction[3], rotation = rotation)
                 interaction_bounds_list.append(bounds)
             else:
@@ -740,18 +751,26 @@ def render_part_list (part_list, renderer, padding=0.2, fig = None, ax = None, r
         for module in module_list:
             start_glyph = module[0]
             end_glyph = module[1]
-            if module[0] > module[1]:
-            # Ensure start_glyph comes before end_glyph in the plot
-                start_glyph = module[1]
-                end_glyph = module[0]
-            elif part_list[start_glyph][1] is not None and part_list[end_glyph][1] is not None:
+            '''
             # Check if plot is flipped, then correct
-                if 'rotation' in part_list[start_glyph][1] and 'rotation' in part_list[end_glyph][1]:
-                    if part_list[start_glyph][1]['rotation'] == pi and part_list[end_glyph][1]['rotation'] == pi:
-                        start_glyph = module[1]
-                        end_glyph = module[0]
-            start_bounds = bounds_list[start_glyph]
-            end_bounds = bounds_list[end_glyph]
+            if 'rotation' in part_list[start_glyph][1] and 'rotation' in part_list[end_glyph][1]:
+                if part_list[start_glyph][1]['rotation'] == pi and part_list[end_glyph][1]['rotation'] == pi:
+                    start_glyph = module[1]
+                    end_glyph = module[0]
+            '''
+            # Find bounds of glyphs
+            n = 0
+            for part in part_list:
+                if part is start_glyph:
+                    start_bounds = bounds_list[n]
+                    break
+                n += 1
+            n = 0
+            for part in part_list:
+                if part is end_glyph:
+                    end_bounds = bounds_list[n]
+                    break
+                n += 1
             # Draw modules
             bounds = draw_module(ax, start_bounds, end_bounds, module[2], module[3])
             module_bounds_list.append(bounds)
