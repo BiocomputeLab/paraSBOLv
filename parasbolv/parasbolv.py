@@ -4,10 +4,10 @@
 paraSBOLv
 
 A simple and lightweight library for rendering parametric SVG versions
-of the SBOL Visual symbols using matplotlib. Is able to load a directory 
+of the SBOL Visual symbols using matplotlib. It is able to load a directory 
 of glyphs and provides access to all style and geometry customisations,
-plus provides a number of helper functions to handle part lists, modules 
-and interactions
+and provides a number of helper functions to handle part lists, modules 
+and interactions.
 """
 
 import warnings 
@@ -36,6 +36,15 @@ class GlyphRenderer:
     """
 
     def __init__(self, glyph_path=None, global_defaults=None):
+        """
+        Parameters
+        ----------
+        glyph_path: str
+            File path at which the glyph SVG files are stored,
+            relative to the directory in which parasbolv.py is
+            contained.
+        global_defaults: 
+        """
         self.svg2mpl_style_map = {}
         self.svg2mpl_style_map['fill'] = 'facecolor'
         self.svg2mpl_style_map['stroke'] = 'edgecolor'
@@ -46,7 +55,14 @@ class GlyphRenderer:
             self.glyphs_library, self.glyph_soterm_map = self.load_glyphs_from_path(glyph_path)
 
     def __process_unknown_val (self, val):
-        # Convert an unknown value into the correct type
+        """Converts an unknown value into the correct type.
+
+        Parameters
+        ----------
+        val: string
+            Represents an unknown value
+            such as colour or line width.
+        """
         converted_val = None
         if val.startswith('rgba'):
             # Convert RGBA value from 8-bit to arithmetic
@@ -77,6 +93,14 @@ class GlyphRenderer:
         return converted_val
 
     def __process_style (self, style_text):
+        """Converts style text into a dictionary.
+
+        Parameters
+        ----------
+        style_text: str
+            Contains concatenated SVG style information
+            such as `fill`, `stroke` and `stroke-width`.
+        """
         # Convert the style text into a dictionary
         style_data = {}
         style_els = style_text.split(';')
@@ -88,7 +112,14 @@ class GlyphRenderer:
         return style_data
 
     def __extract_tag_details(self, tag_attributes):
-        # Extract all the relevant details from an XML tag in the SVG
+        """Extracts all the relevant SVG details from an XML tag in the SVG.
+
+        Parameters
+        ----------
+        tag_attributes: dict
+            Dictionary derived from XML structure
+            containing SVG parameters.
+        """
         tag_details = {}
         tag_details['glyphtype'] = None
         tag_details['soterms'] = []
@@ -123,11 +154,34 @@ class GlyphRenderer:
         return tag_details
 
     def __eval_svg_data(self, svg_text, parameters):
-        # Use regular expression to extract and then replace with evaluated version
-        # https://stackoverflow.com/questions/38734335/python-regex-replace-bracketed-text-with-contents-of-brackets
+        """Extracts and then replaces equation with evaluated version using regular expression.
+
+        See: https://stackoverflow.com/questions/38734335/python-regex-replace-bracketed-text-with-contents-of-brackets
+
+        Parameters
+        ----------
+        svg_text: str
+            SVG text containing unsubstituted values.
+        parameters: dict
+            Contains parameter values to be substituted
+            into `svg_text` for evaluation.
+        """
         return re.sub(r"{([^{}]+)}", lambda m: str(eval(m.group()[1:-1], parameters)), svg_text)
 
     def __flip_position_rotate_glyph(self, path, baseline_y, position, rotation):
+        """Flips paths into matplotlib default orientation and position, and rotates paths.
+
+        Parameters
+        ----------
+        path: Matplotlib Path object - https://matplotlib.org/stable/api/path_api.html
+            Path to be transformed.
+        baseline_y: float
+            y value of the baseline.
+        position: tuple
+            Path position, format (x,y).
+        rotation: float
+            Rotation value in radians.
+        """
         # Flip paths into matplotlib default orientation and position and rotate paths 
         new_verts = []
         new_codes = []
@@ -146,7 +200,13 @@ class GlyphRenderer:
         return Path(new_verts, new_codes)
 
     def __bounds_from_paths_to_draw(self, paths):
-        # Calculate the bounding box from a set of paths
+        """Calculates the bounding box from a set of paths.
+
+        Parameters
+        ----------
+        paths: list
+           List containing Matplotlib Path objects.
+        """
         x_min = None
         x_max = None
         y_min = None
@@ -176,6 +236,13 @@ class GlyphRenderer:
         return (x_min, y_min), (x_max, y_max)
 
     def load_glyph(self, filename):
+        """Loads glyph information from an SVG file.
+
+        Parameters
+        ----------
+        filename: str
+            Absolute file path of SVG file.
+        """
         tree = ET.parse(filename)
         root = tree.getroot()
         root_attributes = self.__extract_tag_details(root.attrib)
@@ -191,12 +258,20 @@ class GlyphRenderer:
         return glyph_type, glyph_soterms, glyph_data
 
     def load_package_glyphs(self):
-        # Find the directory with the packaged glyphs
+        """Finds the directory with packaged glyphs and loads them.
+        """
         d = os.path.dirname(sys.modules[__name__].__file__)
         path = os.path.join(d, 'glyphs')
         return self.load_glyphs_from_path(path)
 
     def load_glyphs_from_path(self, path):
+        """Loads glyph information from SVG files in a directory.
+
+        Parameters
+        ----------
+        path: str
+            Absolute file path of directory containing glyphs.
+        """
         glyphs_library = {}
         glyph_soterm_map = {}
         for infile in glob.glob( os.path.join(path, '*.svg') ):
@@ -207,8 +282,25 @@ class GlyphRenderer:
         return glyphs_library, glyph_soterm_map
 
     def draw_glyph(self, ax, glyph_type, position, rotation=0.0, user_parameters=None, user_style=None):
-	    # Check glyph type exists	
-        try:	
+        """Draws a glyph to Matploblib Axes.
+
+        Parameters
+        ----------
+        ax: Ax object
+            https://matplotlib.org/stable/api/axes_api.html
+        glyph_type: str
+            Name of the glyph being drawn.
+        position: tuple
+            Position to draw to, format (x,y).
+        rotation: float, optional
+            Rotation of glyph in radians.
+        user_parameters: dict, optional
+            Dictionary containing sizing/label parameters of glyph.
+        user_style: dict, optional
+            Dictionary containing style parameters of glyph.
+        """
+        try:
+        # Check glyph type exists	
             glyph = self.glyphs_library[glyph_type]	
         except:	
             class Invalid_glyph_type(Exception):	
@@ -217,15 +309,15 @@ class GlyphRenderer:
         merged_parameters = glyph['defaults'].copy()
         if user_parameters is not None:
             # Find label
-            label = None
-            if 'label' in user_parameters:
-                label = user_parameters['label']
+            label_parameters = None
+            if 'label_parameters' in user_parameters:
+                label_parameters = user_parameters['label_parameters']
             # Find rotation in user_parameters (keyword arg takes priority)
             if rotation == 0.0 and 'rotation' in user_parameters:
                 rotation = user_parameters['rotation']
             # Collate parameters (user parameters take priority)
             for key in user_parameters.keys():
-                if key not in glyph['defaults'] and key != 'label' and key != 'rotation' and key != 'y_offset':
+                if key not in glyph['defaults'] and key != 'label_parameters' and key != 'rotation' and key != 'y_offset':
                     warnings.warn(f"""Parameter '{key}' is not valid for '{glyph_type}'.""")
                 merged_parameters[key] = user_parameters[key]
 	    # Find invalid path ids	
@@ -264,35 +356,54 @@ class GlyphRenderer:
             if ax is not None:
                 ax.add_patch(patch)
         if user_parameters is not None:
-            if label is not None:
+            if label_parameters is not None:
                 # Draw label
-                ax.text(**self.process_label_params(label, all_y_flipped_paths), ha='center', va='center')
+                ax.text(**self.process_label_params(label_parameters, all_y_flipped_paths), ha='center', va='center')
         return self.__bounds_from_paths_to_draw(all_y_flipped_paths), self.get_baseline_end(glyph_type, position, rotation=rotation, user_parameters=user_parameters)
 
-    def process_label_params(self, label, all_y_flipped_paths):
+    def process_label_params(self, label_parameters, paths):
+        """Formats and completes label parameters.
+
+        Parameters
+        ----------
+        label_parameters: dict
+            Dictionary containing label parameters.
+        paths: list
+            List of paths composing the glyph.
+        """
         color = (0,0,0)
         xy_skew = (0,0)
         rotation = 0.0
         finalfont = font_manager.FontProperties()
         # Collate parameters (user parameters take priority)
-        if 'color' in label:
-            color = label['color']
-        if 'xy_skew' in label:
-            xy_skew = label['xy_skew']
-        if 'rotation' in label:
+        if 'color' in label_parameters:
+            color = label_parameters['color']
+        if 'xy_skew' in label_parameters:
+            xy_skew = label_parameters['xy_skew']
+        if 'rotation' in label_parameters:
             # Convert to degrees
-            rotation = (180/pi) * label['rotation']
-        if 'userfont' in label:
-            finalfont = font_manager.FontProperties(**label['userfont'])        
+            rotation = (180/pi) * label_parameters['rotation']
+        if 'userfont' in label_parameters:
+            finalfont = font_manager.FontProperties(**label_parameters['userfont'])        
         all_path_vertices = []
-        for path in all_y_flipped_paths:
+        for path in paths:
             # Find vertices of each path
             path_vertices = path[0].vertices.copy()
             all_path_vertices.append(path_vertices)
         textpos_x, textpos_y = self.calculate_centroid_of_paths(all_path_vertices, xy_skew)
-        return {'x':textpos_x, 'y':textpos_y, 's':label['text'], 'color':color, 'fontproperties':finalfont, 'rotation':rotation}
+        return {'x':textpos_x, 'y':textpos_y, 's':label_parameters['text'], 'color':color, 'fontproperties':finalfont, 'rotation':rotation}
 
     def calculate_centroid_of_paths(self, all_path_vertices, xy_skew):
+        """Calculates central point of paths provided.
+
+        Parameters
+        ----------
+        all_path_vertices: list
+            Contains vertices of every path.
+        xy_skew: tuple
+            Skew of centroid in x and y
+            directions, format (x,y).
+        """
         vertices = []
         if len(all_path_vertices) == 1:
             vertices = all_path_vertices[0]
@@ -315,9 +426,35 @@ class GlyphRenderer:
         return textpos_x, textpos_y
 
     def get_glyph_bounds(self, glyph_type, position, rotation=0.0, user_parameters=None):
+        """Returns bounds of glyph.
+
+        Parameters
+        ----------
+        glyph_type: str
+            Type of glyph.
+        position: tuple
+            Position of glyph, format (x,y).
+        rotation: float, optional
+            Rotation of glyph in radians.
+        user_parameters: dict, optional
+            Dictionary containing sizing/label parameters of glyph.
+        """
         return self.draw_glyph(None, glyph_type, position, rotation=rotation, user_parameters=user_parameters)
 
     def get_baseline_end(self, glyph_type, position, rotation=0.0, user_parameters=None):
+        """Finds the point following a glyph from which the baseline should end.
+
+        Parameters
+        ----------
+        glyph_type: str
+            Type of glyph.
+        position: tuple
+            Position of glyph, format (x,y).
+        rotation: float, optional
+            Rotation of glyph in radians.
+        user_parameters: dict, optional
+            Dictionary containing sizing/label parameters of glyph.
+        """
         glyph = self.glyphs_library[glyph_type]
         merged_parameters = glyph['defaults'].copy()
         if user_parameters is not None:
@@ -340,6 +477,13 @@ class GlyphRenderer:
             return None
 
 def __find_bound_of_bounds (bounds_list):
+    """Find the bounding box of a list of bounds.
+
+    Parameters
+    ----------
+    bounds_list: list
+        List containing bounds to find bounding box of.
+    """
     # Set initial guess
     x_min = bounds_list[0][0][0]
     y_min = bounds_list[0][0][1]
@@ -357,11 +501,87 @@ def __find_bound_of_bounds (bounds_list):
             y_max = b[1][1]
     return [(x_min, y_min), (x_max, y_max)]
 
-class construct(object):
+class Construct(object):
+    """A modifiable construct consisting of
+       SBOL glyphs, interactions and modules.
+       
+       NOTE: Attributes below lacking
+       description are documented in the
+       __init__ docstring of this class.
 
-    # Create and modify constructs
+       Attributes
+       ----------
+       bounds: tuple
+           Represents the bounds of the
+           construct, formatted as ((x1,y1), (x2,y2))
+           where (x1,y1) are the coordinates of the
+           lower left vertex and (x2, y2) are the
+           coordinates of the top right vertex.
+       part_list: list
+       renderer: object
+       padding: float
+       fig: object
+       ax: object
+       start_position: tuple
+       additional_bounds_list: list
+       interaction_list: list
+       module_list: list
+       rotation: float
+    """
 
-    def __init__ (self, part_list, renderer, padding=0.2, fig=None, ax=None, start_position=None, additional_bounds_list=None, interaction_list=None, module_list=None, orientation = 0.0):
+    def __init__ (self, part_list, renderer, padding=0.2, fig=None, ax=None, start_position=(0, 0), additional_bounds_list=None, interaction_list=None, module_list=None, rotation=0.0):
+        """
+        Parameters
+        ----------
+        part_list: list
+            Contains all glyphs in the
+            construct. Each glyph is represented
+            by a list containing three elements:
+            [0] Glyph type, represented by a string,
+            [1] the user_parameters dictionary, and
+            [2] the style_parameters dictionary. 
+        renderer: object
+            ParaSB0Lv GlyphRenderer object defined
+            above.
+        padding: float, optional
+            Scale of the space added to axis limits.
+        fig: object, optional
+            Matplotlib Figure object.
+        ax: object, optional
+            Matplotlib Axes object.
+        start_position: tuple, optional
+            Represents the origin of the construct,
+            format (x, y).
+        additional_bounds_list: list, optional
+            Contains additional bounds to be
+            incorporated into the construct
+            bounds when using self.draw()
+            and self.update_bounds().
+        interaction_list: list, optional
+            Specifies interactions between
+            construct glyphs. Each interaction
+            is represented by a list containing
+            four elements: [0] The origin glyph
+            of the interaction, represented by
+            the glyph's index, [1] the receiving
+            glyph of the interaction, represented
+            similarly, [2] the interaction type
+            string, and [3] the interaction_parameters
+            dictionary.
+        module_list: list, optional
+            Specifies modules within the construct.
+            Each module is represented by a list
+            containing four elements: [0] The first
+            glyph within the module, represented by
+            the index of the glyph, [1] the final glyph
+            of the module, represented similarly, [2]
+            x_stretch, an integer to strech/squash the
+            module in the x direction, [3] y_strech,
+            identical but in the y direction.
+        rotation: float, optional
+            Float representing the rotation of
+            the construct in radians.
+        """
         self.renderer = renderer
         self.padding = padding
         self.fig = fig
@@ -375,33 +595,34 @@ class construct(object):
         self.part_list = part_list
         self.interaction_list = interaction_list
         self.module_list = module_list
-        self._orientation = 0.0
-        self.orientation = orientation # Radians
+        self._rotation = 0.0
+        self.rotation = rotation # Radians
         self.bounds = None
         self.update_bounds()
 
-    # Automatically update construct orientation
+    # Automatically update construct rotation
     @property
-    def orientation(self):
-        return self._orientation
-    @orientation.setter
-    def orientation(self, value):
-        self._orientation = value
-        self.set_orientation(value)
-
-    '''
-    # Automatically update construct bounds
-    @property
-    def start_position(self):
-        return self._start_position
-    @start_position.setter
-    def start_position(self, value):
-        self.update_bounds()
-    '''
+    def rotation(self):
+        return self._rotation
+    @rotation.setter
+    def rotation(self, value):
+        self._rotation = value
+        self.set_rotation(value)
     
-    def set_orientation (self, rotation):
+    def set_rotation (self, rotation):
+        """Sets the rotation of the construct.
+
+        NOTE: the self.rotation attribute
+        should be modified instead of directly
+        calling this method.
+
+        Parameters
+        ----------
+        rotation: float
+            Rotation value in radians to be applied
+            to the construct.
+        """
         part_list = self.part_list
-        # Rotate construct
         for glyph in part_list:
             user_parameters = glyph[1]
             if user_parameters is None:
@@ -414,7 +635,8 @@ class construct(object):
         self.part_list = part_list
 
     def reverse_interactions (self):
-        # Draw interactions from opposite side
+        """Reverses the side interactions are drawn on.
+        """
         if self.interaction_list is not None:
             for interaction in self.interaction_list:
                 if interaction[3] is None:
@@ -428,35 +650,58 @@ class construct(object):
                     interaction[3]['direction'] = 'reverse'
 
     def update_bounds (self):
-        # Update bounds to account for changes to the construct
+        """Updates the bounds of the constuct.
+        """
         self.bounds = self.draw(draw_for_bounds = True)[4]
         self.bounds = ((self.bounds[0], self.bounds[1]))
 
     def draw (self, draw_for_bounds = False):
+        """Draws the construct using Matplotlib.
+
+        Parameters
+        ----------
+        draw_for_bounds: bool, optional
+            Indicates if the construct is being
+            drawn to update the self.bounds 
+            attribute.
+        """
         # Draw the construct
         bounds_to_add = []
-        '''
-        if self.bounds is not None:
-            # Include construct bounds
-            bounds_to_add.append(self.bounds)
-        '''
         if self.additional_bounds_list is not None:
             # Include additional bounds
             for additional_bounds in self.additional_bounds_list:
                 bounds_to_add.append(additional_bounds)
         if draw_for_bounds == False:
-            fig, ax, baseline_start, baseline_end, bounds = render_part_list(self.part_list, self.renderer, padding=self.padding, fig=self.fig, ax=self.ax, rotation = self.orientation, start_position=self.start_position, additional_bounds_list = bounds_to_add, interaction_list=self.interaction_list, module_list=self.module_list)
+            fig, ax, baseline_start, baseline_end, bounds = render_part_list(self.part_list, self.renderer, padding=self.padding, fig=self.fig, ax=self.ax, rotation = self.rotation, start_position=self.start_position, additional_bounds_list = bounds_to_add, interaction_list=self.interaction_list, module_list=self.module_list)
             return fig, ax, baseline_start, baseline_end, bounds
         elif draw_for_bounds == True:
             # Temporary rendering pathway to generate bounds
             temp_fig, temp_ax = plt.subplots()
-            fig, ax, baseline_start, baseline_end, bounds = render_part_list(self.part_list, self.renderer, padding=self.padding, fig=temp_fig, ax=temp_ax, rotation = self.orientation, start_position=self.start_position, additional_bounds_list = bounds_to_add, interaction_list=self.interaction_list, module_list=self.module_list)
+            fig, ax, baseline_start, baseline_end, bounds = render_part_list(self.part_list, self.renderer, padding=self.padding, fig=temp_fig, ax=temp_ax, rotation = self.rotation, start_position=self.start_position, additional_bounds_list = bounds_to_add, interaction_list=self.interaction_list, module_list=self.module_list)
             plt.close()
             return fig, ax, baseline_start, baseline_end, bounds
 
 
-def render_part_list (part_list, renderer, padding=0.2, fig = None, ax = None, rotation = 0.0, start_position=None, additional_bounds_list = None, interaction_list=None, module_list=None):
-    # Render multiple glyphs
+def render_part_list (part_list, renderer, padding=0.2, fig = None, ax = None, rotation = 0.0, start_position=(0, 0), additional_bounds_list = None, interaction_list=None, module_list=None):
+    """Renders multiple glyphs in sequence.
+
+    NOTE: See parameters of the __init__
+    method within the Construct class 
+    for parameter descriptions.
+
+    Parameters
+    ----------
+    part_list: list
+    renderer: object
+    padding: float, optional
+    fig: object, optional
+    ax: object, optional
+    rotation: float, optional
+    start_position: tuple, optional
+    additional_bounds_list: list, optional
+    interaction_list: list, optional
+    module_list: list, optional
+    """
     if fig is None or ax is None:
         fig, ax = plt.subplots()
     ax.set_aspect('equal')
@@ -464,8 +709,6 @@ def render_part_list (part_list, renderer, padding=0.2, fig = None, ax = None, r
     ax.set_yticks([])
     ax.axis('off')
     plt.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
-    if start_position is None:
-        start_position = (0, 0)
     part_position = start_position
     bounds_list = []
     for part in part_list:
@@ -485,9 +728,20 @@ def render_part_list (part_list, renderer, padding=0.2, fig = None, ax = None, r
         interaction_types = ['control','degradation','inhibition','process','stimulation']
         for interaction in interaction_list:
             if interaction[2] in interaction_types:
+                # Find bounds of glyphs
+                n = 0
+                for part in part_list:
+                    if part is interaction[0]:
+                        sending_bounds = bounds_list[n]
+                        break
+                    n += 1
+                n = 0
+                for part in part_list:
+                    if part is interaction[1]:
+                        receiving_bounds = bounds_list[n]
+                        break
+                    n += 1
                 # Draw interactions
-                sending_bounds = bounds_list[interaction[0]]
-                receiving_bounds = bounds_list[interaction[1]]
                 bounds = draw_interaction(ax, sending_bounds, receiving_bounds, interaction[2], interaction[3], rotation = rotation)
                 interaction_bounds_list.append(bounds)
             else:
@@ -497,18 +751,26 @@ def render_part_list (part_list, renderer, padding=0.2, fig = None, ax = None, r
         for module in module_list:
             start_glyph = module[0]
             end_glyph = module[1]
-            if module[0] > module[1]:
-            # Ensure start_glyph comes before end_glyph in the plot
-                start_glyph = module[1]
-                end_glyph = module[0]
-            elif part_list[start_glyph][1] is not None and part_list[end_glyph][1] is not None:
+            '''
             # Check if plot is flipped, then correct
-                if 'rotation' in part_list[start_glyph][1] and 'rotation' in part_list[end_glyph][1]:
-                    if part_list[start_glyph][1]['rotation'] == pi and part_list[end_glyph][1]['rotation'] == pi:
-                        start_glyph = module[1]
-                        end_glyph = module[0]
-            start_bounds = bounds_list[start_glyph]
-            end_bounds = bounds_list[end_glyph]
+            if 'rotation' in part_list[start_glyph][1] and 'rotation' in part_list[end_glyph][1]:
+                if part_list[start_glyph][1]['rotation'] == pi and part_list[end_glyph][1]['rotation'] == pi:
+                    start_glyph = module[1]
+                    end_glyph = module[0]
+            '''
+            # Find bounds of glyphs
+            n = 0
+            for part in part_list:
+                if part is start_glyph:
+                    start_bounds = bounds_list[n]
+                    break
+                n += 1
+            n = 0
+            for part in part_list:
+                if part is end_glyph:
+                    end_bounds = bounds_list[n]
+                    break
+                n += 1
             # Draw modules
             bounds = draw_module(ax, start_bounds, end_bounds, module[2], module[3])
             module_bounds_list.append(bounds)
@@ -533,6 +795,27 @@ def render_part_list (part_list, renderer, padding=0.2, fig = None, ax = None, r
     return fig, ax, start_position, part_position, final_bounds
 
 def draw_module (ax, start_bounds, end_bounds, x_strech, y_strech):
+    """Draws a module bounding at least two glyphs in a construct.
+
+    Parameters
+    ----------
+    ax: object
+        Matplotlib Axes object.
+    start_bounds: tuple
+        Bounds of the starting glyph of the module,
+        format ((x1,y1), (x2,y2)), where (x1,y1)
+        is the bottom left vertex and (x2,y2) the
+        top right.
+    end_bounds: tuple
+        Bounds of the ending glyph of the module,
+        formatted identically.
+    x_strech: float
+        Strech value in x direction to be applied
+        to the module.
+    y_strech: float
+        Strech value in y direction to be applied
+        to the module.
+    """
     x_pad = (end_bounds[0][0] - start_bounds[0][0]) / 10
     y_pad = (end_bounds[1][1] - start_bounds[0][1])
     # Bottom left coords
@@ -550,66 +833,112 @@ def draw_module (ax, start_bounds, end_bounds, x_strech, y_strech):
 
 
 def draw_interaction (ax, sending_bounds, receiving_bounds, interaction_type, parameters, rotation = 0.0):
-        parameters = process_interaction_params(parameters)
-        # Convert to degrees
-        rotation = (180/pi) * rotation
-        if parameters['direction'] == 'reverse':
-            # Flip side to draw interaction on
-            rotation += 180
-        # Assign pad height
-        initial_distance = parameters['heightskew'] * 1.5
-        y_pad = parameters['heightskew'] * 2
-        if interaction_type == 'degradation': # Degradation is bigger than the other interactions
-            initial_distance = parameters['heightskew'] * 3
-        # Find centroid of glyph bounds
-        origin_cent = (sending_bounds[0][0] + (sending_bounds[1][0] - sending_bounds[0][0])/2, sending_bounds[0][1] + (sending_bounds[1][1] - sending_bounds[0][1])/2)
-        end_cent = (receiving_bounds[0][0] + (receiving_bounds[1][0] - receiving_bounds[0][0])/2, receiving_bounds[0][1] + (receiving_bounds[1][1] - receiving_bounds[0][1])/2)        
-        # Find interaction origin and endpoint - (h + rsin(a), k + rcos(a))
-        rotation = rotation % 360
-        bearing = 360 - rotation
-        int_origin_x = (origin_cent[0] + initial_distance*sin(bearing * pi/180)) + parameters['sending_xy_skew'][0]
-        int_origin_y = (origin_cent[1] + initial_distance*cos(bearing * pi/180)) + parameters['sending_xy_skew'][1]
-        int_end_x = (end_cent[0] + initial_distance*sin(bearing * pi/180)) + parameters['receiving_xy_skew'][0]
-        int_end_y = (end_cent[1] + initial_distance*cos(bearing * pi/180)) + parameters['sending_xy_skew'][1]
-        # Determine max/min height
-        int_origin_max = (int_origin_x + y_pad*sin(bearing * pi/180), int_origin_y + y_pad*cos(bearing * pi/180))
-        int_end_max = (int_end_x + y_pad*sin(bearing * pi/180), int_end_y + y_pad*cos(bearing * pi/180))
-        max_height = 3
-        # Draw headless interaction
-        plt.plot([int_origin_x,
-                  int_origin_max[0],
-                  int_end_max[0],
-                  int_end_x],
-                 [int_origin_y,
-                  int_origin_max[1],
-                  int_end_max[1],
-                  int_end_y],
-                color = parameters['color'],
-                lw = parameters['linewidth'],
-                zorder = parameters['zorder'] - 5) # Slightly lower zorder than head to prevent overlap
-        # Control
-        if interaction_type == 'control':
-            draw_control(ax, int_end_x, int_end_y, parameters, rotation = rotation)
-        # Degradation
-        elif interaction_type == 'degradation':
-            draw_degradation(ax, int_end_x, int_end_y, parameters, rotation = rotation)
-        # Inhibition
-        elif interaction_type == 'inhibition':
-            draw_inhibition(ax, int_end_x, int_end_y, parameters, rotation = rotation)
-        # Process
-        elif interaction_type == 'process':
-            draw_process(ax, int_end_x, int_end_y, parameters, rotation = rotation)
-        # Stimulation
-        elif interaction_type == 'stimulation':
-            draw_stimulation(ax, int_end_x, int_end_y, parameters, rotation = rotation)
-        # Find bounds of interaction
-        xcoords = [int_origin_max[0], int_end_max[0], int_origin_x, int_end_x]
-        ycoords = [int_origin_max[1], int_end_max[1], int_origin_y, int_end_y]
-        minbounds = (min(xcoords),min(ycoords))
-        maxbounds = (max(xcoords),max(ycoords))
-        return (minbounds, maxbounds)
+    """Draws an interaction between two glyphs in a construct.
+
+    Parameters
+    ----------
+    ax: object
+        Matplotlib Axes object.
+    sending_bounds: tuple
+        Bounds of the sending glyph of the
+        interaction, format ((x1,y1), (x2,y2)),
+        where (x1,y1) is the bottom left vertex
+        and (x2,y2) the top right.
+    receiving_bounds: tuple
+        Bounds of the receiving glyph of the
+        interaction, formatted identically.
+    interaction_type: string
+        Type of interaction being drawn, from
+        'control', 'degradation', 'inhibition',
+        'process', 'stimulation'.
+    parameters: dict
+        Contains parameters for the interaction.
+        See docstring for the function
+        `process_interaction_params` for details.
+    rotation: float, optional
+        Rotation, in radians, of construct that
+        interactions are to be drawn to.
+    """
+    parameters = process_interaction_params(parameters)
+    # Convert to degrees
+    rotation = (180/pi) * rotation
+    if parameters['direction'] == 'reverse':
+        # Flip side to draw interaction on
+        rotation += 180
+    # Assign pad height
+    initial_distance = parameters['heightskew'] * 1.5
+    y_pad = parameters['heightskew'] * 2
+    if interaction_type == 'degradation': # Degradation is bigger than the other interactions
+        initial_distance = parameters['heightskew'] * 3 
+    # Find centroid of glyph bounds
+    origin_cent = (sending_bounds[0][0] + (sending_bounds[1][0] - sending_bounds[0][0])/2, sending_bounds[0][1] + (sending_bounds[1][1] - sending_bounds[0][1])/2)
+    end_cent = (receiving_bounds[0][0] + (receiving_bounds[1][0] - receiving_bounds[0][0])/2, receiving_bounds[0][1] + (receiving_bounds[1][1] - receiving_bounds[0][1])/2)        
+    # Find interaction origin and endpoint - (h + rsin(a), k + rcos(a))
+    rotation = rotation % 360
+    bearing = 360 - rotation
+    int_origin_x = (origin_cent[0] + initial_distance*sin(bearing * pi/180)) + parameters['sending_xy_skew'][0]
+    int_origin_y = (origin_cent[1] + initial_distance*cos(bearing * pi/180)) + parameters['sending_xy_skew'][1]
+    int_end_x = (end_cent[0] + initial_distance*sin(bearing * pi/180)) + parameters['receiving_xy_skew'][0]
+    int_end_y = (end_cent[1] + initial_distance*cos(bearing * pi/180)) + parameters['sending_xy_skew'][1]
+    # Determine max/min height
+    int_origin_max = (int_origin_x + y_pad*sin(bearing * pi/180), int_origin_y + y_pad*cos(bearing * pi/180))
+    int_end_max = (int_end_x + y_pad*sin(bearing * pi/180), int_end_y + y_pad*cos(bearing * pi/180))
+    max_height = 3
+    # Draw headless interaction
+    plt.plot([int_origin_x,
+              int_origin_max[0],
+              int_end_max[0],
+              int_end_x],
+             [int_origin_y,
+              int_origin_max[1],
+              int_end_max[1],
+              int_end_y],
+            color = parameters['color'],
+            lw = parameters['linewidth'],
+            zorder = parameters['zorder'] - 5) # Slightly lower zorder than head to prevent overlap
+    # Control
+    if interaction_type == 'control':
+        draw_control(ax, int_end_x, int_end_y, parameters, rotation = rotation)
+    # Degradation
+    elif interaction_type == 'degradation':
+        draw_degradation(ax, int_end_x, int_end_y, parameters, rotation = rotation)
+    # Inhibition
+    elif interaction_type == 'inhibition':
+        draw_inhibition(ax, int_end_x, int_end_y, parameters, rotation = rotation)
+    # Process
+    elif interaction_type == 'process':
+        draw_process(ax, int_end_x, int_end_y, parameters, rotation = rotation)
+    # Stimulation
+    elif interaction_type == 'stimulation':
+        draw_stimulation(ax, int_end_x, int_end_y, parameters, rotation = rotation)
+    # Find bounds of interaction
+    xcoords = [int_origin_max[0], int_end_max[0], int_origin_x, int_end_x]
+    ycoords = [int_origin_max[1], int_end_max[1], int_origin_y, int_end_y]
+    minbounds = (min(xcoords),min(ycoords))
+    maxbounds = (max(xcoords),max(ycoords))
+    return (minbounds, maxbounds)
 
 def draw_control(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
+    """Draws the head of a control interaction.
+
+    Parameters
+    ----------
+    ax: object
+        Matplotlib Axes object.
+    int_end_x: float
+        x value for the point at the end of
+        the interaction.
+    int_end_y: float
+        y value for the point at the end of
+        the interaction.
+    parameters: dict
+        Contains parameters for the interaction.
+        See docstring for the function
+        `process_interaction_params` for details.
+    rotation: float, optional
+        Rotation of the construct the interaction
+        is being drawn to.
+    """
     if parameters['headheight'] > parameters['headheight']:
         parameters['headwidth'] = parameters['headheight']
     bearing1 = ((360 - (2 * rotation)) / 2) - 45
@@ -633,6 +962,26 @@ def draw_control(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
               zorder = parameters['zorder'])
 
 def draw_degradation(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
+    """Draws the head of a degradation interaction.
+
+    Parameters
+    ----------
+    ax: object
+        Matplotlib Axes object.
+    int_end_x: float
+        x value for the point at the end of
+        the interaction.
+    int_end_y: float
+        y value for the point at the end of
+        the interaction.
+    parameters: dict
+        Contains parameters for the interaction.
+        See docstring for the function
+        `process_interaction_params` for details.
+    rotation: float, optional
+        Rotation of the construct the interaction
+        is being drawn to.
+    """
     bearing1 = 90 - rotation
     bearing2 = ((360 - (2 * bearing1)) / 2) + (bearing1 * 2)
     bearing3 = ((360 - (2 * rotation)) / 2)
@@ -661,7 +1010,7 @@ def draw_degradation(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
                             lw = parameters['linewidth'],
                             zorder = parameters['zorder'])
     ax.add_patch(patch)
-    # Plot line within circle
+    # Line within circle
     bearing1 = (360 - rotation) + 45
     bearing2 = (360 - rotation) + 225
     end1 = (origin[0] + (parameters['headwidth'] / 2) * sin(bearing1*pi/180), origin[1] + (parameters['headwidth'] / 2) * cos(bearing1*pi/180))
@@ -673,6 +1022,26 @@ def draw_degradation(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
              zorder = parameters['zorder'] + 500)
 
 def draw_inhibition(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
+    """Draws the head of an inhibition interaction.
+
+    Parameters
+    ----------
+    ax: object
+        Matplotlib Axes object.
+    int_end_x: float
+        x value for the point at the end of
+        the interaction.
+    int_end_y: float
+        y value for the point at the end of
+        the interaction.
+    parameters: dict
+        Contains parameters for the interaction.
+        See docstring for the function
+        `process_interaction_params` for details.
+    rotation: float, optional
+        Rotation of the construct the interaction
+        is being drawn to.
+    """
     bearing1 = 90 - rotation
     bearing2 = ((360 - (2 * bearing1)) / 2) + (bearing1 * 2)
     base1 = (int_end_x + (parameters['headwidth'] / 2) * sin(bearing1*pi/180), int_end_y + (parameters['headwidth'] / 2) * cos(bearing1*pi/180))
@@ -687,6 +1056,26 @@ def draw_inhibition(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
              zorder = parameters['zorder'])
 
 def draw_process(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
+    """Draws the head of a process interaction.
+
+    Parameters
+    ----------
+    ax: object
+        Matplotlib Axes object.
+    int_end_x: float
+        x value for the point at the end of
+        the interaction.
+    int_end_y: float
+        y value for the point at the end of
+        the interaction.
+    parameters: dict
+        Contains parameters for the interaction.
+        See docstring for the function
+        `process_interaction_params` for details.
+    rotation: float, optional
+        Rotation of the construct the interaction
+        is being drawn to.
+    """
     bearing1 = 90 - rotation
     bearing2 = ((360 - (2 * bearing1)) / 2) + (bearing1 * 2)
     bearing3 = ((360 - (2 * rotation)) / 2)
@@ -707,6 +1096,26 @@ def draw_process(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
     ax.add_patch(patch)
 
 def draw_stimulation(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
+    """Draws the head of a stimulation interaction.
+
+    Parameters
+    ----------
+    ax: object
+        Matplotlib Axes object.
+    int_end_x: float
+        x value for the point at the end of
+        the interaction.
+    int_end_y: float
+        y value for the point at the end of
+        the interaction.
+    parameters: dict
+        Contains parameters for the interaction.
+        See docstring for the function
+        `process_interaction_params` for details.
+    rotation: float, optional
+        Rotation of the construct the interaction
+        is being drawn to.
+    """
     bearing1 = 90 - rotation
     bearing2 = ((360 - (2 * bearing1)) / 2) + (bearing1 * 2)
     bearing3 = ((360 - (2 * rotation)) / 2)
@@ -728,13 +1137,45 @@ def draw_stimulation(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
     ax.add_patch(patch)
 
 def process_interaction_params(parameters):
+    """Formats and completes parameters to draw an interaction.
+
+    Parameters
+    ----------
+    parameters: dict
+        Contains mutable interaction parameters:
+            color: tuple
+                Format (r,g,b).
+            heightskew: float
+                Skews the height of interaction
+                from the construct.
+            headheight: float
+                Height of interaction head.
+            headwidth: float
+                Width of interaction head.
+            zorder: int
+                Matplotlib zorder value of
+                the interaction.
+            direction: string
+                Determines what side of the construct
+                the interaction is drawn on; 'forward'
+                or 'reverse'.
+            linewidth: float
+                Determines the width of lines
+                used to draw the interaction.
+            sending_xy_skew: tuple
+                Skews the point from which the
+                interaction originates, format (x,y).
+            receiving_xy_skew: tuple
+                Skews the point at which the
+                interaction ends, format (x,y).
+    """
     final_parameters = {'color': (0,0,0),
-                        'heightskew': 10,
-                        'headheight': 7,
-                        'headwidth': 7,
+                        'heightskew': 10.0,
+                        'headheight': 7.0,
+                        'headwidth': 7.0,
                         'zorder': 0,
                         'direction': 'forward',
-                        'linewidth': 1,
+                        'linewidth': 1.0,
                         'sending_xy_skew': (0,0),
                         'receiving_xy_skew': (0,0)}
     if parameters is None:
