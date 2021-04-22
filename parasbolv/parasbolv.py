@@ -55,7 +55,7 @@ class GlyphRenderer:
             self.glyphs_library, self.glyph_soterm_map = self.load_glyphs_from_path(glyph_path)
 
     def __process_unknown_val (self, val):
-        """Convert an unknown value into the correct type.
+        """Converts an unknown value into the correct type.
 
         Parameters
         ----------
@@ -93,7 +93,7 @@ class GlyphRenderer:
         return converted_val
 
     def __process_style (self, style_text):
-        """Convert style text into a dictionary.
+        """Converts style text into a dictionary.
 
         Parameters
         ----------
@@ -112,7 +112,7 @@ class GlyphRenderer:
         return style_data
 
     def __extract_tag_details(self, tag_attributes):
-        """Extract all the relevant details from an XML tag in the SVG.
+        """Extracts all the relevant SVG details from an XML tag in the SVG.
 
         Parameters
         ----------
@@ -176,6 +176,7 @@ class GlyphRenderer:
         path: Matplotlib Path object - https://matplotlib.org/stable/api/path_api.html
             Path to be transformed.
         baseline_y: float
+            y value of the baseline.
         position: tuple
             Path position, format (x,y).
         rotation: float
@@ -199,7 +200,7 @@ class GlyphRenderer:
         return Path(new_verts, new_codes)
 
     def __bounds_from_paths_to_draw(self, paths):
-        """Calculate the bounding box from a set of paths.
+        """Calculates the bounding box from a set of paths.
 
         Parameters
         ----------
@@ -291,11 +292,11 @@ class GlyphRenderer:
             Name of the glyph being drawn.
         position: tuple
             Position to draw to, format (x,y).
-        rotation: float
+        rotation: float, optional
             Rotation of glyph in radians.
-        user_parameters: dict
+        user_parameters: dict, optional
             Dictionary containing sizing/label parameters of glyph.
-        user_style: dict
+        user_style: dict, optional
             Dictionary containing style parameters of glyph.
         """
         try:
@@ -433,9 +434,9 @@ class GlyphRenderer:
             Type of glyph.
         position: tuple
             Position of glyph, format (x,y).
-        rotation: float
+        rotation: float, optional
             Rotation of glyph in radians.
-        user_parameters: dict
+        user_parameters: dict, optional
             Dictionary containing sizing/label parameters of glyph.
         """
         return self.draw_glyph(None, glyph_type, position, rotation=rotation, user_parameters=user_parameters)
@@ -449,9 +450,9 @@ class GlyphRenderer:
             Type of glyph.
         position: tuple
             Position of glyph, format (x,y).
-        rotation: float
+        rotation: float, optional
             Rotation of glyph in radians.
-        user_parameters: dict
+        user_parameters: dict, optional
             Dictionary containing sizing/label parameters of glyph.
         """
         glyph = self.glyphs_library[glyph_type]
@@ -692,14 +693,14 @@ def render_part_list (part_list, renderer, padding=0.2, fig = None, ax = None, r
     ----------
     part_list: list
     renderer: object
-    padding: float
-    fig: object
-    ax: object
-    rotation: float
-    start_position: tuple
-    additional_bounds_list: list
-    interaction_list: list
-    module_list: list
+    padding: float, optional
+    fig: object, optional
+    ax: object, optional
+    rotation: float, optional
+    start_position: tuple, optional
+    additional_bounds_list: list, optional
+    interaction_list: list, optional
+    module_list: list, optional
     """
     if fig is None or ax is None:
         fig, ax = plt.subplots()
@@ -835,7 +836,7 @@ def draw_interaction (ax, sending_bounds, receiving_bounds, interaction_type, pa
         Contains parameters for the interaction.
         See docstring for the function
         `process_interaction_params` for details.
-    rotation: float
+    rotation: float, optional
         Rotation, in radians, of construct that
         interactions are to be drawn to.
     """
@@ -915,7 +916,7 @@ def draw_control(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
         Contains parameters for the interaction.
         See docstring for the function
         `process_interaction_params` for details.
-    rotation: float
+    rotation: float, optional
         Rotation of the construct the interaction
         is being drawn to.
     """
@@ -958,7 +959,7 @@ def draw_degradation(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
         Contains parameters for the interaction.
         See docstring for the function
         `process_interaction_params` for details.
-    rotation: float
+    rotation: float, optional
         Rotation of the construct the interaction
         is being drawn to.
     """
@@ -1018,7 +1019,7 @@ def draw_inhibition(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
         Contains parameters for the interaction.
         See docstring for the function
         `process_interaction_params` for details.
-    rotation: float
+    rotation: float, optional
         Rotation of the construct the interaction
         is being drawn to.
     """
@@ -1052,7 +1053,7 @@ def draw_process(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
         Contains parameters for the interaction.
         See docstring for the function
         `process_interaction_params` for details.
-    rotation: float
+    rotation: float, optional
         Rotation of the construct the interaction
         is being drawn to.
     """
@@ -1092,7 +1093,7 @@ def draw_stimulation(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
         Contains parameters for the interaction.
         See docstring for the function
         `process_interaction_params` for details.
-    rotation: float
+    rotation: float, optional
         Rotation of the construct the interaction
         is being drawn to.
     """
