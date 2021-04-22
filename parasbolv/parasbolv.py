@@ -308,15 +308,15 @@ class GlyphRenderer:
         merged_parameters = glyph['defaults'].copy()
         if user_parameters is not None:
             # Find label
-            label = None
-            if 'label' in user_parameters:
-                label = user_parameters['label']
+            label_parameters = None
+            if 'label_parameters' in user_parameters:
+                label_parameters = user_parameters['label_parameters']
             # Find rotation in user_parameters (keyword arg takes priority)
             if rotation == 0.0 and 'rotation' in user_parameters:
                 rotation = user_parameters['rotation']
             # Collate parameters (user parameters take priority)
             for key in user_parameters.keys():
-                if key not in glyph['defaults'] and key != 'label' and key != 'rotation' and key != 'y_offset':
+                if key not in glyph['defaults'] and key != 'label_parameters' and key != 'rotation' and key != 'y_offset':
                     warnings.warn(f"""Parameter '{key}' is not valid for '{glyph_type}'.""")
                 merged_parameters[key] = user_parameters[key]
 	    # Find invalid path ids	
@@ -355,17 +355,17 @@ class GlyphRenderer:
             if ax is not None:
                 ax.add_patch(patch)
         if user_parameters is not None:
-            if label is not None:
+            if label_parameters is not None:
                 # Draw label
-                ax.text(**self.process_label_params(label, all_y_flipped_paths), ha='center', va='center')
+                ax.text(**self.process_label_params(label_parameters, all_y_flipped_paths), ha='center', va='center')
         return self.__bounds_from_paths_to_draw(all_y_flipped_paths), self.get_baseline_end(glyph_type, position, rotation=rotation, user_parameters=user_parameters)
 
-    def process_label_params(self, label, paths):
+    def process_label_params(self, label_parameters, paths):
         """Formats and completes label parameters.
 
         Parameters
         ----------
-        label: dict
+        label_parameters: dict
             Dictionary containing label parameters.
         paths: list
             List of paths composing the glyph.
@@ -375,22 +375,22 @@ class GlyphRenderer:
         rotation = 0.0
         finalfont = font_manager.FontProperties()
         # Collate parameters (user parameters take priority)
-        if 'color' in label:
-            color = label['color']
-        if 'xy_skew' in label:
-            xy_skew = label['xy_skew']
-        if 'rotation' in label:
+        if 'color' in label_parameters:
+            color = label_parameters['color']
+        if 'xy_skew' in label_parameters:
+            xy_skew = label_parameters['xy_skew']
+        if 'rotation' in label_parameters:
             # Convert to degrees
-            rotation = (180/pi) * label['rotation']
-        if 'userfont' in label:
-            finalfont = font_manager.FontProperties(**label['userfont'])        
+            rotation = (180/pi) * label_parameters['rotation']
+        if 'userfont' in label_parameters:
+            finalfont = font_manager.FontProperties(**label_parameters['userfont'])        
         all_path_vertices = []
         for path in paths:
             # Find vertices of each path
             path_vertices = path[0].vertices.copy()
             all_path_vertices.append(path_vertices)
         textpos_x, textpos_y = self.calculate_centroid_of_paths(all_path_vertices, xy_skew)
-        return {'x':textpos_x, 'y':textpos_y, 's':label['text'], 'color':color, 'fontproperties':finalfont, 'rotation':rotation}
+        return {'x':textpos_x, 'y':textpos_y, 's':label_parameters['text'], 'color':color, 'fontproperties':finalfont, 'rotation':rotation}
 
     def calculate_centroid_of_paths(self, all_path_vertices, xy_skew):
         """Calculates central point of paths provided.
