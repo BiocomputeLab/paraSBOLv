@@ -525,10 +525,10 @@ class Construct(object):
        additional_bounds_list: list
        interaction_list: list
        module_list: list
-       orientation: float
+       rotation: float
     """
 
-    def __init__ (self, part_list, renderer, padding=0.2, fig=None, ax=None, start_position=(0, 0), additional_bounds_list=None, interaction_list=None, module_list=None, orientation = 0.0):
+    def __init__ (self, part_list, renderer, padding=0.2, fig=None, ax=None, start_position=(0, 0), additional_bounds_list=None, interaction_list=None, module_list=None, rotation=0.0):
         """
         Parameters
         ----------
@@ -577,8 +577,8 @@ class Construct(object):
             x_stretch, an integer to strech/squash the
             module in the x direction, [3] y_strech,
             identical but in the y direction.
-        orientation: float, optional
-            Float representing the orientation of
+        rotation: float, optional
+            Float representing the rotation of
             the construct in radians.
         """
         self.renderer = renderer
@@ -594,24 +594,24 @@ class Construct(object):
         self.part_list = part_list
         self.interaction_list = interaction_list
         self.module_list = module_list
-        self._orientation = 0.0
-        self.orientation = orientation # Radians
+        self._rotation = 0.0
+        self.rotation = rotation # Radians
         self.bounds = None
         self.update_bounds()
 
-    # Automatically update construct orientation
+    # Automatically update construct rotation
     @property
-    def orientation(self):
-        return self._orientation
-    @orientation.setter
-    def orientation(self, value):
-        self._orientation = value
-        self.set_orientation(value)
+    def rotation(self):
+        return self._rotation
+    @rotation.setter
+    def rotation(self, value):
+        self._rotation = value
+        self.set_rotation(value)
     
-    def set_orientation (self, rotation):
-        """Sets the orientation of the construct.
+    def set_rotation (self, rotation):
+        """Sets the rotation of the construct.
 
-        NOTE: the self.orientation attribute
+        NOTE: the self.rotation attribute
         should be modified instead of directly
         calling this method.
 
@@ -671,12 +671,12 @@ class Construct(object):
             for additional_bounds in self.additional_bounds_list:
                 bounds_to_add.append(additional_bounds)
         if draw_for_bounds == False:
-            fig, ax, baseline_start, baseline_end, bounds = render_part_list(self.part_list, self.renderer, padding=self.padding, fig=self.fig, ax=self.ax, rotation = self.orientation, start_position=self.start_position, additional_bounds_list = bounds_to_add, interaction_list=self.interaction_list, module_list=self.module_list)
+            fig, ax, baseline_start, baseline_end, bounds = render_part_list(self.part_list, self.renderer, padding=self.padding, fig=self.fig, ax=self.ax, rotation = self.rotation, start_position=self.start_position, additional_bounds_list = bounds_to_add, interaction_list=self.interaction_list, module_list=self.module_list)
             return fig, ax, baseline_start, baseline_end, bounds
         elif draw_for_bounds == True:
             # Temporary rendering pathway to generate bounds
             temp_fig, temp_ax = plt.subplots()
-            fig, ax, baseline_start, baseline_end, bounds = render_part_list(self.part_list, self.renderer, padding=self.padding, fig=temp_fig, ax=temp_ax, rotation = self.orientation, start_position=self.start_position, additional_bounds_list = bounds_to_add, interaction_list=self.interaction_list, module_list=self.module_list)
+            fig, ax, baseline_start, baseline_end, bounds = render_part_list(self.part_list, self.renderer, padding=self.padding, fig=temp_fig, ax=temp_ax, rotation = self.rotation, start_position=self.start_position, additional_bounds_list = bounds_to_add, interaction_list=self.interaction_list, module_list=self.module_list)
             plt.close()
             return fig, ax, baseline_start, baseline_end, bounds
 
