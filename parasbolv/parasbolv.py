@@ -347,6 +347,8 @@ class GlyphRenderer:
                 svg_text = self.__eval_svg_data(path['d'], merged_parameters)
                 # Call to svgpath2mpl
                 paths_to_draw.append([parse_path(svg_text), merged_style])
+        if round(user_parameters['rotation'], 2) == round((3.14 + construct_rotation), 2):
+            position = (position[0] + merged_parameters['width']*cos(construct_rotation)), (position[1] + merged_parameters['width']*sin(construct_rotation))
         # Draw glyph to the axis with correct styling parameters
         baseline_y = glyph['defaults']['baseline_y']
         all_y_flipped_paths = []
