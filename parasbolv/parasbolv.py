@@ -227,11 +227,11 @@ class GlyphRenderer:
             else:
                 if cur_x_min < x_min:
                      x_min = cur_x_min
-                if cur_x_max < x_max:
+                if cur_x_max > x_max:
                      x_max = cur_x_max
                 if cur_y_min < y_min:
                      y_min = cur_y_min
-                if cur_y_max < y_max:
+                if cur_y_max > y_max:
                      y_max = cur_y_max
         return (x_min, y_min), (x_max, y_max)
 
@@ -362,8 +362,6 @@ class GlyphRenderer:
             if label_parameters is not None:
                 # Draw label
                 ax.text(**self.process_label_params(label_parameters, all_y_flipped_paths), ha='center', va='center')
-        if round(user_parameters['rotation'], 2) == round((3.14 + construct_rotation), 2):
-            position = (position[0] + merged_parameters['width']*cos(construct_rotation)), (position[1] + merged_parameters['width']*sin(construct_rotation))
         return self.__bounds_from_paths_to_draw(all_y_flipped_paths), self.get_baseline_end(glyph_type, position, rotation=rotation, user_parameters=user_parameters)
 
     def process_label_params(self, label_parameters, paths):
