@@ -534,7 +534,7 @@ class Construct(object):
        rotation: float
     """
 
-    def __init__ (self, part_list, renderer, padding=0.2, fig=None, ax=None, start_position=(0, 0), additional_bounds_list=None, interaction_list=None, module_list=None, rotation=0.0):
+    def __init__ (self, part_list, renderer, padding=0.2, gapsize = 3.0, fig=None, ax=None, start_position=(0, 0), additional_bounds_list=None, interaction_list=None, module_list=None, rotation=0.0):
         """
         Parameters
         ----------
@@ -550,6 +550,8 @@ class Construct(object):
             above.
         padding: float, optional
             Scale of the space added to axis limits.
+        gapsize: float, optional
+            Scale of the gaps between parts.
         fig: object, optional
             Matplotlib Figure object.
         ax: object, optional
@@ -589,6 +591,7 @@ class Construct(object):
         """
         self.renderer = renderer
         self.padding = padding
+        self.gapsize = gapsize
         self.fig = fig
         self.ax = ax
         if self.fig is None or self.ax is  None:
@@ -677,17 +680,17 @@ class Construct(object):
             for additional_bounds in self.additional_bounds_list:
                 bounds_to_add.append(additional_bounds)
         if draw_for_bounds == False:
-            fig, ax, baseline_start, baseline_end, bounds = render_part_list(self.part_list, self.renderer, padding=self.padding, fig=self.fig, ax=self.ax, rotation = self.rotation, start_position=self.start_position, additional_bounds_list = bounds_to_add, interaction_list=self.interaction_list, module_list=self.module_list)
+            fig, ax, baseline_start, baseline_end, bounds = render_part_list(self.part_list, self.renderer, padding=self.padding, gapsize = self.gapsize, fig=self.fig, ax=self.ax, rotation = self.rotation, start_position=self.start_position, additional_bounds_list = bounds_to_add, interaction_list=self.interaction_list, module_list=self.module_list)
             return fig, ax, baseline_start, baseline_end, bounds
         elif draw_for_bounds == True:
             # Temporary rendering pathway to generate bounds
             temp_fig, temp_ax = plt.subplots()
-            fig, ax, baseline_start, baseline_end, bounds = render_part_list(self.part_list, self.renderer, padding=self.padding, fig=temp_fig, ax=temp_ax, rotation = self.rotation, start_position=self.start_position, additional_bounds_list = bounds_to_add, interaction_list=self.interaction_list, module_list=self.module_list)
+            fig, ax, baseline_start, baseline_end, bounds = render_part_list(self.part_list, self.renderer, padding=self.padding, gapsize = self.gapsize, fig=temp_fig, ax=temp_ax, rotation = self.rotation, start_position=self.start_position, additional_bounds_list = bounds_to_add, interaction_list=self.interaction_list, module_list=self.module_list)
             plt.close()
             return fig, ax, baseline_start, baseline_end, bounds
 
 
-def render_part_list (part_list, renderer, padding=0.2, fig = None, ax = None, rotation = 0.0, start_position=(0, 0), additional_bounds_list = None, interaction_list=None, module_list=None):
+def render_part_list (part_list, renderer, padding=0.2, gapsize = 3.0, fig = None, ax = None, rotation = 0.0, start_position=(0, 0), additional_bounds_list = None, interaction_list=None, module_list=None):
     """Renders multiple glyphs in sequence.
 
     NOTE: See parameters of the __init__
@@ -699,6 +702,7 @@ def render_part_list (part_list, renderer, padding=0.2, fig = None, ax = None, r
     part_list: list
     renderer: object
     padding: float, optional
+    gapsize: float, optional
     fig: object, optional
     ax: object, optional
     rotation: float, optional
@@ -725,9 +729,15 @@ def render_part_list (part_list, renderer, padding=0.2, fig = None, ax = None, r
             bounds_list.append(bounds)
             # Correct part_position to remove y_offset
             part_position = (part_position[0], pre_part_position[1])
+            # Adjust for gapsize
+            if part != part_list[-1]:
+                part_position = (part_position[0] + gapsize*sin(rotation), (part_position[1] + gapsize*cos(rotation)))
         else:
             bounds, part_position = renderer.draw_glyph(ax, part[0], part_position, rotation = rotation, user_parameters=part[1], user_style=part[2])
             bounds_list.append(bounds)
+            # Adjust for gapsize
+            if part != part_list[-1]:
+                part_position = (part_position[0] + gapsize*cos(rotation), (part_position[1] + gapsize*sin(rotation)))
     interaction_bounds_list = []
     if interaction_list is not None:
         interaction_types = ['control','degradation','inhibition','process','stimulation']
