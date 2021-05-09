@@ -45,7 +45,7 @@ for n in range(number_of_rows+1):
                               ax = ax,
                               start_position = start_position,
                               gapsize = 25,
-                              padding = 50)
+                              padding = 20)
     fig, ax, baseline_start, baseline_end, bounds = construct.draw()
     ax.plot([baseline_start[0], baseline_end[0]],
             [baseline_start[1], baseline_end[1]],
@@ -76,7 +76,7 @@ for n in range(number_of_rows+1):
                               ax = ax,
                               start_position = start_position,
                               gapsize = 25,
-                              padding = 50)
+                              padding = 20)
     fig, ax, baseline_start, baseline_end, bounds = construct.draw()
     bounds_list.append(bounds)
 
