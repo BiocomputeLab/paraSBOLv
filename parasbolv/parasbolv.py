@@ -6,8 +6,7 @@ paraSBOLv
 A simple and lightweight library for rendering parametric SVG versions
 of the SBOL Visual symbols using matplotlib. It is able to load a directory 
 of glyphs and provides access to all style and geometry customisations,
-and provides a number of helper functions to handle part lists, modules 
-and interactions.
+and provides a number of helper functions to handle part lists and interactions.
 """
 
 import warnings 
@@ -519,7 +518,7 @@ def __find_bound_of_bounds (bounds_list):
 
 class Construct(object):
     """A modifiable construct consisting of
-       SBOL glyphs, interactions and modules.
+       SBOL glyphs and interactions.
        
        NOTE: Attributes below lacking
        description are documented in the
@@ -541,11 +540,10 @@ class Construct(object):
        start_position: tuple
        additional_bounds_list: list
        interaction_list: list
-       module_list: list
        rotation: float
     """
 
-    def __init__ (self, part_list, renderer, padding=0.2, gapsize = 3.0, fig=None, ax=None, start_position=(0, 0), additional_bounds_list=None, interaction_list=None, module_list=None, rotation=0.0):
+    def __init__ (self, part_list, renderer, padding=0.2, gapsize = 3.0, fig=None, ax=None, start_position=(0, 0), additional_bounds_list=None, interaction_list=None, rotation=0.0):
         """
         Parameters
         ----------
@@ -586,16 +584,6 @@ class Construct(object):
             similarly, [2] the interaction type
             string, and [3] the interaction_parameters
             dictionary.
-        module_list: list, optional
-            Specifies modules within the construct.
-            Each module is represented by a list
-            containing four elements: [0] The first
-            glyph within the module, represented by
-            the index of the glyph, [1] the final glyph
-            of the module, represented similarly, [2]
-            x_stretch, an integer to strech/squash the
-            module in the x direction, [3] y_strech,
-            identical but in the y direction.
         rotation: float, optional
             Float representing the rotation of
             the construct in radians.
@@ -613,7 +601,6 @@ class Construct(object):
         # Data structure
         self.part_list = part_list
         self.interaction_list = interaction_list
-        self.module_list = module_list
         self._rotation = 0.0
         self.rotation = rotation # Radians
         self.bounds = None
@@ -691,17 +678,17 @@ class Construct(object):
             for additional_bounds in self.additional_bounds_list:
                 bounds_to_add.append(additional_bounds)
         if draw_for_bounds == False:
-            fig, ax, baseline_start, baseline_end, bounds = render_part_list(self.part_list, self.renderer, padding=self.padding, gapsize = self.gapsize, fig=self.fig, ax=self.ax, rotation = self.rotation, start_position=self.start_position, additional_bounds_list = bounds_to_add, interaction_list=self.interaction_list, module_list=self.module_list)
+            fig, ax, baseline_start, baseline_end, bounds = render_part_list(self.part_list, self.renderer, padding=self.padding, gapsize = self.gapsize, fig=self.fig, ax=self.ax, rotation = self.rotation, start_position=self.start_position, additional_bounds_list = bounds_to_add, interaction_list=self.interaction_list)
             return fig, ax, baseline_start, baseline_end, bounds
         elif draw_for_bounds == True:
             # Temporary rendering pathway to generate bounds
             temp_fig, temp_ax = plt.subplots()
-            fig, ax, baseline_start, baseline_end, bounds = render_part_list(self.part_list, self.renderer, padding=self.padding, gapsize = self.gapsize, fig=temp_fig, ax=temp_ax, rotation = self.rotation, start_position=self.start_position, additional_bounds_list = bounds_to_add, interaction_list=self.interaction_list, module_list=self.module_list)
+            fig, ax, baseline_start, baseline_end, bounds = render_part_list(self.part_list, self.renderer, padding=self.padding, gapsize = self.gapsize, fig=temp_fig, ax=temp_ax, rotation = self.rotation, start_position=self.start_position, additional_bounds_list = bounds_to_add, interaction_list=self.interaction_list)
             plt.close()
             return fig, ax, baseline_start, baseline_end, bounds
 
 
-def render_part_list (part_list, renderer, padding=0.2, gapsize = 3.0, fig = None, ax = None, rotation = 0.0, start_position=(0, 0), additional_bounds_list = None, interaction_list=None, module_list=None):
+def render_part_list (part_list, renderer, padding=0.2, gapsize = 3.0, fig = None, ax = None, rotation = 0.0, start_position=(0, 0), additional_bounds_list = None, interaction_list=None):
     """Renders multiple glyphs in sequence.
 
     NOTE: See parameters of the __init__
@@ -720,7 +707,6 @@ def render_part_list (part_list, renderer, padding=0.2, gapsize = 3.0, fig = Non
     start_position: tuple, optional
     additional_bounds_list: list, optional
     interaction_list: list, optional
-    module_list: list, optional
     """
     if fig is None or ax is None:
         fig, ax = plt.subplots()
@@ -772,39 +758,9 @@ def render_part_list (part_list, renderer, padding=0.2, gapsize = 3.0, fig = Non
                 interaction_bounds_list.append(bounds)
             else:
                 warnings.warn(f"""'{interaction[2]}' is not a valid interaction type.""")
-    module_bounds_list = []
-    if module_list is not None:
-        for module in module_list:
-            start_glyph = module[0]
-            end_glyph = module[1]
-            '''
-            # Check if plot is flipped, then correct
-            if 'rotation' in part_list[start_glyph][1] and 'rotation' in part_list[end_glyph][1]:
-                if part_list[start_glyph][1]['rotation'] == pi and part_list[end_glyph][1]['rotation'] == pi:
-                    start_glyph = module[1]
-                    end_glyph = module[0]
-            '''
-            # Find bounds of glyphs
-            n = 0
-            for part in part_list:
-                if part is start_glyph:
-                    start_bounds = bounds_list[n]
-                    break
-                n += 1
-            n = 0
-            for part in part_list:
-                if part is end_glyph:
-                    end_bounds = bounds_list[n]
-                    break
-                n += 1
-            # Draw modules
-            bounds = draw_module(ax, start_bounds, end_bounds, module[2], module[3])
-            module_bounds_list.append(bounds)
-    # Unify interaction, module, and additional bounds with glyph bounds
+    # Unify interaction bounds and additional bounds with glyph bounds
     for interaction_bounds in interaction_bounds_list:
         bounds_list.append(interaction_bounds)
-    for module_bounds in module_bounds_list:
-        bounds_list.append(module_bounds)
     for additional_bounds in additional_bounds_list:
         bounds_list.append(additional_bounds)
     # Automatically find bounds for plot and resize axes
@@ -819,44 +775,6 @@ def render_part_list (part_list, renderer, padding=0.2, gapsize = 3.0, fig = Non
     ax.set_ylim([final_bounds[0][1]-fig_pad, final_bounds[1][1]+fig_pad])
     fig.set_size_inches( (width, height) )
     return fig, ax, start_position, part_position, final_bounds
-
-def draw_module (ax, start_bounds, end_bounds, x_strech, y_strech):
-    """Draws a module bounding at least two glyphs in a construct.
-
-    Parameters
-    ----------
-    ax: object
-        Matplotlib Axes object.
-    start_bounds: tuple
-        Bounds of the starting glyph of the module,
-        format ((x1,y1), (x2,y2)), where (x1,y1)
-        is the bottom left vertex and (x2,y2) the
-        top right.
-    end_bounds: tuple
-        Bounds of the ending glyph of the module,
-        formatted identically.
-    x_strech: float
-        Strech value in x direction to be applied
-        to the module.
-    y_strech: float
-        Strech value in y direction to be applied
-        to the module.
-    """
-    x_pad = (end_bounds[0][0] - start_bounds[0][0]) / 10
-    y_pad = (end_bounds[1][1] - start_bounds[0][1])
-    # Bottom left coords
-    x1 = ((start_bounds[0][0]) - x_pad) - x_strech
-    y1 = ((start_bounds[0][1]) - y_pad) - y_strech
-    # Top right coords
-    x2 = ((end_bounds[1][0]) + x_pad) + x_strech
-    y2 = ((end_bounds[1][1]) + y_pad) + y_strech
-    # Draw module
-    plt.plot([x1,x2,x2,x1,x1],
-             [y1,y1,y2,y2,y1],
-             '--',
-             color='black')
-    return ((x1,y1), (x2,y2))
-
 
 def draw_interaction (ax, sending_bounds, receiving_bounds, interaction_type, parameters, rotation = 0.0):
     """Draws an interaction between two glyphs in a construct.
