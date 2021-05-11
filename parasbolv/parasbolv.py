@@ -563,14 +563,14 @@ class Construct(object):
     def __init__ (self,
                   part_list,
                   renderer,
-                  padding=0.2,
+                  padding = 0.2,
                   gapsize = 3.0,
-                  fig=None,
-                  ax=None,
-                  start_position=(0, 0),
-                  additional_bounds_list=None,
-                  interaction_list=None,
-                  rotation=0.0):
+                  fig = None,
+                  ax = None,
+                  start_position = (0, 0),
+                  additional_bounds_list = None,
+                  interaction_list = None,
+                  rotation = 0.0):
         """
         Parameters
         ----------
@@ -711,10 +711,10 @@ class Construct(object):
                                                                              gapsize = self.gapsize,
                                                                              fig = self.fig,
                                                                              ax = self.ax,
-                                                                             rotation = self.rotation,
                                                                              start_position = self.start_position,
                                                                              additional_bounds_list = bounds_to_add,
-                                                                             interaction_list = self.interaction_list)
+                                                                             interaction_list = self.interaction_list,
+                                                                             rotation = self.rotation)
             return fig, ax, baseline_start, baseline_end, bounds
         elif draw_for_bounds == True:
             # Temporary rendering pathway to generate bounds
@@ -725,10 +725,10 @@ class Construct(object):
                                                                              gapsize = self.gapsize,
                                                                              fig = temp_fig,
                                                                              ax = temp_ax,
-                                                                             rotation = self.rotation,
                                                                              start_position = self.start_position,
                                                                              additional_bounds_list = bounds_to_add,
-                                                                             interaction_list = self.interaction_list)
+                                                                             interaction_list = self.interaction_list,
+                                                                             rotation = self.rotation)
             plt.close()
             return fig, ax, baseline_start, baseline_end, bounds
 
@@ -739,10 +739,10 @@ def render_part_list (part_list,
                       gapsize = 3.0,
                       fig = None,
                       ax = None,
-                      rotation = 0.0,
                       start_position = (0, 0),
                       additional_bounds_list = None,
-                      interaction_list = None):
+                      interaction_list = None,
+                      rotation = 0.0):
     """Renders multiple glyphs in sequence.
 
     NOTE: See parameters of the __init__
@@ -757,10 +757,10 @@ def render_part_list (part_list,
     gapsize: float, optional
     fig: object, optional
     ax: object, optional
-    rotation: float, optional
     start_position: tuple, optional
     additional_bounds_list: list, optional
     interaction_list: list, optional
+    rotation: float, optional
     """
     if fig is None or ax is None:
         fig, ax = plt.subplots()
