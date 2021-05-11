@@ -286,7 +286,7 @@ class GlyphRenderer:
 
         Parameters
         ----------
-        ax: Ax object
+        ax: Axes object
             https://matplotlib.org/stable/api/axes_api.html
         glyph_type: str
             Name of the glyph being drawn.
