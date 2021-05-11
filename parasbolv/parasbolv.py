@@ -786,7 +786,7 @@ def render_part_list (part_list,
             # Correct part_position to remove y_offset
             part_position = (part_position[0], pre_part_position[1])
             # Adjust for gapsize
-            if part != part_list[-1]:
+            if part is not part_list[-1]:
                 part_position = (part_position[0] + gapsize*sin(rotation),
                                 (part_position[1] + gapsize*cos(rotation)))
         else:
@@ -798,7 +798,7 @@ def render_part_list (part_list,
                                                         user_style = part[2])
             bounds_list.append(bounds)
             # Adjust for gapsize
-            if part != part_list[-1]:
+            if part is not part_list[-1]:
                 part_position = (part_position[0] + gapsize*cos(rotation),
                                 (part_position[1] + gapsize*sin(rotation)))
     interaction_bounds_list = []
