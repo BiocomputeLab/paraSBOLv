@@ -312,10 +312,13 @@ class GlyphRenderer:
             label_parameters = None
             if 'label_parameters' in user_parameters:
                 label_parameters = user_parameters['label_parameters']
+            #=================
+            # TODO: Rotation should never be a glyph property (only orientation)
             # Find rotation in user_parameters (dict value takes priority)
-            if 'rotation' in user_parameters:
-                construct_rotation = rotation
-                rotation = user_parameters['rotation']
+            #if 'rotation' in user_parameters:
+            #    construct_rotation = rotation
+            #    rotation = user_parameters['rotation']
+            #=================
             # Collate parameters (user parameters take priority)
             for key in user_parameters.keys():
                 if key not in glyph['defaults'] and key != 'label_parameters' and key != 'rotation' and key != 'y_offset':
@@ -347,9 +350,12 @@ class GlyphRenderer:
                 svg_text = self.__eval_svg_data(path['d'], merged_parameters)
                 # Call to svgpath2mpl
                 paths_to_draw.append([parse_path(svg_text), merged_style])
-        if user_parameters is not None:
-            if round(user_parameters['rotation'], 2) == round((3.14 + construct_rotation), 2):
-                position = (position[0] + merged_parameters['width']*cos(construct_rotation)), (position[1] + merged_parameters['width']*sin(construct_rotation))
+        #=================
+        # TODO: This should be rewritten
+        #if user_parameters is not None:
+        #    if round(user_parameters['rotation'], 2) == round((3.14 + construct_rotation), 2):
+        #        position = (position[0] + merged_parameters['width']*cos(construct_rotation)), (position[1] + merged_parameters['width']*sin(construct_rotation))
+        #=================
         # Draw glyph to the axis with correct styling parameters
         baseline_y = glyph['defaults']['baseline_y']
         all_y_flipped_paths = []
@@ -363,9 +369,12 @@ class GlyphRenderer:
             if label_parameters is not None:
                 # Draw label
                 ax.text(**self.process_label_params(label_parameters, all_y_flipped_paths), ha='center', va='center')
-        if user_parameters is not None:
-            if round(user_parameters['rotation'], 2) == round((3.14 + construct_rotation), 2):
-                position = (position[0] + merged_parameters['width']*cos(construct_rotation)), (position[1] + merged_parameters['width']*sin(construct_rotation))
+        #=================
+        # TODO: This should be rewritten
+        #if user_parameters is not None:
+        #    if round(user_parameters['rotation'], 2) == round((3.14 + construct_rotation), 2):
+        #        position = (position[0] + merged_parameters['width']*cos(construct_rotation)), (position[1] + merged_parameters['width']*sin(construct_rotation))
+        #=================
         return self.__bounds_from_paths_to_draw(all_y_flipped_paths), self.get_baseline_end(glyph_type, position, rotation=rotation, user_parameters=user_parameters)
 
     def process_label_params(self, label_parameters, paths):

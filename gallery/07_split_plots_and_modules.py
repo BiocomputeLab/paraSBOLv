@@ -47,7 +47,7 @@ module_list.append([6, 7, 0, -60])
 renderer = psv.GlyphRenderer()
 
 # Draw construct
-construct = psv.construct(part_list, renderer, module_list = module_list)
+construct = psv.Construct(part_list, renderer, module_list = module_list)
 fig, ax, baseline_start, baseline_end, bounds = construct.draw()
 
 ax.plot([baseline_start[0], baseline_end[0]], [baseline_start[1], baseline_end[1]], color=(0,0,0), linewidth=1.5, zorder=0)

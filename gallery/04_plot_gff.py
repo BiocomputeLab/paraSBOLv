@@ -63,7 +63,7 @@ part_list = load_part_list_from_gff('./04_plot_gff.gff', 'chrom1', type_map=gffs
 
 renderer = psv.GlyphRenderer()
 
-construct = psv.construct(part_list, renderer)
+construct = psv.Construct(part_list, renderer)
 fig, ax, baseline_start, baseline_end, bounds = construct.draw()
 ax.plot([baseline_start[0], baseline_end[0]], [baseline_start[1], baseline_end[1]], color=(0,0,0), linewidth=1.5, zorder=0)
 
