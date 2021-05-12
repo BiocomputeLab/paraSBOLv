@@ -305,26 +305,10 @@ class GlyphRenderer:
             class Invalid_glyph_type(Exception):	
                 pass	
             raise Invalid_glyph_type(f"""'{glyph_type}' is not a valid glyph.""")
-        merged_parameters = glyph['defaults'].copy()
-        if user_parameters is not None:
-            # Find label
-            label_parameters = None
-            if 'label_parameters' in user_parameters:
-                label_parameters = user_parameters['label_parameters']
-            #=================
-            # TODO: Rotation should never be a glyph property (only orientation)
-            # Find rotation in user_parameters (dict value takes priority)
-            #if 'rotation' in user_parameters:
-            #    construct_rotation = rotation
-            #    rotation = user_parameters['rotation']
-            #=================
-            # Collate parameters (user parameters take priority)
-            for key in user_parameters.keys():
-                if key not in glyph['defaults'] and key != 'label_parameters' and key != 'rotation' and key != 'y_offset':
-                    warnings.warn(f"""Parameter '{key}' is not valid for '{glyph_type}'.""")
-                merged_parameters[key] = user_parameters[key]
+        # Collate parameters
+        merged_parameters, label_parameters = collate_user_params(self, glyph_type, user_parameters)
 	    # Find invalid path ids	
-        if user_style is not None:	
+        if user_style is not None:
             path_ids = []	
             for path in glyph['paths']:	
                 path_ids.append(path['id'])	
@@ -349,12 +333,6 @@ class GlyphRenderer:
                 svg_text = self.__eval_svg_data(path['d'], merged_parameters)
                 # Call to svgpath2mpl
                 paths_to_draw.append([parse_path(svg_text), merged_style])
-        #=================
-        # TODO: This should be rewritten
-        #if user_parameters is not None:
-        #    if round(user_parameters['rotation'], 2) == round((3.14 + construct_rotation), 2):
-        #        position = (position[0] + merged_parameters['width']*cos(construct_rotation)), (position[1] + merged_parameters['width']*sin(construct_rotation))
-        #=================
         # Draw glyph to the axis with correct styling parameters
         baseline_y = glyph['defaults']['baseline_y']
         all_y_flipped_paths = []
@@ -374,12 +352,6 @@ class GlyphRenderer:
                                                     all_y_flipped_paths),
                                                     ha='center',
                                                     va='center')
-        #=================
-        # TODO: This should be rewritten
-        #if user_parameters is not None:
-        #    if round(user_parameters['rotation'], 2) == round((3.14 + construct_rotation), 2):
-        #        position = (position[0] + merged_parameters['width']*cos(construct_rotation)), (position[1] + merged_parameters['width']*sin(construct_rotation))
-        #=================
         return self.__bounds_from_paths_to_draw(all_y_flipped_paths), self.get_baseline_end(glyph_type,
                                                                                             position,
                                                                                             rotation=rotation,
@@ -552,12 +524,13 @@ class Construct(object):
        part_list: list
        renderer: object
        padding: float
+       gapsize: float
        fig: object
        ax: object
        start_position: tuple
        additional_bounds_list: list
        interaction_list: list
-       rotation: float
+       construct_rotation: float
     """
 
     def __init__ (self,
@@ -570,7 +543,7 @@ class Construct(object):
                   start_position = (0, 0),
                   additional_bounds_list = None,
                   interaction_list = None,
-                  rotation = 0.0):
+                  construct_rotation = 0.0):
         """
         Parameters
         ----------
@@ -611,7 +584,7 @@ class Construct(object):
             similarly, [2] the interaction type
             string, and [3] the interaction_parameters
             dictionary.
-        rotation: float, optional
+        construct_rotation: float, optional
             Float representing the rotation of
             the construct in radians.
         """
@@ -628,44 +601,10 @@ class Construct(object):
         # Data structure
         self.part_list = part_list
         self.interaction_list = interaction_list
-        self._rotation = 0.0
-        self.rotation = rotation # Radians
+        self._construct_rotation = 0.0
+        self.construct_rotation = construct_rotation # Radians
         self.bounds = None
         self.update_bounds()
-
-    # Automatically update construct rotation
-    @property
-    def rotation(self):
-        return self._rotation
-    @rotation.setter
-    def rotation(self, value):
-        self._rotation = value
-        self.set_rotation(value)
-    
-    def set_rotation (self, rotation):
-        """Sets the rotation of the construct.
-
-        NOTE: the self.rotation attribute
-        should be modified instead of directly
-        calling this method.
-
-        Parameters
-        ----------
-        rotation: float
-            Rotation value in radians to be applied
-            to the construct.
-        """
-        part_list = self.part_list
-        for glyph in part_list:
-            user_parameters = glyph[1]
-            if user_parameters is None:
-                user_parameters = {}
-                glyph[1] = user_parameters
-            if 'rotation' in user_parameters:
-                user_parameters['rotation'] += rotation
-            elif 'rotation' not in user_parameters:
-                user_parameters['rotation'] = rotation
-        self.part_list = part_list
 
     def reverse_interactions (self):
         """Reverses the side interactions are drawn on.
@@ -714,7 +653,7 @@ class Construct(object):
                                                                              start_position = self.start_position,
                                                                              additional_bounds_list = bounds_to_add,
                                                                              interaction_list = self.interaction_list,
-                                                                             rotation = self.rotation)
+                                                                             construct_rotation = self.construct_rotation)
             return fig, ax, baseline_start, baseline_end, bounds
         elif draw_for_bounds == True:
             # Temporary rendering pathway to generate bounds
@@ -728,7 +667,7 @@ class Construct(object):
                                                                              start_position = self.start_position,
                                                                              additional_bounds_list = bounds_to_add,
                                                                              interaction_list = self.interaction_list,
-                                                                             rotation = self.rotation)
+                                                                             construct_rotation = self.construct_rotation)
             plt.close()
             return fig, ax, baseline_start, baseline_end, bounds
 
@@ -742,7 +681,7 @@ def render_part_list (part_list,
                       start_position = (0, 0),
                       additional_bounds_list = None,
                       interaction_list = None,
-                      rotation = 0.0):
+                      construct_rotation = 0.0):
     """Renders multiple glyphs in sequence.
 
     NOTE: See parameters of the __init__
@@ -760,7 +699,7 @@ def render_part_list (part_list,
     start_position: tuple, optional
     additional_bounds_list: list, optional
     interaction_list: list, optional
-    rotation: float, optional
+    construct_rotation: float, optional
     """
     if fig is None or ax is None:
         fig, ax = plt.subplots()
@@ -772,35 +711,45 @@ def render_part_list (part_list,
     part_position = start_position
     bounds_list = []
     for part in part_list:
-        # Draw glyphs
-        if part[1] is not None and 'y_offset' in part[1]:
-            pre_part_position = part_position
-            part_position = (part_position[0], part_position[1] + part[1]['y_offset'])
-            bounds, part_position = renderer.draw_glyph(ax,
-                                                        part[0],
-                                                        part_position,
-                                                        rotation = rotation,
-                                                        user_parameters = part[1],
-                                                        user_style = part[2])
-            bounds_list.append(bounds)
-            # Correct part_position to remove y_offset
-            part_position = (part_position[0], pre_part_position[1])
-            # Adjust for gapsize
-            if part is not part_list[-1]:
-                part_position = (part_position[0] + gapsize*sin(rotation),
-                                (part_position[1] + gapsize*cos(rotation)))
-        else:
-            bounds, part_position = renderer.draw_glyph(ax,
-                                                        part[0],
-                                                        part_position,
-                                                        rotation = rotation,
-                                                        user_parameters = part[1],
-                                                        user_style = part[2])
-            bounds_list.append(bounds)
-            # Adjust for gapsize
-            if part is not part_list[-1]:
-                part_position = (part_position[0] + gapsize*cos(rotation),
-                                (part_position[1] + gapsize*sin(rotation)))
+        user_parameters = part[1]
+        # Pre-draw part_position adjustments (y_offset and orientation).
+        if user_parameters is not None:
+            if 'y_offset' in user_parameters:
+                part_position = (part_position[0], part_position[1] + user_parameters['y_offset'])
+            if 'orientation' in user_parameters:
+                part_position = adjust_position_for_orientation (part_position,
+                                                                 user_parameters['orientation'],
+                                                                 collate_user_params(renderer,
+                                                                                     part[0],
+                                                                                     user_parameters)[0]['width'],
+                                                                 construct_rotation)
+        # Draw the part.
+        rotation = construct_rotation
+        if user_parameters is not None:
+            if 'orientation' in user_parameters:
+                if user_parameters['orientation'] == 'reverse':
+                    rotation = construct_rotation + 3.142
+        bounds, part_position = renderer.draw_glyph(ax,
+                                                    part[0],
+                                                    part_position,
+                                                    rotation = rotation,
+                                                    user_parameters = user_parameters,
+                                                    user_style = part[2])
+        # Post-draw part_position adjustments (y_offset, orientation, and gapsize).
+        if user_parameters is not None:
+            if 'y_offset' in user_parameters:
+                part_position = (part_position[0], part_position[1] - user_parameters['y_offset'])
+            if 'orientation' in user_parameters:
+                part_position = adjust_position_for_orientation (part_position,
+                                                                 user_parameters['orientation'],
+                                                                 collate_user_params(renderer,
+                                                                                     part[0],
+                                                                                     user_parameters)[0]['width'],
+                                                                 construct_rotation)
+        if part is not part_list[-1]:
+            part_position = (part_position[0] + gapsize*cos(construct_rotation),
+                            (part_position[1] + gapsize*sin(construct_rotation)))
+        bounds_list.append(bounds)
     interaction_bounds_list = []
     if interaction_list is not None:
         interaction_types = ['control','degradation','inhibition','process','stimulation']
@@ -825,7 +774,7 @@ def render_part_list (part_list,
                                           receiving_bounds,
                                           interaction[2],
                                           interaction[3],
-                                          rotation = rotation)
+                                          rotation = construct_rotation)
                 interaction_bounds_list.append(bounds)
             else:
                 warnings.warn(f"""'{interaction[2]}' is not a valid interaction type.""")
@@ -846,6 +795,57 @@ def render_part_list (part_list,
     ax.set_ylim([final_bounds[0][1]-fig_pad, final_bounds[1][1]+fig_pad])
     fig.set_size_inches( (width, height) )
     return fig, ax, start_position, part_position, final_bounds
+
+def adjust_position_for_orientation (position, orientation, glyph_width, construct_rotation):
+    """Adjusts the relative position of a part
+       to be drawn with a reversed orientation.
+
+    Parameters
+    ----------
+    position: tuple
+        Position the glyph is to be
+        drawn to, format (x,y).
+    orientation: string
+        Defines the glyph orientation,
+        valued as either 'forward' or
+        'reverse'.
+    glyph_width: float
+        Width value of the glyph.
+    construct_rotation: float
+        Rotation value of the construct
+        containing the glyph.
+    """
+    if orientation == 'reverse':
+        position = (position[0] + glyph_width*cos(construct_rotation)), (position[1] + glyph_width*sin(construct_rotation))
+    return position
+
+def collate_user_params (renderer, glyph_type, user_parameters):
+    """Combine user-defined parameters with default glyph
+       parameters to create merged parameters for drawing.
+
+    Parameters
+    ----------
+    renderer: object
+        ParaSBOLv rendering object.
+    glyph_type: str
+        Type of glyph being drawn.
+    user_parameters: dict
+        User-defined parameters to
+        be applied to the glyph.
+    """
+    
+    glyph = renderer.glyphs_library[glyph_type]	
+    merged_parameters = glyph['defaults'].copy()
+    label_parameters = None
+    if user_parameters is not None:
+        # Find label
+        if 'label_parameters' in user_parameters:
+            label_parameters = user_parameters['label_parameters']
+        for key in user_parameters.keys():
+            if key not in glyph['defaults'] and key != 'label_parameters' and key != 'rotation' and key != 'y_offset':
+                warnings.warn(f"""Parameter '{key}' is not valid for '{glyph_type}'.""")
+            merged_parameters[key] = user_parameters[key]
+    return merged_parameters, label_parameters
 
 def draw_interaction (ax,
                       sending_bounds,
