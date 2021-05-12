@@ -34,7 +34,7 @@ class GlyphRenderer:
     """ Class to load and render using matplotlib parametric SVG glyphs.
     """
 
-    def __init__(self, glyph_path=None, global_defaults=None):
+    def __init__(self, glyph_path=None):
         """
         Parameters
         ----------
@@ -42,7 +42,6 @@ class GlyphRenderer:
             File path at which the glyph SVG files are stored,
             relative to the directory in which parasbolv.py is
             contained.
-        global_defaults: 
         """
         self.svg2mpl_style_map = {}
         self.svg2mpl_style_map['fill'] = 'facecolor'
@@ -515,12 +514,6 @@ class Construct(object):
 
        Attributes
        ----------
-       bounds: tuple
-           Represents the bounds of the
-           construct, formatted as ((x1,y1), (x2,y2))
-           where (x1,y1) are the coordinates of the
-           lower left vertex and (x2, y2) are the
-           coordinates of the top right vertex.
        part_list: list
        renderer: object
        padding: float
@@ -530,7 +523,13 @@ class Construct(object):
        start_position: tuple
        additional_bounds_list: list
        interaction_list: list
-       construct_rotation: float
+       rotation: float
+       bounds: tuple
+           Represents the bounds of the
+           construct, formatted as ((x1,y1), (x2,y2))
+           where (x1,y1) are the coordinates of the
+           lower left vertex and (x2, y2) are the
+           coordinates of the top right vertex.
     """
 
     def __init__ (self,
@@ -543,7 +542,7 @@ class Construct(object):
                   start_position = (0, 0),
                   additional_bounds_list = None,
                   interaction_list = None,
-                  construct_rotation = 0.0):
+                  rotation = 0.0):
         """
         Parameters
         ----------
@@ -584,7 +583,7 @@ class Construct(object):
             similarly, [2] the interaction type
             string, and [3] the interaction_parameters
             dictionary.
-        construct_rotation: float, optional
+        rotation: float, optional
             Float representing the rotation of
             the construct in radians.
         """
@@ -601,8 +600,8 @@ class Construct(object):
         # Data structure
         self.part_list = part_list
         self.interaction_list = interaction_list
-        self._construct_rotation = 0.0
-        self.construct_rotation = construct_rotation # Radians
+        self.rotation = 0.0
+        self.rotation = rotation # Radians
         self.bounds = None
         self.update_bounds()
 
@@ -653,7 +652,7 @@ class Construct(object):
                                                                              start_position = self.start_position,
                                                                              additional_bounds_list = bounds_to_add,
                                                                              interaction_list = self.interaction_list,
-                                                                             construct_rotation = self.construct_rotation)
+                                                                             rotation = self.rotation)
             return fig, ax, baseline_start, baseline_end, bounds
         elif draw_for_bounds == True:
             # Temporary rendering pathway to generate bounds
@@ -667,7 +666,7 @@ class Construct(object):
                                                                              start_position = self.start_position,
                                                                              additional_bounds_list = bounds_to_add,
                                                                              interaction_list = self.interaction_list,
-                                                                             construct_rotation = self.construct_rotation)
+                                                                             rotation = self.rotation)
             plt.close()
             return fig, ax, baseline_start, baseline_end, bounds
 
@@ -681,7 +680,7 @@ def render_part_list (part_list,
                       start_position = (0, 0),
                       additional_bounds_list = None,
                       interaction_list = None,
-                      construct_rotation = 0.0):
+                      rotation = 0.0):
     """Renders multiple glyphs in sequence.
 
     NOTE: See parameters of the __init__
@@ -699,7 +698,7 @@ def render_part_list (part_list,
     start_position: tuple, optional
     additional_bounds_list: list, optional
     interaction_list: list, optional
-    construct_rotation: float, optional
+    rotation: float, optional
     """
     if fig is None or ax is None:
         fig, ax = plt.subplots()
@@ -722,17 +721,17 @@ def render_part_list (part_list,
                                                                  collate_user_params(renderer,
                                                                                      part[0],
                                                                                      user_parameters)[0]['width'],
-                                                                 construct_rotation)
+                                                                 rotation)
         # Draw the part.
-        rotation = construct_rotation
+        drawing_rotation = rotation
         if user_parameters is not None:
             if 'orientation' in user_parameters:
                 if user_parameters['orientation'] == 'reverse':
-                    rotation = construct_rotation + 3.142
+                    drawing_rotation = rotation + 3.142
         bounds, part_position = renderer.draw_glyph(ax,
                                                     part[0],
                                                     part_position,
-                                                    rotation = rotation,
+                                                    rotation = drawing_rotation,
                                                     user_parameters = user_parameters,
                                                     user_style = part[2])
         # Post-draw part_position adjustments (y_offset, orientation, and gapsize).
@@ -745,10 +744,10 @@ def render_part_list (part_list,
                                                                  collate_user_params(renderer,
                                                                                      part[0],
                                                                                      user_parameters)[0]['width'],
-                                                                 construct_rotation)
+                                                                 rotation)
         if part is not part_list[-1]:
-            part_position = (part_position[0] + gapsize*cos(construct_rotation),
-                            (part_position[1] + gapsize*sin(construct_rotation)))
+            part_position = (part_position[0] + gapsize*cos(rotation),
+                            (part_position[1] + gapsize*sin(rotation)))
         bounds_list.append(bounds)
     interaction_bounds_list = []
     if interaction_list is not None:
@@ -774,7 +773,7 @@ def render_part_list (part_list,
                                           receiving_bounds,
                                           interaction[2],
                                           interaction[3],
-                                          rotation = construct_rotation)
+                                          rotation = rotation)
                 interaction_bounds_list.append(bounds)
             else:
                 warnings.warn(f"""'{interaction[2]}' is not a valid interaction type.""")
@@ -796,8 +795,8 @@ def render_part_list (part_list,
     fig.set_size_inches( (width, height) )
     return fig, ax, start_position, part_position, final_bounds
 
-def adjust_position_for_orientation (position, orientation, glyph_width, construct_rotation):
-    """Adjusts the relative position of a part
+def adjust_position_for_orientation (position, orientation, glyph_width, rotation):
+    """Adjusts the relative position of a part that
        to be drawn with a reversed orientation.
 
     Parameters
@@ -811,12 +810,12 @@ def adjust_position_for_orientation (position, orientation, glyph_width, constru
         'reverse'.
     glyph_width: float
         Width value of the glyph.
-    construct_rotation: float
+    rotation: float
         Rotation value of the construct
         containing the glyph.
     """
     if orientation == 'reverse':
-        position = (position[0] + glyph_width*cos(construct_rotation)), (position[1] + glyph_width*sin(construct_rotation))
+        position = (position[0] + glyph_width*cos(rotation)), (position[1] + glyph_width*sin(rotation))
     return position
 
 def collate_user_params (renderer, glyph_type, user_parameters):
