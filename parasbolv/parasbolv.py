@@ -279,7 +279,13 @@ class GlyphRenderer:
                 glyph_soterm_map[soterm] = glyph_type
         return glyphs_library, glyph_soterm_map
 
-    def draw_glyph(self, ax, glyph_type, position, rotation=0.0, user_parameters=None, user_style=None):
+    def draw_glyph(self,
+                   ax,
+                   glyph_type,
+                   position,
+                   rotation=0.0,
+                   user_parameters=None,
+                   user_style=None):
         """Draws a glyph to Matploblib Axes.
 
         Parameters
@@ -305,7 +311,9 @@ class GlyphRenderer:
                 pass	
             raise Invalid_glyph_type(f"""'{glyph_type}' is not a valid glyph.""")
         # Collate parameters
-        merged_parameters, label_parameters = collate_user_params(self, glyph_type, user_parameters)
+        merged_parameters, label_parameters = collate_user_params(self,
+                                                                  glyph_type,
+                                                                  user_parameters)
 	    # Find invalid path ids	
         if user_style is not None:
             path_ids = []	
@@ -318,7 +326,9 @@ class GlyphRenderer:
         for path in glyph['paths']:
             if path['class'] not in ['baseline', 'bounding-box']:
                 merged_style = path['style']
-                if path['id'] is not None and user_style is not None and path['id'] in user_style.keys():
+                if (user_style is not None and
+                    path['id'] is not None and
+                    path['id'] in user_style.keys()):
                     # Merge the styling dictionaries (user takes preference)
                     merged_style = user_style[path['id']].copy()
                     for style_el in path['style'].keys():
@@ -351,10 +361,11 @@ class GlyphRenderer:
                                                     all_y_flipped_paths),
                                                     ha='center',
                                                     va='center')
-        return self.__bounds_from_paths_to_draw(all_y_flipped_paths), self.get_baseline_end(glyph_type,
-                                                                                            position,
-                                                                                            rotation=rotation,
-                                                                                            user_parameters=user_parameters)
+        return (self.__bounds_from_paths_to_draw(all_y_flipped_paths),
+                self.get_baseline_end(glyph_type,
+                                      position,
+                                      rotation=rotation,
+                                      user_parameters=user_parameters))
 
     def process_label_params(self, label_parameters, paths):
         """Formats and completes label parameters.
@@ -852,7 +863,7 @@ def draw_interaction (ax,
                       interaction_type,
                       parameters,
                       rotation = 0.0):
-    """Draws an interaction between two glyphs in a construct.
+    """Draws an interaction.
 
     Parameters
     ----------
@@ -1223,7 +1234,7 @@ def process_interaction_params(parameters):
     Parameters
     ----------
     parameters: dict
-        Contains mutable interaction parameters:
+        Contains interaction parameters:
             color: tuple
                 Format (r,g,b).
             headheight: float
@@ -1234,9 +1245,9 @@ def process_interaction_params(parameters):
                 Matplotlib zorder value of
                 the interaction.
             direction: string
-                Determines what side of the construct
-                the interaction is drawn on; 'forward'
-                or 'reverse'.
+                Determines what side of the
+                construct the interaction is
+                drawn on; 'forward' or 'reverse'.
             linewidth: float
                 Determines the width of lines
                 used to draw the interaction.
@@ -1248,7 +1259,8 @@ def process_interaction_params(parameters):
                 line of the interaction.
             receiving_length_skew: float
                 Skews the length of the
-                receiving line of the interaction.
+                receiving line of the
+                interaction.
             distance_from_baseline: float
                 Skews the distance between the
                 interaction and the baseline.
