@@ -15,7 +15,7 @@ import sys
 import glob
 import xml.etree.ElementTree as ET
 import re
-from math import cos, sin, pi
+from math import cos, sin, pi, sqrt
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -841,7 +841,7 @@ def collate_user_params (renderer, glyph_type, user_parameters):
         if 'label_parameters' in user_parameters:
             label_parameters = user_parameters['label_parameters']
         for key in user_parameters.keys():
-            if key not in glyph['defaults'] and key != 'label_parameters' and key != 'rotation' and key != 'y_offset':
+            if key not in glyph['defaults'] and key != 'label_parameters' and key != 'orientation' and key != 'y_offset':
                 warnings.warn(f"""Parameter '{key}' is not valid for '{glyph_type}'.""")
             merged_parameters[key] = user_parameters[key]
     return merged_parameters, label_parameters
@@ -884,29 +884,44 @@ def draw_interaction (ax,
     if parameters['direction'] == 'reverse':
         # Flip side to draw interaction on
         rotation += 180
-    # Assign pad height
-    initial_distance = parameters['heightskew'] * 1.5
-    y_pad = parameters['heightskew'] * 2
+        # Flip centroids
+        p = sending_bounds
+        sending_bounds = receiving_bounds
+        receiving_bounds = p
+    # Determine distance from baseline
+    initial_distance = parameters['distance_from_baseline']
     if interaction_type == 'degradation': # Degradation is bigger than the other interactions
-        initial_distance = parameters['heightskew'] * 3 
+        initial_distance = parameters['distance_from_baseline'] * 2
+    # Determine pad size
+    y_pad = parameters['heightskew'] * 2
     # Find centroid of glyph bounds
     origin_cent = (sending_bounds[0][0] + (sending_bounds[1][0] - sending_bounds[0][0])/2,
                    sending_bounds[0][1] + (sending_bounds[1][1] - sending_bounds[0][1])/2)
     end_cent = (receiving_bounds[0][0] + (receiving_bounds[1][0] - receiving_bounds[0][0])/2,
-                receiving_bounds[0][1] + (receiving_bounds[1][1] - receiving_bounds[0][1])/2)        
-    # Find interaction origin and endpoint - (h + rsin(a), k + rcos(a))
+                receiving_bounds[0][1] + (receiving_bounds[1][1] - receiving_bounds[0][1])/2)
+    # Determine distance between centroids
+    x_distance = abs(origin_cent[0] - end_cent[0])
+    y_distance = abs(origin_cent[1] - end_cent[1])
+    centroid_distance = sqrt(x_distance**2 + y_distance**2)        
+    # Determine interaction origin
     rotation = rotation % 360
     bearing = 360 - rotation
-    int_origin_x = (origin_cent[0] + initial_distance*sin(bearing * pi/180)) + parameters['sending_xy_skew'][0]
-    int_origin_y = (origin_cent[1] + initial_distance*cos(bearing * pi/180)) + parameters['sending_xy_skew'][1]
-    int_end_x = (end_cent[0] + initial_distance*sin(bearing * pi/180)) + parameters['receiving_xy_skew'][0]
-    int_end_y = (end_cent[1] + initial_distance*cos(bearing * pi/180)) + parameters['sending_xy_skew'][1]
-    # Determine max/min height
-    int_origin_max = (int_origin_x + y_pad*sin(bearing * pi/180),
-                      int_origin_y + y_pad*cos(bearing * pi/180))
-    int_end_max = (int_end_x + y_pad*sin(bearing * pi/180),
-                   int_end_y + y_pad*cos(bearing * pi/180))
-    max_height = 3
+    int_origin_x = (origin_cent[0] + (initial_distance+parameters['distance_from_baseline'])*sin(bearing * pi/180)) # (h + rsin(a), k + rcos(a))
+    int_origin_y = (origin_cent[1] + (initial_distance+parameters['distance_from_baseline'])*cos(bearing * pi/180))
+    # Determine origin max
+    int_origin_max = (int_origin_x + (y_pad+parameters['sending_length_skew'])*sin(bearing * pi/180),
+                      int_origin_y + (y_pad+parameters['sending_length_skew'])*cos(bearing * pi/180))
+    # Determine end max
+    int_end_max = (int_origin_max[0] + centroid_distance*sin((90 - rotation) * pi/180),
+                   int_origin_max[1] + centroid_distance*cos((90 - rotation) * pi/180))
+    # Determine interaction endpoint
+    int_end_x = (int_end_max[0] + (y_pad+parameters['receiving_length_skew'])*sin((180-rotation) * pi/180))
+    int_end_y = (int_end_max[1] + (y_pad+parameters['receiving_length_skew'])*cos((180-rotation) * pi/180))
+    if parameters['direction'] == 'reverse':
+        # Reverse origin and end points
+        p = int_origin_x, int_origin_y, int_origin_max
+        int_origin_x, int_origin_y, int_origin_max = int_end_x, int_end_y, int_end_max
+        int_end_x, int_end_y, int_end_max = p
     # Draw headless interaction
     plt.plot([int_origin_x,
               int_origin_max[0],
@@ -1203,7 +1218,7 @@ def draw_stimulation(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
     ax.add_patch(patch)
 
 def process_interaction_params(parameters):
-    """Formats and completes parameters to draw an interaction.
+    """Formats and completes interaction parameters.
 
     Parameters
     ----------
@@ -1211,9 +1226,6 @@ def process_interaction_params(parameters):
         Contains mutable interaction parameters:
             color: tuple
                 Format (r,g,b).
-            heightskew: float
-                Skews the height of interaction
-                from the construct.
             headheight: float
                 Height of interaction head.
             headwidth: float
@@ -1228,22 +1240,29 @@ def process_interaction_params(parameters):
             linewidth: float
                 Determines the width of lines
                 used to draw the interaction.
-            sending_xy_skew: tuple
-                Skews the point from which the
-                interaction originates, format (x,y).
-            receiving_xy_skew: tuple
-                Skews the point at which the
-                interaction ends, format (x,y).
+            heightskew: float
+                Skews the total height of the
+                interaction.
+            sending_length_skew: float
+                Skews the length of the origin
+                line of the interaction.
+            receiving_length_skew: float
+                Skews the length of the
+                receiving line of the interaction.
+            distance_from_baseline: float
+                Skews the distance between the
+                interaction and the baseline.
     """
     final_parameters = {'color': (0,0,0),
-                        'heightskew': 10.0,
                         'headheight': 7.0,
                         'headwidth': 7.0,
                         'zorder': 0,
                         'direction': 'forward',
                         'linewidth': 1.0,
-                        'sending_xy_skew': (0,0),
-                        'receiving_xy_skew': (0,0)}
+                        'heightskew': 10.0,
+                        'sending_length_skew': 0.0,
+                        'receiving_length_skew': 0.0,
+                        'distance_from_baseline': 10.0}
     if parameters is None:
         return final_parameters
     # Collate interaction parameters
