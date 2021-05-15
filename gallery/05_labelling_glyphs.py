@@ -38,17 +38,17 @@ renderer.draw_glyph(ax, 'CDS', (55, 60), user_parameters=user_parameters, user_s
 dnalocation_style = {}
 dnalocation_style['location-top-path'] = {'facecolor': (1,0,0), 'edgecolor': (0,0,0), 'linewidth': 3}
 user_parameters['label_parameters'] = {'text':'label',
-                            'color':(1,0,0),
-                            'rotation':(-3.14 / 4),
-                            'xy_skew':(-7,10)
+                                       'color':(1,0,0),
+                                       'rotation':(-3.14 / 4),
+                                       'xy_skew':(-7,10)
 }
 renderer.draw_glyph(ax, 'DNA Location', (15, 15), user_parameters=user_parameters, user_style=dnalocation_style)
 
 signature_style = {}
 signature_style['signature-box-path'] = {'facecolor': (1,1,0), 'edgecolor': (0,0,0), 'linewidth': 3}
 user_parameters['label_parameters'] = {'text':'label',
-                            'color':(0.5,0.5,0),
-                            'xy_skew':(2,10)
+                                       'color':(0.5,0.5,0),
+                                       'xy_skew':(2,10)
 }
 renderer.draw_glyph(ax, 'Signature', (40, 15), user_parameters=user_parameters, user_style=signature_style)
 
