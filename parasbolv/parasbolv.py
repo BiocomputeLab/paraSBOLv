@@ -363,14 +363,7 @@ class GlyphRenderer:
                 ax.text(**processed_label_params,
                         ha='center',
                         va='center')
-                # Find label bounds (in case of labels not directly on glyph).
-                label_position = (processed_label_params['x'], processed_label_params['y'])
-                # Convert to be read as bounds
-                label_bounds = ((label_position[0]-3, label_position[1]-3),
-                                  (label_position[0]+3, label_position[1]+3))
         glyph_bounds = self.__bounds_from_paths_to_draw(all_y_flipped_paths)
-        if label_bounds is not None:
-            glyph_bounds = find_bound_of_bounds([glyph_bounds, label_bounds])
         return (glyph_bounds,
                 self.get_baseline_end(glyph_type,
                                       position,
@@ -513,7 +506,7 @@ class GlyphRenderer:
         else:
             return None
 
-def find_bound_of_bounds (bounds_list):
+def __find_bound_of_bounds (bounds_list):
     """Find the bounding box of a list of bounds.
 
     Parameters
@@ -817,7 +810,7 @@ def render_part_list (part_list,
     for additional_bounds in additional_bounds_list:
         bounds_list.append(additional_bounds)
     # Automatically find bounds for plot and resize axes
-    final_bounds = find_bound_of_bounds(bounds_list)
+    final_bounds = __find_bound_of_bounds(bounds_list)
     width = (final_bounds[1][0] - final_bounds[0][0])/60.0
     height = (final_bounds[1][1] - final_bounds[0][1])/60.0
     fig_pad = (final_bounds[1][1] - final_bounds[0][1])*padding
