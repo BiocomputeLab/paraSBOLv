@@ -354,14 +354,24 @@ class GlyphRenderer:
             patch = patches.PathPatch(y_flipped_path, **path[1])
             if ax is not None:
                 ax.add_patch(patch)
+        label_bounds = None
         if user_parameters is not None:
             if label_parameters is not None:
                 # Draw label
-                ax.text(**self.process_label_params(label_parameters,
-                                                    all_y_flipped_paths),
-                                                    ha='center',
-                                                    va='center')
-        return (self.__bounds_from_paths_to_draw(all_y_flipped_paths),
+                processed_label_params = self.process_label_params(label_parameters,
+                                                                   all_y_flipped_paths)
+                ax.text(**processed_label_params,
+                        ha='center',
+                        va='center')
+                # Find label bounds (in case of labels not directly on glyph).
+                label_position = (processed_label_params['x'], processed_label_params['y'])
+                # Convert to be read as bounds
+                label_bounds = ((label_position[0]-3, label_position[1]-3),
+                                  (label_position[0]+3, label_position[1]+3))
+        glyph_bounds = self.__bounds_from_paths_to_draw(all_y_flipped_paths)
+        if label_bounds is not None:
+            glyph_bounds = find_bound_of_bounds([glyph_bounds, label_bounds])
+        return (glyph_bounds,
                 self.get_baseline_end(glyph_type,
                                       position,
                                       rotation=rotation,
@@ -396,7 +406,7 @@ class GlyphRenderer:
             # Find vertices of each path
             path_vertices = path[0].vertices.copy()
             all_path_vertices.append(path_vertices)
-        textpos_x, textpos_y = self.calculate_centroid_of_paths(all_path_vertices, xy_skew)
+        textpos_x, textpos_y = self.calculate_centroid_of_paths(all_path_vertices, xy_skew=xy_skew)
         return {'x':textpos_x,
                 'y':textpos_y,
                 's':label_parameters['text'],
@@ -404,14 +414,14 @@ class GlyphRenderer:
                 'fontproperties':finalfont,
                 'rotation':rotation}
 
-    def calculate_centroid_of_paths(self, all_path_vertices, xy_skew):
+    def calculate_centroid_of_paths(self, all_path_vertices, xy_skew=(0,0)):
         """Calculates central point of paths provided.
 
         Parameters
         ----------
         all_path_vertices: list
             Contains vertices of every path.
-        xy_skew: tuple
+        xy_skew: tuple, optional
             Skew of centroid in x and y
             directions, format (x,y).
         """
@@ -432,9 +442,9 @@ class GlyphRenderer:
         sum_x = np.sum(vertices[:, 0])
         sum_y = np.sum(vertices[:, 1])
         # Collate original and relative values
-        textpos_x = xy_skew[0] + sum_x/length
-        textpos_y = xy_skew[1] + sum_y/length
-        return textpos_x, textpos_y
+        x = xy_skew[0] + sum_x/length
+        y = xy_skew[1] + sum_y/length
+        return x, y
 
     def get_glyph_bounds(self, glyph_type, position, rotation=0.0, user_parameters=None):
         """Returns bounds of glyph.
@@ -490,7 +500,7 @@ class GlyphRenderer:
         else:
             return None
 
-def __find_bound_of_bounds (bounds_list):
+def find_bound_of_bounds (bounds_list):
     """Find the bounding box of a list of bounds.
 
     Parameters
@@ -794,7 +804,7 @@ def render_part_list (part_list,
     for additional_bounds in additional_bounds_list:
         bounds_list.append(additional_bounds)
     # Automatically find bounds for plot and resize axes
-    final_bounds = __find_bound_of_bounds(bounds_list)
+    final_bounds = find_bound_of_bounds(bounds_list)
     width = (final_bounds[1][0] - final_bounds[0][0])/60.0
     height = (final_bounds[1][1] - final_bounds[0][1])/60.0
     fig_pad = (final_bounds[1][1] - final_bounds[0][1])*padding
