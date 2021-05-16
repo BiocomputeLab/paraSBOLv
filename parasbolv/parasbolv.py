@@ -383,9 +383,22 @@ class GlyphRenderer:
         Parameters
         ----------
         label_parameters: dict
-            Dictionary containing label parameters.
+            Dictionary containing user-inputted
+            label parameters, may contain:
+                color: tuple
+                    Label text colour, format
+                    (r,g,b).
+                xy_skew: tuple
+                    Skew of label from centroid,
+                    format (x,y).
+                rotation: float
+                    Rotation of label text in
+                    Radians.
+                userfont: font_manager.FontProperties object
+                    https://matplotlib.org/stable/api/font_manager_api.html
         paths: list
-            List of paths composing the glyph.
+            List of paths composing the
+            to-be-labelled glyph.
         """
         color = (0,0,0)
         xy_skew = (0,0)
@@ -862,7 +875,10 @@ def collate_user_params (renderer, glyph_type, user_parameters):
         if 'label_parameters' in user_parameters:
             label_parameters = user_parameters['label_parameters']
         for key in user_parameters.keys():
-            if key not in glyph['defaults'] and key != 'label_parameters' and key != 'orientation' and key != 'y_offset':
+            if (key not in glyph['defaults'] and
+                key != 'label_parameters' and
+                key != 'orientation' and
+                key != 'y_offset'):
                 warnings.warn(f"""Parameter '{key}' is not valid for '{glyph_type}'.""")
             merged_parameters[key] = user_parameters[key]
     return merged_parameters, label_parameters
