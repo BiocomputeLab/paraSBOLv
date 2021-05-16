@@ -81,7 +81,7 @@ for n in range(number_of_rows+1):
     bounds_list.append(bounds)
 
 # Get bounds
-bounds = psv.find_bound_of_bounds(bounds_list)
+bounds = psv.__find_bound_of_bounds(bounds_list)
 ax.set_ylim(bounds[0][1]-10, bounds[1][1]+10)
 ax.set_xlim(bounds[0][0]-10, bounds[1][0]+10)
 
