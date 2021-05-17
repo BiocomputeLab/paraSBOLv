@@ -387,8 +387,10 @@ class GlyphRenderer:
                 rotation: float
                     Rotation of label text in
                     Radians.
-                userfont: font_manager.FontProperties object
-                    https://matplotlib.org/stable/api/font_manager_api.html
+                userfont: dict
+                    Dictionary containing Matplotlib
+                    font properties key-value pairs:
+                    https://matplotlib.org/stable/_modules/matplotlib/font_manager.html#FontProperties.
         paths: list
             List of paths composing the
             to-be-labelled glyph.
@@ -696,7 +698,6 @@ class Construct(object):
                                                                              rotation = self.rotation)
             plt.close()
             return fig, ax, baseline_start, baseline_end, bounds
-
 
 def render_part_list (part_list,
                       renderer,
