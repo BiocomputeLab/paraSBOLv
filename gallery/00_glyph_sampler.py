@@ -26,7 +26,7 @@ fig, ax = plt.subplots()
 
 # Plot glyphs on backbone
 part_list = []
-for part in parts:
+for part in sorted(parts):
     part_list.append([part, None, None])
     part_list.append([part, {'orientation': 'reverse'}, None])
 
@@ -44,8 +44,8 @@ for n in range(number_of_rows+1):
                               fig = fig,
                               ax = ax,
                               start_position = start_position,
-                              gapsize = 25,
-                              padding = 20)
+                              gapsize = 20,
+                              padding = 10)
     fig, ax, baseline_start, baseline_end, bounds = construct.draw()
     ax.plot([baseline_start[0], baseline_end[0]],
             [baseline_start[1], baseline_end[1]],
@@ -81,7 +81,7 @@ for n in range(number_of_rows+1):
     bounds_list.append(bounds)
 
 # Get bounds
-bounds = psv.__find_bound_of_bounds(bounds_list)
+bounds = psv.find_bound_of_bounds(bounds_list)
 ax.set_ylim(bounds[0][1]-10, bounds[1][1]+10)
 ax.set_xlim(bounds[0][0]-10, bounds[1][0]+10)
 

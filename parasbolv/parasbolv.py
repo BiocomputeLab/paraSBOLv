@@ -508,7 +508,7 @@ class GlyphRenderer:
         else:
             return None
 
-def __find_bound_of_bounds (bounds_list):
+def find_bound_of_bounds(bounds_list):
     """Find the bounding box of a list of bounds.
 
     Parameters
@@ -811,7 +811,7 @@ def render_part_list (part_list,
     for additional_bounds in additional_bounds_list:
         bounds_list.append(additional_bounds)
     # Automatically find bounds for plot and resize axes
-    final_bounds = __find_bound_of_bounds(bounds_list)
+    final_bounds = find_bound_of_bounds(bounds_list)
     width = (final_bounds[1][0] - final_bounds[0][0])/60.0
     height = (final_bounds[1][1] - final_bounds[0][1])/60.0
     fig_pad = (final_bounds[1][1] - final_bounds[0][1])*padding
