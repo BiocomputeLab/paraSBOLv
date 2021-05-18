@@ -87,5 +87,4 @@ ax.set_xlim(bounds[0][0]-10, bounds[1][0]+10)
 
 fig.savefig('00_glyph_sampler.pdf', transparent=True, dpi=300)
 fig.savefig('00_glyph_sampler.jpg', dpi=300)
-
 plt.show()

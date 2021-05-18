@@ -64,6 +64,6 @@ ax.set_ylim([0,100])
 ax.set_xlim([0,100])
 
 fig.savefig('05_labelling_glyphs.pdf', transparent=True, dpi=300)
-
+fig.savefig('05_labelling_glyphs.jpg', dpi=300)
 plt.show()
 
