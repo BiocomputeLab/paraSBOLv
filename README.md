@@ -12,6 +12,14 @@ As a note, `dnaplotlib` version 2.0, which is currently under development, will 
 
 `paraSBOLv` does not require any other dependancies when installed. However, internally it does make use of the [`svgpath2mpl`](https://github.com/nvictus/svgpath2mpl) package to handle the generation of `matplotlib` compatible paths from an SVG path string. Do check this package out if you'd like to know more about using SVG with `matplotlib`.
 
+## Installation
+
+The easiest way to start playing with `parasbolv` is to clone this repository and place the `parasbolv` directory into you `PYTHONPATH` environment variable. Once done, it should be possible to then:
+
+```
+import parasbolv as psv
+```
+
 ## Support
 
 If you use this tool to create diagrams or as a basis for new software please cite the following paper. Without citations that demonstrate use, the support of this tool becomes difficult.
