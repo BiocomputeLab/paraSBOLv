@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """
 paraSBOLv
 
@@ -9,6 +8,7 @@ of glyphs and provides access to all style and geometry customisations,
 and provides a number of helper functions to handle part lists and interactions.
 """
 
+
 import warnings 
 import os
 import sys
@@ -16,23 +16,24 @@ import glob
 import xml.etree.ElementTree as ET
 import re
 from math import cos, sin, pi, sqrt
-
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import matplotlib.font_manager as font_manager
 from matplotlib.path import Path
-
 from parasbolv.svgpath2mpl import parse_path
+
 
 __author__  = 'Thomas E. Gorochowski <tom@chofski.co.uk>, \
                Charlie Clark <charlieclark1.e.e.2019@bristol.ac.uk>'
 __license__ = 'MIT'
 __version__ = '0.1'
 
+
 class GlyphRenderer:
     """ Class to load and render using matplotlib parametric SVG glyphs.
     """
+
 
     def __init__(self, glyph_path=None):
         """
@@ -51,6 +52,7 @@ class GlyphRenderer:
             self.glyphs_library, self.glyph_soterm_map = self.load_package_glyphs()
         else:
             self.glyphs_library, self.glyph_soterm_map = self.load_glyphs_from_path(glyph_path)
+
 
     def __process_unknown_val (self, val):
         """Converts an unknown value into the correct type.
@@ -90,6 +92,7 @@ class GlyphRenderer:
                 converted_val = val
         return converted_val
 
+
     def __process_style (self, style_text):
         """Converts style text into a dictionary.
 
@@ -108,6 +111,7 @@ class GlyphRenderer:
                 # Create new key-value pair with processed value
                 style_data[self.svg2mpl_style_map[key_val[0]]] = self.__process_unknown_val(key_val[1])
         return style_data
+
 
     def __extract_tag_details(self, tag_attributes):
         """Extracts all the relevant SVG details from an XML tag in the SVG.
@@ -151,6 +155,7 @@ class GlyphRenderer:
                 tag_details['defaults'] = defaults
         return tag_details
 
+
     def __eval_svg_data(self, svg_text, parameters):
         """Extracts and then replaces equation with evaluated version using regular expression.
 
@@ -165,6 +170,7 @@ class GlyphRenderer:
             into `svg_text` for evaluation.
         """
         return re.sub(r"{([^{}]+)}", lambda m: str(eval(m.group()[1:-1], parameters)), svg_text)
+
 
     def __flip_position_rotate_glyph(self, path, baseline_y, position, rotation):
         """Flips paths into matplotlib default orientation and position, and rotates paths.
@@ -196,6 +202,7 @@ class GlyphRenderer:
             final_y = rot_y+position[1]
             new_verts.append([final_x, final_y])
         return Path(new_verts, new_codes)
+
 
     def __bounds_from_paths_to_draw(self, paths):
         """Calculates the bounding box from a set of paths.
@@ -233,6 +240,7 @@ class GlyphRenderer:
                      y_max = cur_y_max
         return (x_min, y_min), (x_max, y_max)
 
+
     def load_glyph(self, filename):
         """Loads glyph information from an SVG file.
 
@@ -255,12 +263,14 @@ class GlyphRenderer:
                 glyph_data['paths'].append(self.__extract_tag_details(child.attrib))
         return glyph_type, glyph_soterms, glyph_data
 
+
     def load_package_glyphs(self):
         """Finds the directory with packaged glyphs and loads them.
         """
         d = os.path.dirname(sys.modules[__name__].__file__)
         path = os.path.join(d, 'glyphs')
         return self.load_glyphs_from_path(path)
+
 
     def load_glyphs_from_path(self, path):
         """Loads glyph information from SVG files in a directory.
@@ -278,6 +288,7 @@ class GlyphRenderer:
             for soterm in glyph_soterms:
                 glyph_soterm_map[soterm] = glyph_type
         return glyphs_library, glyph_soterm_map
+
 
     def draw_glyph(self,
                    ax,
@@ -370,6 +381,7 @@ class GlyphRenderer:
                                       rotation=rotation,
                                       user_parameters=user_parameters))
 
+
     def process_label_params(self, label_parameters, paths):
         """Formats and completes label parameters.
 
@@ -422,6 +434,7 @@ class GlyphRenderer:
                 'fontproperties':finalfont,
                 'rotation':rotation}
 
+
     def calculate_centroid_of_paths(self, all_path_vertices, xy_skew=(0,0)):
         """Calculates central point of paths provided.
 
@@ -454,6 +467,7 @@ class GlyphRenderer:
         y = xy_skew[1] + sum_y/length
         return x, y
 
+
     def get_glyph_bounds(self, glyph_type, position, rotation=0.0, user_parameters=None):
         """Returns bounds of glyph.
 
@@ -469,6 +483,7 @@ class GlyphRenderer:
             Dictionary containing sizing/label parameters of glyph.
         """
         return self.draw_glyph(None, glyph_type, position, rotation=rotation, user_parameters=user_parameters)
+
 
     def get_baseline_end(self, glyph_type, position, rotation=0.0, user_parameters=None):
         """Finds the point following a glyph from which the baseline should end.
@@ -508,6 +523,7 @@ class GlyphRenderer:
         else:
             return None
 
+
 def find_bound_of_bounds(bounds_list):
     """Find the bounding box of a list of bounds.
 
@@ -532,6 +548,7 @@ def find_bound_of_bounds(bounds_list):
         if b[1][1] > y_max:
             y_max = b[1][1]
     return [(x_min, y_min), (x_max, y_max)]
+
 
 class Construct(object):
     """A modifiable construct consisting of
@@ -560,6 +577,7 @@ class Construct(object):
            lower left vertex and (x2, y2) are the
            coordinates of the top right vertex.
     """
+
 
     def __init__ (self,
                   part_list,
@@ -634,6 +652,7 @@ class Construct(object):
         self.bounds = None
         self.update_bounds()
 
+
     def reverse_interactions (self):
         """Reverses the side interactions are drawn on.
         """
@@ -649,11 +668,13 @@ class Construct(object):
                 if 'direction' not in interaction[3]:
                     interaction[3]['direction'] = 'reverse'
 
+
     def update_bounds (self):
         """Updates the bounds of the constuct.
         """
         self.bounds = self.draw(draw_for_bounds = True)[4]
         self.bounds = ((self.bounds[0], self.bounds[1]))
+
 
     def draw (self, draw_for_bounds = False):
         """Draws the construct using Matplotlib.
@@ -698,6 +719,7 @@ class Construct(object):
                                                                              rotation = self.rotation)
             plt.close()
             return fig, ax, baseline_start, baseline_end, bounds
+
 
 def render_part_list (part_list,
                       renderer,
@@ -823,6 +845,7 @@ def render_part_list (part_list,
     fig.set_size_inches( (width, height) )
     return fig, ax, start_position, part_position, final_bounds
 
+
 def adjust_position_for_orientation (position, orientation, glyph_width, rotation):
     """Adjusts the relative position of a part that
        to be drawn with a reversed orientation.
@@ -845,6 +868,7 @@ def adjust_position_for_orientation (position, orientation, glyph_width, rotatio
     if orientation == 'reverse':
         position = (position[0] + glyph_width*cos(rotation)), (position[1] + glyph_width*sin(rotation))
     return position
+
 
 def collate_user_params (renderer, glyph_type, user_parameters):
     """Combine user-defined parameters with default glyph
@@ -876,6 +900,7 @@ def collate_user_params (renderer, glyph_type, user_parameters):
                 warnings.warn(f"""Parameter '{key}' is not valid for '{glyph_type}'.""")
             merged_parameters[key] = user_parameters[key]
     return merged_parameters, label_parameters
+
 
 def draw_interaction (ax,
                       sending_bounds,
@@ -1009,6 +1034,7 @@ def draw_interaction (ax,
     maxbounds = (max(xcoords),max(ycoords))
     return (minbounds, maxbounds)
 
+
 def draw_control(ax,
                  int_end_x,
                  int_end_y,
@@ -1058,6 +1084,7 @@ def draw_control(ax,
               color = parameters['color'],
               lw = parameters['linewidth'],
               zorder = parameters['zorder'])
+
 
 def draw_degradation(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
     """Draws the head of a degradation interaction.
@@ -1125,6 +1152,7 @@ def draw_degradation(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
              lw = parameters['linewidth'],
              zorder = parameters['zorder'] + 500)
 
+
 def draw_inhibition(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
     """Draws the head of an inhibition interaction.
 
@@ -1160,6 +1188,7 @@ def draw_inhibition(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
              color = parameters['color'],
              lw = parameters['linewidth'],
              zorder = parameters['zorder'])
+
 
 def draw_process(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
     """Draws the head of a process interaction.
@@ -1204,6 +1233,7 @@ def draw_process(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
                               zorder = parameters['zorder'])
     ax.add_patch(patch)
 
+
 def draw_stimulation(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
     """Draws the head of a stimulation interaction.
 
@@ -1247,6 +1277,7 @@ def draw_stimulation(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
                               lw = parameters['linewidth'],
                               zorder = parameters['zorder'])
     ax.add_patch(patch)
+
 
 def process_interaction_params(parameters):
     """Formats and completes interaction parameters.
