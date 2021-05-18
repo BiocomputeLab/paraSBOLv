@@ -39,5 +39,9 @@ def run(data):
 
 ani = animation.FuncAnimation(fig, run, None, blit=False, interval=10,
                               repeat=False, init_func=None)
+
+
+ani.save('02_animated_CDS.gif', fps=30)
+
 # Let the rave begin!
 plt.show()

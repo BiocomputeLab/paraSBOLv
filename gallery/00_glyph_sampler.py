@@ -28,7 +28,7 @@ fig, ax = plt.subplots()
 part_list = []
 for part in parts:
     part_list.append([part, None, None])
-    part_list.append([part, {'rotation': 3.14}, None])
+    part_list.append([part, {'orientation': 'reverse'}, None])
 
 length = len(part_list)
 r = length%12
@@ -59,7 +59,7 @@ part_list = []
 for part in no_baselines:
     if part in parts:
         part_list.append([part, None, None])
-        part_list.append([part, {'rotation': 3.14}, None])
+        part_list.append([part, {'orientation':'reverse'}, None])
 
 length = len(part_list)
 r = length%12
