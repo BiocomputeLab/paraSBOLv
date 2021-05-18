@@ -22,6 +22,6 @@ import parasbolv as psv
 
 ## Support
 
-If you use this tool to create diagrams or as a basis for new software please cite the following paper. Without citations that demonstrate use, the support of this tool becomes difficult.
+If you use this tool to create diagrams or as a basis for new software please cite the following paper. Without citations that demonstrate use it becomes difficult to support this tool.
 
 `Clark C., Scott-Brown J. & Gorochowski T.E. "paraSBOLv: a foundation for standard-compliant genetic design visualisation tools" (in prep.)`
