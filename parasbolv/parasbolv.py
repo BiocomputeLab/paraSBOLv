@@ -1282,39 +1282,40 @@ def draw_stimulation(ax, int_end_x, int_end_y, parameters, rotation = 0.0):
 def process_interaction_params(parameters):
     """Formats and completes interaction parameters.
 
+    Interaction parameters are combined into a dictionary passed as a single argumnet.
+
     Parameters
     ----------
-    parameters: dict
-        Contains interaction parameters:
-            color: tuple
-                Format (r,g,b).
-            headheight: float
-                Height of interaction head.
-            headwidth: float
-                Width of interaction head.
-            zorder: int
-                Matplotlib zorder value of
-                the interaction.
-            direction: string
-                Determines what side of the
-                construct the interaction is
-                drawn on; 'forward' or 'reverse'.
-            linewidth: float
-                Determines the width of lines
-                used to draw the interaction.
-            heightskew: float
-                Skews the total height of the
-                interaction.
-            sending_length_skew: float
-                Skews the length of the origin
-                line of the interaction.
-            receiving_length_skew: float
-                Skews the length of the
-                receiving line of the
-                interaction.
-            distance_from_baseline: float
-                Skews the distance between the
-                interaction and the baseline.
+
+    color: tuple
+        Format (r,g,b).
+    headheight: float
+        Height of interaction head.
+    headwidth: float
+        Width of interaction head.
+    zorder: int
+        Matplotlib zorder value of
+        the interaction.
+    direction: string
+        Determines what side of the
+        construct the interaction is
+        drawn on; 'forward' or 'reverse'.
+    linewidth: float
+        Determines the width of lines
+        used to draw the interaction.
+    heightskew: float
+        Skews the total height of the
+        interaction.
+    sending_length_skew: float
+        Skews the length of the origin
+        line of the interaction.
+    receiving_length_skew: float
+        Skews the length of the
+        receiving line of the
+        interaction.
+    distance_from_baseline: float
+        Skews the distance between the
+        interaction and the baseline.
     """
     final_parameters = {'color': (0,0,0),
                         'headheight': 7.0,
