@@ -12,7 +12,10 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install dependencies
+    - name: Install parasbolv (and dependencies)
+      run: python3 setup.py install
+
+    - name: Install pdoc
       run: pip3 install pdoc
 
     - name: Generate docs
