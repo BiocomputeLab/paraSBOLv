@@ -329,7 +329,7 @@ class GlyphRenderer:
         merged_parameters, label_parameters = collate_user_params(self,
                                                                   glyph_type,
                                                                   user_parameters)
-	    # Find invalid path ids
+        # Find invalid path ids
         if user_style is not None:
             path_ids = []
             for path in glyph['paths']:
