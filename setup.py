@@ -9,7 +9,7 @@ setup(name='parasbolv',
 
       author='Thomas E. Gorochowski, Charlie Clark',
 
-      author_email='tom@chofski.co.uk, charlieclark1.e.e.2019@bristol.ac.uk>',
+      author_email='tom@chofski.co.uk, charlieclark1.e.e.2019@bristol.ac.uk',
 
       url='https://github.com/BiocomputeLab/paraSBOLv/blob/master/parasbolv/parasbolv.py',
 
