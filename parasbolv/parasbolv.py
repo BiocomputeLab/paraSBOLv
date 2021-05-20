@@ -692,7 +692,7 @@ class Construct(object):
             # Include additional bounds
             for additional_bounds in self.additional_bounds_list:
                 bounds_to_add.append(additional_bounds)
-        if draw_for_bounds == False:
+        if draw_for_bounds is False:
             fig, ax, baseline_start, baseline_end, bounds = render_part_list(self.part_list,
                                                                              self.renderer,
                                                                              padding = self.padding,
@@ -704,7 +704,7 @@ class Construct(object):
                                                                              interaction_list = self.interaction_list,
                                                                              rotation = self.rotation)
             return fig, ax, baseline_start, baseline_end, bounds
-        elif draw_for_bounds == True:
+        elif draw_for_bounds is True:
             # Temporary rendering pathway to generate bounds
             temp_fig, temp_ax = plt.subplots()
             fig, ax, baseline_start, baseline_end, bounds = render_part_list(self.part_list,
