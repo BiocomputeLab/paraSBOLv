@@ -369,7 +369,7 @@ class GlyphRenderer:
             patch = patches.PathPatch(y_flipped_path, **path[1])
             if ax is not None:
                 ax.add_patch(patch)
-        label_bounds = None
+
         if user_parameters is not None:
             if label_parameters is not None:
                 # Draw label
