@@ -525,8 +525,8 @@ class GlyphRenderer:
                                                                position,
                                                                rotation)
             return (y_flipped_path.vertices[1,0], y_flipped_path.vertices[1,1])
-        else:
-            return None
+
+        return None
 
 
 def find_bound_of_bounds(bounds_list):
