@@ -2,6 +2,9 @@
 
 A lightweight Python library designed to simplify the rendering of highly-customisable SBOL Visual glyphs and diagrams. To do this, `paraSBOLv` uses the [Parametric Scalable Vector Graphic (pSVG)](https://parametric-svg.js.org) format to enable the encoding of the shape geometry and allowed parametric variations for each glyph. The best way to learn how to use `paraSBOLv` is to dive into our [`gallery`](./gallery/) of examples which cover most of the capabilities present. In addition, all functions and classes are extensively documented in code to allow usage to be easily inferred.
 
+![Example image geenrated by paraSBOLv](gallery/04_plot_gff/04_plot_gff.jpg?raw=true "Example image geenrated by paraSBOLv")
+
+
 ## Relationship to DNAplotlib
 
 We are regularly asked about the relationship of `parasbolv` and another genetic design visualisation tool we have developed called [`dnaplotlib`](http://www.dnaplotlib.org). The major difference between the two packages is that `parasbolv` is designed to be lightweight, include minimal additional functionality, and be tailored to tool developers to provide them with low level access to the rendering of SBOL Visual glyphs and interactions. In contrast, `dnaplotlib` is designed to provide a much fuller and wider range of functionalities to both developers and non-computational users.
