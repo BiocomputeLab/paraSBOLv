@@ -12,11 +12,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Install parasbolv (and dependencies)
-      run: python3 setup.py install --user
+    - name: Install parasbolv dependencies
+      run: pip3 install numpy matplotlib
 
     - name: Install pdoc
-      run: pip3 install pdoc
+      run: pip3 install pdoc numpy matplotlib
 
     - name: Generate docs
       run: pdoc -o ./docs --docformat=numpy parasbolv/
