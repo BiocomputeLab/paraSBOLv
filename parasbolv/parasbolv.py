@@ -54,7 +54,8 @@ class GlyphRenderer:
             self.glyphs_library, self.glyph_soterm_map = self.load_glyphs_from_path(glyph_path)
 
 
-    def __process_unknown_val (self, val):
+    @staticmethod
+    def __process_unknown_val (val):
         """Converts an unknown value into the correct type.
 
         Parameters
@@ -156,7 +157,8 @@ class GlyphRenderer:
         return tag_details
 
 
-    def __eval_svg_data(self, svg_text, parameters):
+    @staticmethod
+    def __eval_svg_data(svg_text, parameters):
         """Extracts and then replaces equation with evaluated version using regular expression.
 
         See: https://stackoverflow.com/questions/38734335/python-regex-replace-bracketed-text-with-contents-of-brackets
@@ -172,7 +174,8 @@ class GlyphRenderer:
         return re.sub(r"{([^{}]+)}", lambda m: str(eval(m.group()[1:-1], parameters)), svg_text)
 
 
-    def __flip_position_rotate_glyph(self, path, baseline_y, position, rotation):
+    @staticmethod
+    def __flip_position_rotate_glyph(path, baseline_y, position, rotation):
         """Flips paths into matplotlib default orientation and position, and rotates paths.
 
         Parameters
@@ -204,7 +207,8 @@ class GlyphRenderer:
         return Path(new_verts, new_codes)
 
 
-    def __bounds_from_paths_to_draw(self, paths):
+    @staticmethod
+    def __bounds_from_paths_to_draw(paths):
         """Calculates the bounding box from a set of paths.
 
         Parameters
@@ -435,7 +439,8 @@ class GlyphRenderer:
                 'rotation':rotation}
 
 
-    def calculate_centroid_of_paths(self, all_path_vertices, xy_skew=(0,0)):
+    @staticmethod
+    def calculate_centroid_of_paths(all_path_vertices, xy_skew=(0,0)):
         """Calculates central point of paths provided.
 
         Parameters
