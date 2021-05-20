@@ -555,7 +555,7 @@ def find_bound_of_bounds(bounds_list):
     return [(x_min, y_min), (x_max, y_max)]
 
 
-class Construct(object):
+class Construct:
     """A modifiable construct consisting of
        SBOL glyphs and interactions.
 
