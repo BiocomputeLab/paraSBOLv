@@ -1,0 +1,25 @@
+name: Update docs
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: pip3 install pdoc
+
+    - name: Generate docs
+      run: pdoc -o ./docs --docformat=numpy parasbolv/
+
+    - name: Publish docs
+      uses: JamesIves/github-pages-deploy-action@4.1.3
+      with:
+        branch: gh-pages
+        folder: docs
