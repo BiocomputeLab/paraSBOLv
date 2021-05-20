@@ -3,13 +3,13 @@
 paraSBOLv
 
 A simple and lightweight library for rendering parametric SVG versions
-of the SBOL Visual symbols using matplotlib. It is able to load a directory 
+of the SBOL Visual symbols using matplotlib. It is able to load a directory
 of glyphs and provides access to all style and geometry customisations,
 and provides a number of helper functions to handle part lists and interactions.
 """
 
 
-import warnings 
+import warnings
 import os
 import sys
 import glob
@@ -186,7 +186,7 @@ class GlyphRenderer:
         rotation: float
             Rotation value in radians.
         """
-        # Flip paths into matplotlib default orientation and position and rotate paths 
+        # Flip paths into matplotlib default orientation and position and rotate paths
         new_verts = []
         new_codes = []
         for v_idx in range(np.size(path.vertices, 0)):
@@ -231,13 +231,13 @@ class GlyphRenderer:
                 y_max = cur_y_max
             else:
                 if cur_x_min < x_min:
-                     x_min = cur_x_min
+                    x_min = cur_x_min
                 if cur_x_max > x_max:
-                     x_max = cur_x_max
+                    x_max = cur_x_max
                 if cur_y_min < y_min:
-                     y_min = cur_y_min
+                    y_min = cur_y_min
                 if cur_y_max > y_max:
-                     y_max = cur_y_max
+                    y_max = cur_y_max
         return (x_min, y_min), (x_max, y_max)
 
 
@@ -315,23 +315,23 @@ class GlyphRenderer:
             Dictionary containing style parameters of glyph.
         """
         try:
-        # Check glyph type exists	
-            glyph = self.glyphs_library[glyph_type]	
-        except:	
-            class Invalid_glyph_type(Exception):	
-                pass	
+        # Check glyph type exists
+            glyph = self.glyphs_library[glyph_type]
+        except:
+            class Invalid_glyph_type(Exception):
+                pass
             raise Invalid_glyph_type(f"""'{glyph_type}' is not a valid glyph.""")
         # Collate parameters
         merged_parameters, label_parameters = collate_user_params(self,
                                                                   glyph_type,
                                                                   user_parameters)
-	    # Find invalid path ids	
+	    # Find invalid path ids
         if user_style is not None:
-            path_ids = []	
-            for path in glyph['paths']:	
-                path_ids.append(path['id'])	
-            for key in user_style.keys():	
-                if key not in path_ids:	
+            path_ids = []
+            for path in glyph['paths']:
+                path_ids.append(path['id'])
+            for key in user_style.keys():
+                if key not in path_ids:
                     warnings.warn(f"""'{key}' is not a valid path ID for the '{glyph_type}' glyph.""")
         paths_to_draw = []
         for path in glyph['paths']:
@@ -420,7 +420,7 @@ class GlyphRenderer:
             # Convert to degrees
             rotation = (180/pi) * label_parameters['rotation']
         if 'userfont' in label_parameters:
-            finalfont = font_manager.FontProperties(**label_parameters['userfont'])        
+            finalfont = font_manager.FontProperties(**label_parameters['userfont'])
         all_path_vertices = []
         for path in paths:
             # Find vertices of each path
@@ -457,7 +457,7 @@ class GlyphRenderer:
                 sum_x = np.sum(path_vertices[:, 0])
                 sum_y = np.sum(path_vertices[:, 1])
                 vertices_to_array.append([sum_x/length, sum_y/length])
-            vertices = np.array(vertices_to_array)            
+            vertices = np.array(vertices_to_array)
         # Find centroid of single path/centroid of multiple centroids
         length = vertices.shape[0]
         sum_x = np.sum(vertices[:, 0])
@@ -502,7 +502,7 @@ class GlyphRenderer:
         glyph = self.glyphs_library[glyph_type]
         merged_parameters = glyph['defaults'].copy()
         if user_parameters is not None:
-            # Collate parameters (user parameters take priority) 
+            # Collate parameters (user parameters take priority)
             for key in user_parameters.keys():
                 merged_parameters[key] = user_parameters[key]
         baseline_path = None
@@ -553,7 +553,7 @@ def find_bound_of_bounds(bounds_list):
 class Construct(object):
     """A modifiable construct consisting of
        SBOL glyphs and interactions.
-       
+
        NOTE: Attributes below lacking
        description are documented in the
        __init__ docstring of this class.
@@ -599,7 +599,7 @@ class Construct(object):
             by a list containing three elements:
             [0] Glyph type, represented by a string,
             [1] the user_parameters dictionary, and
-            [2] the style_parameters dictionary. 
+            [2] the style_parameters dictionary.
         renderer: object
             ParaSB0Lv GlyphRenderer object defined
             above.
@@ -643,7 +643,7 @@ class Construct(object):
             self.fig, self.ax = plt.subplots()
         self.start_position = start_position
         self.additional_bounds_list = additional_bounds_list
-        
+
         # Data structure
         self.part_list = part_list
         self.interaction_list = interaction_list
@@ -683,7 +683,7 @@ class Construct(object):
         ----------
         draw_for_bounds: bool, optional
             Indicates if the construct is being
-            drawn to update the self.bounds 
+            drawn to update the self.bounds
             attribute.
         """
         # Draw the construct
@@ -734,7 +734,7 @@ def render_part_list (part_list,
     """Renders multiple glyphs in sequence.
 
     NOTE: See parameters of the __init__
-    method within the Construct class 
+    method within the Construct class
     for parameter descriptions.
 
     Parameters
@@ -884,8 +884,8 @@ def collate_user_params (renderer, glyph_type, user_parameters):
         User-defined parameters to
         be applied to the glyph.
     """
-    
-    glyph = renderer.glyphs_library[glyph_type]	
+
+    glyph = renderer.glyphs_library[glyph_type]
     merged_parameters = glyph['defaults'].copy()
     label_parameters = None
     if user_parameters is not None:
@@ -958,7 +958,7 @@ def draw_interaction (ax,
     # Determine distance between centroids
     x_distance = abs(origin_cent[0] - end_cent[0])
     y_distance = abs(origin_cent[1] - end_cent[1])
-    centroid_distance = sqrt(x_distance**2 + y_distance**2)        
+    centroid_distance = sqrt(x_distance**2 + y_distance**2)
     # Determine interaction origin
     rotation = rotation % 360
     bearing = 360 - rotation
@@ -1067,7 +1067,7 @@ def draw_control(ax,
     point1 = (int_end_x + (parameters['headwidth'] / 2) * sin(bearing1*pi/180),
               int_end_y + (parameters['headwidth'] / 2) * cos(bearing1*pi/180))
     point2 = (point1[0] + (parameters['headwidth'] / 2) * sin(bearing2*pi/180),
-              point1[1] + (parameters['headwidth'] / 2) * cos(bearing2*pi/180)) 
+              point1[1] + (parameters['headwidth'] / 2) * cos(bearing2*pi/180))
     point3 = (int_end_x + (parameters['headwidth'] / 2) * sin(bearing2*pi/180),
               int_end_y + (parameters['headwidth'] / 2) * cos(bearing2*pi/180))
     # Draw
