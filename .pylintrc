@@ -149,11 +149,12 @@ disable=print-statement,
         line-too-long,
         too-many-lines,
         invalid-name,
-        too-manu-arguments,
-        too-many-locals,
-        too-many-branches,
-        too-many-statements,
         too-many-arguments,
+        too-many-branches,
+        too-many-instance-attributes,
+        too-many-locals,
+        too-many-statements,
+        eval-used
 
 
 # Enable the message, report, category or checker with the given id(s). You can
