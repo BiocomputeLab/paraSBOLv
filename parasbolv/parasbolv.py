@@ -15,7 +15,7 @@ import sys
 import glob
 import xml.etree.ElementTree as ET
 import re
-from math import cos, sin, pi, sqrt
+from math import cos, sin, pi, sqrt, asin
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -963,25 +963,53 @@ def draw_interaction (ax,
     # Determine distance between centroids
     x_distance = origin_cent[0] - end_cent[0]
     y_distance = origin_cent[1] - end_cent[1]
-    centroid_distance = sqrt(abs(x_distance)**2 + abs(y_distance)**2)        
+    centroid_distance = sqrt(abs(x_distance)**2 + abs(y_distance)**2)
+    # Determine bearing between centroids
+    if origin_cent[1] < end_cent[1]:
+        # Origin is lower
+        centroid_angle = abs(asin(y_distance/centroid_distance))
+        if origin_cent[0] < end_cent[0]:
+            # Origin to left
+            centroid_bearing = (3.142/2 - centroid_angle)
+        else:
+            # Origin to right / equal X value
+            centroid_bearing = centroid_angle + (3*3.142)/2
+    elif origin_cent[1] > end_cent[1]:
+        # Origin is higher
+        centroid_angle = abs(asin(x_distance/centroid_distance))
+        if origin_cent[0] < end_cent[0]:
+            # Origin to left
+            centroid_bearing = (3.142/2 - centroid_angle) + 3.142/2
+        else:
+            # Origin to right / equal X value
+            centroid_bearing = centroid_angle + 3.142
+    else:
+        if origin_cent[0] < end_cent[0]:
+            centroid_bearing = 3.142/2
+        else:
+            centroid_bearing = (3*3.142)/2
+    # Convert to degrees
+    centroid_bearing = (180/pi) * centroid_bearing
+    centroid_bearing = centroid_bearing % 360
     # Determine interaction origin
     rotation = rotation % 360
     bearing = 360 - rotation
+    construct_bearing = 90 - rotation
+    construct_bearing = construct_bearing % 360
     int_origin_x = (origin_cent[0] + (initial_distance+parameters['distance_from_baseline'])*sin(bearing * pi/180)) # (h + rsin(a), k + rcos(a))
     int_origin_y = (origin_cent[1] + (initial_distance+parameters['distance_from_baseline'])*cos(bearing * pi/180))
     # Determine origin max
     int_origin_max = (int_origin_x + (y_pad+parameters['sending_length_skew'])*sin(bearing * pi/180),
                       int_origin_y + (y_pad+parameters['sending_length_skew'])*cos(bearing * pi/180))
     # Determine end max
-    int_end_max = (int_origin_max[0] + centroid_distance*sin((90 - rotation) * pi/180),
-                   int_origin_max[1] + centroid_distance*cos((90 - rotation) * pi/180))
-    if x_distance > 0 or y_distance > 0:
+    if round(construct_bearing) == round(centroid_bearing):
+        # The interaction moves in the same direction as the construct
+        int_end_max = (int_origin_max[0] + centroid_distance*sin((90 - rotation) * pi/180),
+                       int_origin_max[1] + centroid_distance*cos((90 - rotation) * pi/180))
+    else:
+        # The interaction moves in the opposite direction as the construct
         int_end_max = (int_origin_max[0] + centroid_distance*sin((270 - rotation) * pi/180),
                        int_origin_max[1] + centroid_distance*cos((270 - rotation) * pi/180))
-    if parameters['direction'] == 'reverse':
-        if x_distance < 0 or y_distance < 0:
-            int_end_max = (int_origin_max[0] + centroid_distance*sin((270 - rotation) * pi/180),
-                        int_origin_max[1] + centroid_distance*cos((270 - rotation) * pi/180))
     # Determine interaction endpoint
     int_end_x = (int_end_max[0] + (y_pad+parameters['receiving_length_skew'])*sin((180-rotation) * pi/180))
     int_end_y = (int_end_max[1] + (y_pad+parameters['receiving_length_skew'])*cos((180-rotation) * pi/180))
