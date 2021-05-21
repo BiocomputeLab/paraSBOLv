@@ -795,6 +795,10 @@ def render_part_list (part_list,
                                                                                      part[0],
                                                                                      user_parameters)[0]['width'],
                                                                  rotation)
+            if 'trailing_gap_skew' in user_parameters:
+                trailing_gap_skew = user_parameters['trailing_gap_skew']
+                part_position = (part_position[0] + trailing_gap_skew*cos(rotation),
+                                (part_position[1] + trailing_gap_skew*sin(rotation)))
         if part is not part_list[-1]:
             part_position = (part_position[0] + gapsize*cos(rotation),
                             (part_position[1] + gapsize*sin(rotation)))
