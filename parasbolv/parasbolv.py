@@ -1002,7 +1002,7 @@ def draw_interaction (ax,
     int_origin_max = (int_origin_x + (y_pad+parameters['sending_length_skew'])*sin(bearing * pi/180),
                       int_origin_y + (y_pad+parameters['sending_length_skew'])*cos(bearing * pi/180))
     # Determine end max
-    if round(construct_bearing) == round(centroid_bearing):
+    if (construct_bearing - 89) < centroid_bearing < construct_bearing + 89:
         # The interaction moves in the same direction as the construct
         int_end_max = (int_origin_max[0] + centroid_distance*sin((90 - rotation) * pi/180),
                        int_origin_max[1] + centroid_distance*cos((90 - rotation) * pi/180))
