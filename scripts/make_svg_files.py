@@ -18,7 +18,7 @@ svg_width = 100
 svg_height = 100
 
 # Default baseline start position
-baseline_x = 0
+baseline_x =  0
 baseline_y = 0
 
 # Standard styling used for major component types
