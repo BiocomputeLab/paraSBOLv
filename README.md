@@ -23,6 +23,10 @@ The easiest way to start playing with `parasbolv` is to clone this repository an
 import parasbolv as psv
 ```
 
+## Documentation
+
+Automatically generated documentation can be accessed at: [https://biocomputelab.github.io/paraSBOLv/index.html](https://biocomputelab.github.io/paraSBOLv/index.html)
+
 ## Support
 
 If you use this tool to create diagrams or as a basis for new software please cite the following paper. Without citations that demonstrate use it becomes difficult to support this tool.
