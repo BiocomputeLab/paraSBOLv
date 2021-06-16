@@ -800,6 +800,10 @@ def render_part_list (part_list,
                                                                                      part[0],
                                                                                      user_parameters)[0]['width'],
                                                                  rotation)
+            if 'trailing_gap_skew' in user_parameters:
+                trailing_gap_skew = user_parameters['trailing_gap_skew']
+                part_position = (part_position[0] + trailing_gap_skew*cos(rotation),
+                                (part_position[1] + trailing_gap_skew*sin(rotation)))
         if part is not part_list[-1]:
             part_position = (part_position[0] + gapsize*cos(rotation),
                             (part_position[1] + gapsize*sin(rotation)))
@@ -901,7 +905,8 @@ def collate_user_params (renderer, glyph_type, user_parameters):
             if (key not in glyph['defaults'] and
                 key != 'label_parameters' and
                 key != 'orientation' and
-                key != 'y_offset'):
+                key != 'y_offset' and
+                key != 'trailing_gap_skew'):
                 warnings.warn(f"""Parameter '{key}' is not valid for '{glyph_type}'.""")
             merged_parameters[key] = user_parameters[key]
     return merged_parameters, label_parameters
