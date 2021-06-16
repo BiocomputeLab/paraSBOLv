@@ -130,3 +130,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# generated docs - these get auto-generate and pushed to gh-pages branch
+docs/
