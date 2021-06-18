@@ -31,4 +31,4 @@ Automatically generated documentation can be accessed at: [https://biocomputelab
 
 If you use this tool to create diagrams or as a basis for new software please cite the following paper. Without citations that demonstrate use it becomes difficult to support this tool.
 
-`Clark C., Scott-Brown J. & Gorochowski T.E. "paraSBOLv: a foundation for standard-compliant genetic design visualisation tools" (in prep.)`
+`Clark C.J., Scott-Brown J. & Gorochowski T.E. "paraSBOLv: a foundation for standard-compliant genetic design visualisation tools" (in prep.)`
