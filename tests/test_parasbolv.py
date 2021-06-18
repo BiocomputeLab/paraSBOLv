@@ -61,4 +61,3 @@ def test_plotting_interactions():
                                                             'distance_from_baseline': 27.0}]]
     construct = psv.Construct(part_list, renderer, interaction_list=int_list)
     fig, ax, baseline_start, baseline_end, bounds = construct.draw()
-    plt.show()
