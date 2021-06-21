@@ -1,0 +1,1 @@
+ffmpeg -i ./frames/%04d.png sbolv-kaleidoscope.gif
