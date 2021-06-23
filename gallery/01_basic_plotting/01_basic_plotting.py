@@ -32,7 +32,7 @@ user_parameters['arrowbody_height'] = 5
 user_parameters['arrowhead_width'] = 15
 cds_style = {}
 cds_style['cds'] = {'facecolor': (0,0,1), 'edgecolor': (1,1,0), 'linewidth': 10}
-bounds, end_point = renderer.draw_glyph(ax, 'CDS', (35, 80), rotation=(2*3.14)-(3.14/4), user_parameters=user_parameters, user_style=cds_style)
+bounds, end_point = renderer.draw_glyph(ax, 'CDS', (35, 80), orientation='reverse', rotation=(2*3.14)-(3.14/4), user_parameters=user_parameters, user_style=cds_style)
 
 # Set Bounds
 ax.set_ylim([0,100])

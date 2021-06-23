@@ -13,6 +13,7 @@ import warnings
 import os
 import sys
 import glob
+import math
 import xml.etree.ElementTree as ET
 import re
 from math import cos, sin, pi, sqrt
@@ -175,7 +176,7 @@ class GlyphRenderer:
 
 
     @staticmethod
-    def __flip_position_rotate_glyph(path, baseline_y, position, rotation):
+    def __flip_position_rotate_glyph(path, baseline_y, position, orientation, rotation):
         """Flips paths into matplotlib default orientation and position, and rotates paths.
 
         Parameters
@@ -186,10 +187,14 @@ class GlyphRenderer:
             y value of the baseline.
         position: tuple
             Path position, format (x,y).
+        orientation: 'forward' or 'reverse'
+            Orietnation of the part.
         rotation: float
             Rotation value in radians.
         """
         # Flip paths into matplotlib default orientation and position and rotate paths
+        if orientation == 'reverse':
+            rotation += math.radians(180)
         new_verts = []
         new_codes = []
         for v_idx in range(np.size(path.vertices, 0)):
@@ -298,6 +303,7 @@ class GlyphRenderer:
                    ax,
                    glyph_type,
                    position,
+                   orientation='forward',
                    rotation=0.0,
                    user_parameters=None,
                    user_style=None):
@@ -360,10 +366,12 @@ class GlyphRenderer:
         # Draw glyph to the axis with correct styling parameters
         baseline_y = glyph['defaults']['baseline_y']
         all_y_flipped_paths = []
+        position = adjust_position_for_orientation(position, orientation, merged_parameters['width'], rotation)
         for path in paths_to_draw:
             y_flipped_path = self.__flip_position_rotate_glyph(path[0],
                                                                baseline_y,
                                                                position,
+                                                               orientation,
                                                                rotation)
             all_y_flipped_paths.append([y_flipped_path])
             patch = patches.PathPatch(y_flipped_path, **path[1])
@@ -379,9 +387,11 @@ class GlyphRenderer:
                         ha='center',
                         va='center')
         glyph_bounds = self.__bounds_from_paths_to_draw(all_y_flipped_paths)
+        position = adjust_position_for_orientation(position, orientation, merged_parameters['width'], rotation)
         return (glyph_bounds,
                 self.get_baseline_end(glyph_type,
                                       position,
+                                      orientation,
                                       rotation=rotation,
                                       user_parameters=user_parameters))
 
@@ -490,7 +500,7 @@ class GlyphRenderer:
         return self.draw_glyph(None, glyph_type, position, rotation=rotation, user_parameters=user_parameters)
 
 
-    def get_baseline_end(self, glyph_type, position, rotation=0.0, user_parameters=None):
+    def get_baseline_end(self, glyph_type, position, orientation, rotation=0.0, user_parameters=None):
         """Finds the point following a glyph from which the baseline should end.
 
         Parameters
@@ -523,6 +533,7 @@ class GlyphRenderer:
             y_flipped_path = self.__flip_position_rotate_glyph(baseline_path,
                                                                baseline_y,
                                                                position,
+                                                               orientation,
                                                                rotation)
             return (y_flipped_path.vertices[1,0], y_flipped_path.vertices[1,1])
 
@@ -765,41 +776,26 @@ def render_part_list (part_list,
     part_position = start_position
     bounds_list = []
     for part in part_list:
-        user_parameters = part[1]
+        orientation = part[1]
+        user_parameters = part[2]
         # Pre-draw part_position adjustments (y_offset and orientation).
         if user_parameters is not None:
+            # TODO: Shouldn't this be relative to the rotation?
             if 'y_offset' in user_parameters:
                 part_position = (part_position[0], part_position[1] + user_parameters['y_offset'])
-            if 'orientation' in user_parameters:
-                part_position = adjust_position_for_orientation (part_position,
-                                                                 user_parameters['orientation'],
-                                                                 collate_user_params(renderer,
-                                                                                     part[0],
-                                                                                     user_parameters)[0]['width'],
-                                                                 rotation)
-        # Draw the part.
-        drawing_rotation = rotation
-        if user_parameters is not None:
-            if 'orientation' in user_parameters:
-                if user_parameters['orientation'] == 'reverse':
-                    drawing_rotation = rotation + 3.142
+        # Draw the part
         bounds, part_position = renderer.draw_glyph(ax,
                                                     part[0],
                                                     part_position,
-                                                    rotation = drawing_rotation,
-                                                    user_parameters = user_parameters,
-                                                    user_style = part[2])
-        # Post-draw part_position adjustments (y_offset, orientation, and gapsize).
+                                                    orientation=orientation,
+                                                    rotation=rotation,
+                                                    user_parameters=user_parameters,
+                                                    user_style=part[3])
+        # Post-draw part_position adjustments (y_offset, orientation, and gapsize)
         if user_parameters is not None:
+            # TODO: Shouldn't this be relative to the rotation?
             if 'y_offset' in user_parameters:
                 part_position = (part_position[0], part_position[1] - user_parameters['y_offset'])
-            if 'orientation' in user_parameters:
-                part_position = adjust_position_for_orientation (part_position,
-                                                                 user_parameters['orientation'],
-                                                                 collate_user_params(renderer,
-                                                                                     part[0],
-                                                                                     user_parameters)[0]['width'],
-                                                                 rotation)
             if 'trailing_gap_skew' in user_parameters:
                 trailing_gap_skew = user_parameters['trailing_gap_skew']
                 part_position = (part_position[0] + trailing_gap_skew*cos(rotation),

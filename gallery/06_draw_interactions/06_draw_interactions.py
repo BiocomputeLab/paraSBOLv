@@ -7,31 +7,37 @@ import parasbolv as psv
 import matplotlib.pyplot as plt
 
 part_list = []
-part_list.append( ['CDS', 
+part_list.append( ['CDS',
+                   'forward', 
                    None,
                    {'cds': {'facecolor': (1,1,1), 'edgecolor': (0.75,0,0), 'linewidth': 2}}
                   ] )
 part_list.append( ['Promoter',
+                   'forward', 
                    None,
                    None
                   ] )
 part_list.append( ['CDS', 
+                   'forward', 
                    None,
                    {'cds': {'facecolor': (1,1,1), 'edgecolor': (0,0.75,0), 'linewidth': 2}}
                   ] )
-part_list.append( ['Promoter', 
-                   None,
-                   None
-                  ] )
-part_list.append( ['CDS', 
+part_list.append( ['CDS',
+                   'reverse', 
                    None,
                    {'cds': {'facecolor': (1,1,1), 'edgecolor': (0,0,0.75), 'linewidth': 2}}
                   ] )
+part_list.append( ['Promoter', 
+                   'reverse', 
+                   None,
+                   None
+                  ] )
+
 
 # Create list of interactions to pass to render_part_list
 interaction_list = []
 interaction_list.append([part_list[0], part_list[1], 'inhibition', {'color': (0.75,0,0)}])
-interaction_list.append([part_list[2], part_list[3], 'control', {'color': (0, 0.75, 0),
+interaction_list.append([part_list[2], part_list[4], 'control', {'color': (0, 0.75, 0),
                                                                  'direction':'reverse'}])
 
 # Create renderer

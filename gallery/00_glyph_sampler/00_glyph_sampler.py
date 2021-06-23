@@ -27,8 +27,8 @@ fig, ax = plt.subplots()
 # Plot glyphs on backbone
 part_list = []
 for part in sorted(parts):
-    part_list.append([part, None, None])
-    part_list.append([part, {'orientation': 'reverse'}, None])
+    part_list.append([part, 'forward', None, None])
+    part_list.append([part, 'reverse', None, None])
 
 length = len(part_list)
 r = length%12
@@ -58,8 +58,8 @@ parts = list(renderer.glyphs_library.keys())
 part_list = []
 for part in no_baselines:
     if part in parts:
-        part_list.append([part, None, None])
-        part_list.append([part, {'orientation':'reverse'}, None])
+        part_list.append([part, 'forward', None, None])
+        part_list.append([part, 'reverse', None, None])
 
 length = len(part_list)
 r = length%12

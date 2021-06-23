@@ -215,10 +215,10 @@ def format_parts(part_list, renderer):
         glyph, orientation, color, label = part[0], part[1], part[2], part[3]
         style_dict = set_style_color(glyph, color, renderer)
         if label is None:
-            formatted_part = [glyph, {'orientation':orientation}, style_dict]
+            formatted_part = [glyph, orientation, None, style_dict]
             formatted_part_list.append(formatted_part)
         else:
-            formatted_part = [glyph, {'orientation':orientation, 'label_parameters':{'text':label}}, style_dict]
+            formatted_part = [glyph, orientation, {'label_parameters':{'text':label}}, style_dict]
             formatted_part_list.append(formatted_part)
     return formatted_part_list
 

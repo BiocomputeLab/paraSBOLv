@@ -8,27 +8,33 @@ import matplotlib.pyplot as plt
 
 # Basic data type to hold the parts
 part_list = []
-part_list.append( ['CDS', 
+part_list.append( ['CDS',
+                   'forward',
                    None, 
                    {'cds': {'facecolor': (0.5,0.5,0.5), 'edgecolor': (1,0,0), 'linewidth': 2}}
                   ] )
-part_list.append( ['CDS', 
+part_list.append( ['CDS',
+                   'forward',
                    {'height':25, 'arrowbody_height':25, 'width':40}, 
                    {'cds': {'facecolor': (1,1,1), 'edgecolor': (0,0,1), 'linewidth': 2}}
                   ] )
 part_list.append( ['Promoter', 
+                   'forward',
                    None, 
                    None
                   ] )
 part_list.append( ['CDS', 
+                   'forward',
                    None, 
                    None
                   ] )
 part_list.append( ['CDS', 
+                   'reverse',
                    {'orientation':'reverse'}, 
                    None
                   ] )
 part_list.append( ['CDS', 
+                   'forward',
                    {'orientation':'reverse'},
                    None
                   ] )
