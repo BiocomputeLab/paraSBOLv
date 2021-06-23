@@ -154,6 +154,7 @@ and provides a number of helper functions to handle part lists and interactions.
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">xml.etree.ElementTree</span> <span class="kn">as</span> <span class="nn">ET</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">cos</span><span class="p">,</span> <span class="n">sin</span><span class="p">,</span> <span class="n">pi</span><span class="p">,</span> <span class="n">sqrt</span>
@@ -316,7 +317,7 @@ and provides a number of helper functions to handle part lists and interactions.
 
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__flip_position_rotate_glyph</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">baseline_y</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">rotation</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__flip_position_rotate_glyph</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">baseline_y</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">rotation</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Flips paths into matplotlib default orientation and position, and rotates paths.</span>
 
 <span class="sd">        Parameters</span>
@@ -327,10 +328,14 @@ and provides a number of helper functions to handle part lists and interactions.
 <span class="sd">            y value of the baseline.</span>
 <span class="sd">        position: tuple</span>
 <span class="sd">            Path position, format (x,y).</span>
+<span class="sd">        orientation: &#39;forward&#39; or &#39;reverse&#39;</span>
+<span class="sd">            Orietnation of the part.</span>
 <span class="sd">        rotation: float</span>
 <span class="sd">            Rotation value in radians.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Flip paths into matplotlib default orientation and position and rotate paths</span>
+        <span class="k">if</span> <span class="n">orientation</span> <span class="o">==</span> <span class="s1">&#39;reverse&#39;</span><span class="p">:</span>
+            <span class="n">rotation</span> <span class="o">+=</span> <span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mi">180</span><span class="p">)</span>
         <span class="n">new_verts</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">new_codes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">v_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
@@ -439,6 +444,7 @@ and provides a number of helper functions to handle part lists and interactions.
                    <span class="n">ax</span><span class="p">,</span>
                    <span class="n">glyph_type</span><span class="p">,</span>
                    <span class="n">position</span><span class="p">,</span>
+                   <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;forward&#39;</span><span class="p">,</span>
                    <span class="n">rotation</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
                    <span class="n">user_parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                    <span class="n">user_style</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -501,10 +507,12 @@ and provides a number of helper functions to handle part lists and interactions.
         <span class="c1"># Draw glyph to the axis with correct styling parameters</span>
         <span class="n">baseline_y</span> <span class="o">=</span> <span class="n">glyph</span><span class="p">[</span><span class="s1">&#39;defaults&#39;</span><span class="p">][</span><span class="s1">&#39;baseline_y&#39;</span><span class="p">]</span>
         <span class="n">all_y_flipped_paths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">adjust_position_for_orientation</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">merged_parameters</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">],</span> <span class="n">rotation</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths_to_draw</span><span class="p">:</span>
             <span class="n">y_flipped_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__flip_position_rotate_glyph</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                                                                <span class="n">baseline_y</span><span class="p">,</span>
                                                                <span class="n">position</span><span class="p">,</span>
+                                                               <span class="n">orientation</span><span class="p">,</span>
                                                                <span class="n">rotation</span><span class="p">)</span>
             <span class="n">all_y_flipped_paths</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">y_flipped_path</span><span class="p">])</span>
             <span class="n">patch</span> <span class="o">=</span> <span class="n">patches</span><span class="o">.</span><span class="n">PathPatch</span><span class="p">(</span><span class="n">y_flipped_path</span><span class="p">,</span> <span class="o">**</span><span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -520,9 +528,11 @@ and provides a number of helper functions to handle part lists and interactions.
                         <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
                         <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
         <span class="n">glyph_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bounds_from_paths_to_draw</span><span class="p">(</span><span class="n">all_y_flipped_paths</span><span class="p">)</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">adjust_position_for_orientation</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">merged_parameters</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">],</span> <span class="n">rotation</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">glyph_bounds</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_baseline_end</span><span class="p">(</span><span class="n">glyph_type</span><span class="p">,</span>
                                       <span class="n">position</span><span class="p">,</span>
+                                      <span class="n">orientation</span><span class="p">,</span>
                                       <span class="n">rotation</span><span class="o">=</span><span class="n">rotation</span><span class="p">,</span>
                                       <span class="n">user_parameters</span><span class="o">=</span><span class="n">user_parameters</span><span class="p">))</span>
 
@@ -631,7 +641,7 @@ and provides a number of helper functions to handle part lists and interactions.
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_glyph</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="n">glyph_type</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="n">rotation</span><span class="p">,</span> <span class="n">user_parameters</span><span class="o">=</span><span class="n">user_parameters</span><span class="p">)</span>
 
 
-    <span class="k">def</span> <span class="nf">get_baseline_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">glyph_type</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">user_parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_baseline_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">glyph_type</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">user_parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Finds the point following a glyph from which the baseline should end.</span>
 
 <span class="sd">        Parameters</span>
@@ -664,6 +674,7 @@ and provides a number of helper functions to handle part lists and interactions.
             <span class="n">y_flipped_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__flip_position_rotate_glyph</span><span class="p">(</span><span class="n">baseline_path</span><span class="p">,</span>
                                                                <span class="n">baseline_y</span><span class="p">,</span>
                                                                <span class="n">position</span><span class="p">,</span>
+                                                               <span class="n">orientation</span><span class="p">,</span>
                                                                <span class="n">rotation</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">y_flipped_path</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_flipped_path</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
 
@@ -906,41 +917,26 @@ and provides a number of helper functions to handle part lists and interactions.
     <span class="n">part_position</span> <span class="o">=</span> <span class="n">start_position</span>
     <span class="n">bounds_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">part_list</span><span class="p">:</span>
-        <span class="n">user_parameters</span> <span class="o">=</span> <span class="n">part</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">orientation</span> <span class="o">=</span> <span class="n">part</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">user_parameters</span> <span class="o">=</span> <span class="n">part</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
         <span class="c1"># Pre-draw part_position adjustments (y_offset and orientation).</span>
         <span class="k">if</span> <span class="n">user_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c1"># TODO: Shouldn&#39;t this be relative to the rotation?</span>
             <span class="k">if</span> <span class="s1">&#39;y_offset&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
                 <span class="n">part_position</span> <span class="o">=</span> <span class="p">(</span><span class="n">part_position</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">part_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;y_offset&#39;</span><span class="p">])</span>
-            <span class="k">if</span> <span class="s1">&#39;orientation&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
-                <span class="n">part_position</span> <span class="o">=</span> <span class="n">adjust_position_for_orientation</span> <span class="p">(</span><span class="n">part_position</span><span class="p">,</span>
-                                                                 <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;orientation&#39;</span><span class="p">],</span>
-                                                                 <span class="n">collate_user_params</span><span class="p">(</span><span class="n">renderer</span><span class="p">,</span>
-                                                                                     <span class="n">part</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                                                                     <span class="n">user_parameters</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;width&#39;</span><span class="p">],</span>
-                                                                 <span class="n">rotation</span><span class="p">)</span>
-        <span class="c1"># Draw the part.</span>
-        <span class="n">drawing_rotation</span> <span class="o">=</span> <span class="n">rotation</span>
-        <span class="k">if</span> <span class="n">user_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s1">&#39;orientation&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;orientation&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;reverse&#39;</span><span class="p">:</span>
-                    <span class="n">drawing_rotation</span> <span class="o">=</span> <span class="n">rotation</span> <span class="o">+</span> <span class="mf">3.142</span>
+        <span class="c1"># Draw the part</span>
         <span class="n">bounds</span><span class="p">,</span> <span class="n">part_position</span> <span class="o">=</span> <span class="n">renderer</span><span class="o">.</span><span class="n">draw_glyph</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span>
                                                     <span class="n">part</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                                                     <span class="n">part_position</span><span class="p">,</span>
-                                                    <span class="n">rotation</span> <span class="o">=</span> <span class="n">drawing_rotation</span><span class="p">,</span>
-                                                    <span class="n">user_parameters</span> <span class="o">=</span> <span class="n">user_parameters</span><span class="p">,</span>
-                                                    <span class="n">user_style</span> <span class="o">=</span> <span class="n">part</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-        <span class="c1"># Post-draw part_position adjustments (y_offset, orientation, and gapsize).</span>
+                                                    <span class="n">orientation</span><span class="o">=</span><span class="n">orientation</span><span class="p">,</span>
+                                                    <span class="n">rotation</span><span class="o">=</span><span class="n">rotation</span><span class="p">,</span>
+                                                    <span class="n">user_parameters</span><span class="o">=</span><span class="n">user_parameters</span><span class="p">,</span>
+                                                    <span class="n">user_style</span><span class="o">=</span><span class="n">part</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+        <span class="c1"># Post-draw part_position adjustments (y_offset, orientation, and gapsize)</span>
         <span class="k">if</span> <span class="n">user_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c1"># TODO: Shouldn&#39;t this be relative to the rotation?</span>
             <span class="k">if</span> <span class="s1">&#39;y_offset&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
                 <span class="n">part_position</span> <span class="o">=</span> <span class="p">(</span><span class="n">part_position</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">part_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;y_offset&#39;</span><span class="p">])</span>
-            <span class="k">if</span> <span class="s1">&#39;orientation&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
-                <span class="n">part_position</span> <span class="o">=</span> <span class="n">adjust_position_for_orientation</span> <span class="p">(</span><span class="n">part_position</span><span class="p">,</span>
-                                                                 <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;orientation&#39;</span><span class="p">],</span>
-                                                                 <span class="n">collate_user_params</span><span class="p">(</span><span class="n">renderer</span><span class="p">,</span>
-                                                                                     <span class="n">part</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                                                                     <span class="n">user_parameters</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;width&#39;</span><span class="p">],</span>
-                                                                 <span class="n">rotation</span><span class="p">)</span>
             <span class="k">if</span> <span class="s1">&#39;trailing_gap_skew&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
                 <span class="n">trailing_gap_skew</span> <span class="o">=</span> <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;trailing_gap_skew&#39;</span><span class="p">]</span>
                 <span class="n">part_position</span> <span class="o">=</span> <span class="p">(</span><span class="n">part_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">trailing_gap_skew</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">rotation</span><span class="p">),</span>
@@ -1650,7 +1646,7 @@ and provides a number of helper functions to handle part lists and interactions.
 
 
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__flip_position_rotate_glyph</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">baseline_y</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">rotation</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__flip_position_rotate_glyph</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">baseline_y</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">rotation</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Flips paths into matplotlib default orientation and position, and rotates paths.</span>
 
 <span class="sd">        Parameters</span>
@@ -1661,10 +1657,14 @@ and provides a number of helper functions to handle part lists and interactions.
 <span class="sd">            y value of the baseline.</span>
 <span class="sd">        position: tuple</span>
 <span class="sd">            Path position, format (x,y).</span>
+<span class="sd">        orientation: &#39;forward&#39; or &#39;reverse&#39;</span>
+<span class="sd">            Orietnation of the part.</span>
 <span class="sd">        rotation: float</span>
 <span class="sd">            Rotation value in radians.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Flip paths into matplotlib default orientation and position and rotate paths</span>
+        <span class="k">if</span> <span class="n">orientation</span> <span class="o">==</span> <span class="s1">&#39;reverse&#39;</span><span class="p">:</span>
+            <span class="n">rotation</span> <span class="o">+=</span> <span class="n">math</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="mi">180</span><span class="p">)</span>
         <span class="n">new_verts</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">new_codes</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">v_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="mi">0</span><span class="p">)):</span>
@@ -1773,6 +1773,7 @@ and provides a number of helper functions to handle part lists and interactions.
                    <span class="n">ax</span><span class="p">,</span>
                    <span class="n">glyph_type</span><span class="p">,</span>
                    <span class="n">position</span><span class="p">,</span>
+                   <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;forward&#39;</span><span class="p">,</span>
                    <span class="n">rotation</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
                    <span class="n">user_parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                    <span class="n">user_style</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -1835,10 +1836,12 @@ and provides a number of helper functions to handle part lists and interactions.
         <span class="c1"># Draw glyph to the axis with correct styling parameters</span>
         <span class="n">baseline_y</span> <span class="o">=</span> <span class="n">glyph</span><span class="p">[</span><span class="s1">&#39;defaults&#39;</span><span class="p">][</span><span class="s1">&#39;baseline_y&#39;</span><span class="p">]</span>
         <span class="n">all_y_flipped_paths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">adjust_position_for_orientation</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">merged_parameters</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">],</span> <span class="n">rotation</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths_to_draw</span><span class="p">:</span>
             <span class="n">y_flipped_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__flip_position_rotate_glyph</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                                                                <span class="n">baseline_y</span><span class="p">,</span>
                                                                <span class="n">position</span><span class="p">,</span>
+                                                               <span class="n">orientation</span><span class="p">,</span>
                                                                <span class="n">rotation</span><span class="p">)</span>
             <span class="n">all_y_flipped_paths</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">y_flipped_path</span><span class="p">])</span>
             <span class="n">patch</span> <span class="o">=</span> <span class="n">patches</span><span class="o">.</span><span class="n">PathPatch</span><span class="p">(</span><span class="n">y_flipped_path</span><span class="p">,</span> <span class="o">**</span><span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -1854,9 +1857,11 @@ and provides a number of helper functions to handle part lists and interactions.
                         <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
                         <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
         <span class="n">glyph_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bounds_from_paths_to_draw</span><span class="p">(</span><span class="n">all_y_flipped_paths</span><span class="p">)</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">adjust_position_for_orientation</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">merged_parameters</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">],</span> <span class="n">rotation</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">glyph_bounds</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_baseline_end</span><span class="p">(</span><span class="n">glyph_type</span><span class="p">,</span>
                                       <span class="n">position</span><span class="p">,</span>
+                                      <span class="n">orientation</span><span class="p">,</span>
                                       <span class="n">rotation</span><span class="o">=</span><span class="n">rotation</span><span class="p">,</span>
                                       <span class="n">user_parameters</span><span class="o">=</span><span class="n">user_parameters</span><span class="p">))</span>
 
@@ -1965,7 +1970,7 @@ and provides a number of helper functions to handle part lists and interactions.
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">draw_glyph</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="n">glyph_type</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="n">rotation</span><span class="p">,</span> <span class="n">user_parameters</span><span class="o">=</span><span class="n">user_parameters</span><span class="p">)</span>
 
 
-    <span class="k">def</span> <span class="nf">get_baseline_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">glyph_type</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">user_parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">get_baseline_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">glyph_type</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">user_parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Finds the point following a glyph from which the baseline should end.</span>
 
 <span class="sd">        Parameters</span>
@@ -1998,6 +2003,7 @@ and provides a number of helper functions to handle part lists and interactions.
             <span class="n">y_flipped_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__flip_position_rotate_glyph</span><span class="p">(</span><span class="n">baseline_path</span><span class="p">,</span>
                                                                <span class="n">baseline_y</span><span class="p">,</span>
                                                                <span class="n">position</span><span class="p">,</span>
+                                                               <span class="n">orientation</span><span class="p">,</span>
                                                                <span class="n">rotation</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">y_flipped_path</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_flipped_path</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
 
@@ -2176,6 +2182,7 @@ Absolute file path of directory containing glyphs.</li>
     ax,
     glyph_type,
     position,
+    orientation=&#39;forward&#39;,
     rotation=0.0,
     user_parameters=None,
     user_style=None
@@ -2188,6 +2195,7 @@ Absolute file path of directory containing glyphs.</li>
                    <span class="n">ax</span><span class="p">,</span>
                    <span class="n">glyph_type</span><span class="p">,</span>
                    <span class="n">position</span><span class="p">,</span>
+                   <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;forward&#39;</span><span class="p">,</span>
                    <span class="n">rotation</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
                    <span class="n">user_parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
                    <span class="n">user_style</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
@@ -2250,10 +2258,12 @@ Absolute file path of directory containing glyphs.</li>
         <span class="c1"># Draw glyph to the axis with correct styling parameters</span>
         <span class="n">baseline_y</span> <span class="o">=</span> <span class="n">glyph</span><span class="p">[</span><span class="s1">&#39;defaults&#39;</span><span class="p">][</span><span class="s1">&#39;baseline_y&#39;</span><span class="p">]</span>
         <span class="n">all_y_flipped_paths</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">adjust_position_for_orientation</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">merged_parameters</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">],</span> <span class="n">rotation</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths_to_draw</span><span class="p">:</span>
             <span class="n">y_flipped_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__flip_position_rotate_glyph</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                                                                <span class="n">baseline_y</span><span class="p">,</span>
                                                                <span class="n">position</span><span class="p">,</span>
+                                                               <span class="n">orientation</span><span class="p">,</span>
                                                                <span class="n">rotation</span><span class="p">)</span>
             <span class="n">all_y_flipped_paths</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">y_flipped_path</span><span class="p">])</span>
             <span class="n">patch</span> <span class="o">=</span> <span class="n">patches</span><span class="o">.</span><span class="n">PathPatch</span><span class="p">(</span><span class="n">y_flipped_path</span><span class="p">,</span> <span class="o">**</span><span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -2269,9 +2279,11 @@ Absolute file path of directory containing glyphs.</li>
                         <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
                         <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
         <span class="n">glyph_bounds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__bounds_from_paths_to_draw</span><span class="p">(</span><span class="n">all_y_flipped_paths</span><span class="p">)</span>
+        <span class="n">position</span> <span class="o">=</span> <span class="n">adjust_position_for_orientation</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">merged_parameters</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">],</span> <span class="n">rotation</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">glyph_bounds</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">get_baseline_end</span><span class="p">(</span><span class="n">glyph_type</span><span class="p">,</span>
                                       <span class="n">position</span><span class="p">,</span>
+                                      <span class="n">orientation</span><span class="p">,</span>
                                       <span class="n">rotation</span><span class="o">=</span><span class="n">rotation</span><span class="p">,</span>
                                       <span class="n">user_parameters</span><span class="o">=</span><span class="n">user_parameters</span><span class="p">))</span>
 </pre></div>
@@ -2508,12 +2520,19 @@ Dictionary containing sizing/label parameters of glyph.</li>
 
         
             <span class="def">def</span>
-            <span class="name">get_baseline_end</span><span class="signature">(self, glyph_type, position, rotation=0.0, user_parameters=None)</span>:
+            <span class="name">get_baseline_end</span><span class="signature">(
+    self,
+    glyph_type,
+    position,
+    orientation,
+    rotation=0.0,
+    user_parameters=None
+)</span>:
     </div>
 
                 <details>
             <summary>View Source</summary>
-            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_baseline_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">glyph_type</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">user_parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_baseline_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">glyph_type</span><span class="p">,</span> <span class="n">position</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">user_parameters</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Finds the point following a glyph from which the baseline should end.</span>
 
 <span class="sd">        Parameters</span>
@@ -2546,6 +2565,7 @@ Dictionary containing sizing/label parameters of glyph.</li>
             <span class="n">y_flipped_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__flip_position_rotate_glyph</span><span class="p">(</span><span class="n">baseline_path</span><span class="p">,</span>
                                                                <span class="n">baseline_y</span><span class="p">,</span>
                                                                <span class="n">position</span><span class="p">,</span>
+                                                               <span class="n">orientation</span><span class="p">,</span>
                                                                <span class="n">rotation</span><span class="p">)</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">y_flipped_path</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span> <span class="n">y_flipped_path</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
 
@@ -3170,41 +3190,26 @@ attribute.</li>
     <span class="n">part_position</span> <span class="o">=</span> <span class="n">start_position</span>
     <span class="n">bounds_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">part_list</span><span class="p">:</span>
-        <span class="n">user_parameters</span> <span class="o">=</span> <span class="n">part</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">orientation</span> <span class="o">=</span> <span class="n">part</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">user_parameters</span> <span class="o">=</span> <span class="n">part</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
         <span class="c1"># Pre-draw part_position adjustments (y_offset and orientation).</span>
         <span class="k">if</span> <span class="n">user_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c1"># TODO: Shouldn&#39;t this be relative to the rotation?</span>
             <span class="k">if</span> <span class="s1">&#39;y_offset&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
                 <span class="n">part_position</span> <span class="o">=</span> <span class="p">(</span><span class="n">part_position</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">part_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;y_offset&#39;</span><span class="p">])</span>
-            <span class="k">if</span> <span class="s1">&#39;orientation&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
-                <span class="n">part_position</span> <span class="o">=</span> <span class="n">adjust_position_for_orientation</span> <span class="p">(</span><span class="n">part_position</span><span class="p">,</span>
-                                                                 <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;orientation&#39;</span><span class="p">],</span>
-                                                                 <span class="n">collate_user_params</span><span class="p">(</span><span class="n">renderer</span><span class="p">,</span>
-                                                                                     <span class="n">part</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                                                                     <span class="n">user_parameters</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;width&#39;</span><span class="p">],</span>
-                                                                 <span class="n">rotation</span><span class="p">)</span>
-        <span class="c1"># Draw the part.</span>
-        <span class="n">drawing_rotation</span> <span class="o">=</span> <span class="n">rotation</span>
-        <span class="k">if</span> <span class="n">user_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s1">&#39;orientation&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;orientation&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;reverse&#39;</span><span class="p">:</span>
-                    <span class="n">drawing_rotation</span> <span class="o">=</span> <span class="n">rotation</span> <span class="o">+</span> <span class="mf">3.142</span>
+        <span class="c1"># Draw the part</span>
         <span class="n">bounds</span><span class="p">,</span> <span class="n">part_position</span> <span class="o">=</span> <span class="n">renderer</span><span class="o">.</span><span class="n">draw_glyph</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span>
                                                     <span class="n">part</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                                                     <span class="n">part_position</span><span class="p">,</span>
-                                                    <span class="n">rotation</span> <span class="o">=</span> <span class="n">drawing_rotation</span><span class="p">,</span>
-                                                    <span class="n">user_parameters</span> <span class="o">=</span> <span class="n">user_parameters</span><span class="p">,</span>
-                                                    <span class="n">user_style</span> <span class="o">=</span> <span class="n">part</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-        <span class="c1"># Post-draw part_position adjustments (y_offset, orientation, and gapsize).</span>
+                                                    <span class="n">orientation</span><span class="o">=</span><span class="n">orientation</span><span class="p">,</span>
+                                                    <span class="n">rotation</span><span class="o">=</span><span class="n">rotation</span><span class="p">,</span>
+                                                    <span class="n">user_parameters</span><span class="o">=</span><span class="n">user_parameters</span><span class="p">,</span>
+                                                    <span class="n">user_style</span><span class="o">=</span><span class="n">part</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+        <span class="c1"># Post-draw part_position adjustments (y_offset, orientation, and gapsize)</span>
         <span class="k">if</span> <span class="n">user_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c1"># TODO: Shouldn&#39;t this be relative to the rotation?</span>
             <span class="k">if</span> <span class="s1">&#39;y_offset&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
                 <span class="n">part_position</span> <span class="o">=</span> <span class="p">(</span><span class="n">part_position</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">part_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;y_offset&#39;</span><span class="p">])</span>
-            <span class="k">if</span> <span class="s1">&#39;orientation&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
-                <span class="n">part_position</span> <span class="o">=</span> <span class="n">adjust_position_for_orientation</span> <span class="p">(</span><span class="n">part_position</span><span class="p">,</span>
-                                                                 <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;orientation&#39;</span><span class="p">],</span>
-                                                                 <span class="n">collate_user_params</span><span class="p">(</span><span class="n">renderer</span><span class="p">,</span>
-                                                                                     <span class="n">part</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-                                                                                     <span class="n">user_parameters</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;width&#39;</span><span class="p">],</span>
-                                                                 <span class="n">rotation</span><span class="p">)</span>
             <span class="k">if</span> <span class="s1">&#39;trailing_gap_skew&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
                 <span class="n">trailing_gap_skew</span> <span class="o">=</span> <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;trailing_gap_skew&#39;</span><span class="p">]</span>
                 <span class="n">part_position</span> <span class="o">=</span> <span class="p">(</span><span class="n">part_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">trailing_gap_skew</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">rotation</span><span class="p">),</span>
