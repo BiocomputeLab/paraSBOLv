@@ -23,7 +23,7 @@ def test_plotting_construct():
     renderer = psv.GlyphRenderer()
     fig, ax = plt.subplots()
 
-    construct = psv.Construct([["RibosomeEntrySite", None, None]],
+    construct = psv.Construct([["RibosomeEntrySite", 'forward', None, None]],
                               renderer,
                               fig=fig,
                               ax=ax,
