@@ -48,7 +48,7 @@ def test_find_bound_of_bounds():
 def test_plotting_interactions():
     """Test loading glyphs from SVGs with no errors/exceptions."""
     renderer = psv.GlyphRenderer()
-    part_list = [["Promoter", None, None],["Promoter", None, None]]
+    part_list = [["Promoter", 'forward', None, None],["Promoter", 'forward', None, None]]
     int_list = [[part_list[0], part_list[1], 'inhibition', {'color': (1,0,0),
                                                             'headheight': 13.0,
                                                             'headwidth': 14.0,
