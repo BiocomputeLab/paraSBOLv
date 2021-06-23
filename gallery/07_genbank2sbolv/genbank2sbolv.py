@@ -5,13 +5,13 @@ genbank2sbolv
 Generate a simplified SBOLV diagram of the contents of a GenBank file. Only
 CDSs are shown with key types coloured.
 
-factor - green
-enzyme - blue
-regulator - red
+factor     - green
+enzyme     - blue
+regulator  - red
 structural - orange
-membrane - purple
-IS - black
-none - light grey
+membrane   - purple
+IS         - black
+none       - light grey
 """
 
 import parasbolv as psv
