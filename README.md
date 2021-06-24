@@ -7,7 +7,7 @@ A lightweight Python library designed to simplify the rendering of highly-custom
 
 ## Relationship to DNAplotlib
 
-We are regularly asked about the relationship of `parasbolv` and another genetic design visualisation tool we have developed called [`dnaplotlib`](http://www.dnaplotlib.org). The major difference between the two packages is that `parasbolv` is designed to be lightweight, include minimal additional functionality, and be tailored to tool developers to provide them with low level access to the rendering of SBOL Visual glyphs and interactions. In contrast, `dnaplotlib` is designed to provide a much fuller and wider range of functionalities to both developers and non-computational users.
+We are regularly asked about the relationship of `parasbolv` and another genetic design visualisation tool we have developed called [`dnaplotlib`](http://www.dnaplotlib.org). The major difference between the two packages is that `parasbolv` is designed to be lightweight, include minimal additional functionality, and be tailored to tool developers to provide them with low level access to the rendering of SBOL Visual glyphs and interactions. In contrast, `dnaplotlib` is designed to provide a much fuller and wider range of functionalities to both developers and biologists.
 
 As a note, `dnaplotlib` version 2.0, which is currently under development, will completely replace its legacy rendering pipeline with `paraSBOLv`. This will not only simplify maintenance, but also allow access to new glyphs ratified by the SBOL community as they become available.
 
