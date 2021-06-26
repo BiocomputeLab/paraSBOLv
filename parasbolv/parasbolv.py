@@ -820,9 +820,17 @@ def render_part_list (part_list,
                 for part in part_list:
                     if part is interaction[1]:
                         receiving_bounds = bounds_list[n]
+                        receiving_part_orientation = part[1]
                         break
                     n += 1
-                # Draw interactions
+                # If unspecified by the user, interactions with reverse orientation receiving parts are drawn in reverse direction
+                if receiving_part_orientation == 'reverse':
+                    if interaction[3] is None:
+                        interaction[3] = {'direction':'reverse'}
+                    else:
+                        if 'direction' not in interaction[3]:
+                            interaction[3]['direction'] = 'reverse'
+                # Draw interactions   
                 bounds = draw_interaction(ax,
                                           sending_bounds,
                                           receiving_bounds,
