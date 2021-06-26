@@ -778,11 +778,12 @@ def render_part_list (part_list,
     for part in part_list:
         orientation = part[1]
         user_parameters = part[2]
-        # Pre-draw part_position adjustments (y_offset and orientation).
+        # Pre-draw part_position adjustments (vertical_offset and orientation).
         if user_parameters is not None:
-            # TODO: Shouldn't this be relative to the rotation?
-            if 'y_offset' in user_parameters:
-                part_position = (part_position[0], part_position[1] + user_parameters['y_offset'])
+            if 'vertical_offset' in user_parameters:
+                bearing = 2*3.142 - rotation
+                part_position = (part_position[0] + (user_parameters['vertical_offset'])*sin(bearing),
+                                 part_position[1] + (user_parameters['vertical_offset'])*cos(bearing))
         # Draw the part
         bounds, part_position = renderer.draw_glyph(ax,
                                                     part[0],
@@ -791,11 +792,12 @@ def render_part_list (part_list,
                                                     rotation=rotation,
                                                     user_parameters=user_parameters,
                                                     user_style=part[3])
-        # Post-draw part_position adjustments (y_offset, orientation, and gapsize)
+        # Post-draw part_position adjustments (vertical_offset, orientation, and gapsize)
         if user_parameters is not None:
-            # TODO: Shouldn't this be relative to the rotation?
-            if 'y_offset' in user_parameters:
-                part_position = (part_position[0], part_position[1] - user_parameters['y_offset'])
+            if 'vertical_offset' in user_parameters:
+                bearing = 2*3.142 - rotation
+                part_position = (part_position[0] - (user_parameters['vertical_offset'])*sin(bearing),
+                                 part_position[1] - (user_parameters['vertical_offset'])*cos(bearing))
             if 'trailing_gap_skew' in user_parameters:
                 trailing_gap_skew = user_parameters['trailing_gap_skew']
                 part_position = (part_position[0] + trailing_gap_skew*cos(rotation),
@@ -909,7 +911,7 @@ def collate_user_params (renderer, glyph_type, user_parameters):
             if (key not in glyph['defaults'] and
                 key != 'label_parameters' and
                 key != 'orientation' and
-                key != 'y_offset' and
+                key != 'vertical_offset' and
                 key != 'trailing_gap_skew'):
                 warnings.warn(f"""Parameter '{key}' is not valid for '{glyph_type}'.""")
             merged_parameters[key] = user_parameters[key]
