@@ -586,6 +586,7 @@ class Construct:
        additional_bounds_list: list
        interaction_list: list
        rotation: float
+       modify_axis: bool
        bounds: tuple
            Represents the bounds of the
            construct, formatted as ((x1,y1), (x2,y2))
@@ -605,7 +606,8 @@ class Construct:
                   start_position = (0, 0),
                   additional_bounds_list = None,
                   interaction_list = None,
-                  rotation = 0.0):
+                  rotation = 0.0,
+                  modify_axis = True):
         """
         Parameters
         ----------
@@ -649,6 +651,10 @@ class Construct:
         rotation: float, optional
             Float representing the rotation of
             the construct in radians.
+        modify_axis: bool, optional
+            Enable/disable the automatic resizing and
+            modification of the Matplotlib Axes object - useful
+            when wanting to modify it manually
         """
         self.renderer = renderer
         self.padding = padding
@@ -659,6 +665,7 @@ class Construct:
             self.fig, self.ax = plt.subplots()
         self.start_position = start_position
         self.additional_bounds_list = additional_bounds_list
+        self.modify_axis = modify_axis
 
         # Data structure
         self.part_list = part_list
@@ -718,7 +725,8 @@ class Construct:
                                                                              start_position = self.start_position,
                                                                              additional_bounds_list = bounds_to_add,
                                                                              interaction_list = self.interaction_list,
-                                                                             rotation = self.rotation)
+                                                                             rotation = self.rotation,
+                                                                             modify_axis = self.modify_axis)
             return fig, ax, baseline_start, baseline_end, bounds
         elif draw_for_bounds is True:
             # Temporary rendering pathway to generate bounds
@@ -732,7 +740,8 @@ class Construct:
                                                                              start_position = self.start_position,
                                                                              additional_bounds_list = bounds_to_add,
                                                                              interaction_list = self.interaction_list,
-                                                                             rotation = self.rotation)
+                                                                             rotation = self.rotation,
+                                                                             modify_axis = self.modify_axis)
             plt.close()
             return fig, ax, baseline_start, baseline_end, bounds
 
@@ -746,7 +755,8 @@ def render_part_list (part_list,
                       start_position = (0, 0),
                       additional_bounds_list = None,
                       interaction_list = None,
-                      rotation = 0.0):
+                      rotation = 0.0,
+                      modify_axis = 1):
     """Renders multiple glyphs in sequence.
 
     NOTE: See parameters of the __init__
@@ -768,11 +778,12 @@ def render_part_list (part_list,
     """
     if fig is None or ax is None:
         fig, ax = plt.subplots()
-    ax.set_aspect('equal')
-    ax.set_xticks([])
-    ax.set_yticks([])
-    ax.axis('off')
-    plt.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
+    if modify_axis:
+        ax.set_aspect('equal')
+        ax.set_xticks([])
+        ax.set_yticks([])
+        ax.axis('off')
+        plt.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
     part_position = start_position
     bounds_list = []
     for part in part_list:
@@ -855,9 +866,10 @@ def render_part_list (part_list,
     pad = height*padding
     width = width + (pad*2.0)
     height = height + (pad*2.0)
-    ax.set_xlim([final_bounds[0][0]-fig_pad, final_bounds[1][0]+fig_pad])
-    ax.set_ylim([final_bounds[0][1]-fig_pad, final_bounds[1][1]+fig_pad])
-    fig.set_size_inches( (width, height) )
+    if modify_axis:
+        ax.set_xlim([final_bounds[0][0]-fig_pad, final_bounds[1][0]+fig_pad])
+        ax.set_ylim([final_bounds[0][1]-fig_pad, final_bounds[1][1]+fig_pad])
+        fig.set_size_inches( (width, height) )
     return fig, ax, start_position, part_position, final_bounds
 
 
