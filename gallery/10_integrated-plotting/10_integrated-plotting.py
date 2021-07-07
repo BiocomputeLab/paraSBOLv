@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 """
-Description
+Draw paraSBOLv constructs within matplotlib figures, making use of 
+the construct parameter `modify_axis = 0`.
 """
 
 import parasbolv as psv
