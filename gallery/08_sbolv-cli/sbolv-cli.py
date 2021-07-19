@@ -10,6 +10,7 @@ import parasbolv as psv
 import matplotlib.pyplot as plt
 import click
 import math
+from collections import namedtuple
 
 
 @click.command()
@@ -211,14 +212,15 @@ def format_parts(part_list, renderer):
         containing glyphs library a attribute.
     """
     formatted_part_list = []
+    Part = namedtuple('part', ['glyph_type', 'orientation',  'user_parameters', 'style_parameters'])
     for part in part_list:
         glyph, orientation, color, label = part[0], part[1], part[2], part[3]
         style_dict = set_style_color(glyph, color, renderer)
         if label is None:
-            formatted_part = [glyph, orientation, None, style_dict]
+            formatted_part = Part(glyph, orientation, None, style_dict)
             formatted_part_list.append(formatted_part)
         else:
-            formatted_part = [glyph, orientation, {'label_parameters':{'text':label}}, style_dict]
+            formatted_part = Part(glyph, orientation, {'label_parameters':{'text':label}}, style_dict)
             formatted_part_list.append(formatted_part)
     return formatted_part_list
 
@@ -303,3 +305,4 @@ def find_interaction_type(value):
 if __name__ == '__main__':
     renderer = psv.GlyphRenderer()
     render_input()
+
