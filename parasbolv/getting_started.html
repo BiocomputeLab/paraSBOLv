@@ -44,7 +44,7 @@
                         <div class="docstring"><p><code>paraSBOLv</code> is a lightweight Python library designed to simplify the rendering of highly-customisable SBOL Visual glyphs and diagrams. To begin, perform the following essential imports:</p>
 
 <pre><code>    import parasbolv as psv
-import matplotlib.pyplot as plt
+    import matplotlib.pyplot as plt
 </code></pre>
 
 <p><strong>Initialising <code>fig</code> and <code>ax</code></strong></p>
@@ -84,25 +84,25 @@ import matplotlib.pyplot as plt
 <p>We can make use of the parameterised SVG files and customise our glyphs in many different ways. Here we draw a coding sequence glyph (CDS) that has been <strong>widened</strong> and <strong>rotated</strong> 90 degrees (π/2), with a <strong>blue face</strong> and <strong>red edges</strong>.</p>
 
 <pre><code>    user_parameters = {
-                                       'width' : 50
+                       'width' : 50
     }
 
     user_style = {
-                              'cds' : {
-                                               'facecolor': (0,0,1),
-                                               'edgecolor': (1,0,0),
-                                                      # (R,G,B)
-                              }
+                  'cds' : {
+                           'facecolor': (0,0,1),
+                           'edgecolor': (1,0,0),
+                                      # (R,G,B)
+                  }
     }
 
     bounds,end_point = renderer.draw_glyph(
-                                                                                    ax,
-                                                                                    'CDS',
-                                                                                    (0,0),
-                                                                                    user_parameters = user_parameters,
-                                                                                    user_style = user_style,
-                                                                                    rotation = 3.14/2
-                                            )
+                                           ax,
+                                           'CDS',
+                                           (0,0),
+                                           user_parameters = user_parameters
+                                           user_style = user_style,
+                                           rotation = 3.14/2
+    )
 </code></pre>
 
 <ul>
@@ -116,26 +116,26 @@ import matplotlib.pyplot as plt
 <p>The easiest way to plot many glyphs in succession is with the <code>Construct</code> class, which can apply parameters to and render  a <code>part_list</code>, an ordered list of glyphs. Glyphs in part lists are represented by <code>named_tuples</code> (https://bit.ly/2Tu8IMK) like so:</p>
 
 <pre><code>    Part = namedtuple(
-                                              'part', ['glyph_type',
-                                                                   'orientation',
-                                                                   'user_parameters', 
-                                                                   'style_parameters']
+                      'part', ['glyph_type',
+                               'orientation',
+                               'user_parameters', 
+                               'style_parameters']
     )
 
     part_example = Part(
-                                                    'part_name',
-                                                'orientation', # Forward or Reverse
-                                                    {user_parameters}, # Falsy object if there is none
-                                                    {style_parameters} # Falsy object if there is none
-                                            )
+                        'part_name',
+                        'orientation', # Forward or Reverse
+                        {user_parameters}, # Falsy object if there is none
+                        {style_parameters} # Falsy object if there is none
+    )
 </code></pre>
 
 <p>and formatted in part lists:</p>
 
 <pre><code>    part_list = [
-                    cds_part,
-                    promoter_part,
-                    cds_part
+                 cds_part,
+                 promoter_part,
+                 cds_part
     ]
 
     # All parts in the part list are named tuple objects
@@ -156,11 +156,11 @@ import matplotlib.pyplot as plt
 <p>Among the construct parameters that can be specified are the start position, space between glyphs, and rotation of constructs:</p>
 
 <pre><code>    construct = psv.Construct(
-                                                              part_list,
-                                                      renderer,
-                                                      start_position = (9,6),
-                                                                  gapsize = 8,
-                                                                  rotation = 3.14/4,
+                              part_list,
+                              renderer,
+                              start_position = (9,6),
+                              gapsize = 8,
+                              rotation = 3.14/4,
     )
 </code></pre>
 
@@ -169,31 +169,31 @@ import matplotlib.pyplot as plt
 <p>Finally, interactions between glyphs can be defined by passing an <code>interaction_list</code> to a construct. Interactions, like parts, are defined as named tuples.</p>
 
 <pre><code>    Interaction = namedtuple(
-                                                                 'interaction', ['starting_glyph',
-                                                                                                          'ending_glyph',
-                                                                                                    'user_parameters', 
-                                                                                                    'style_parameters']
+                             'interaction', ['starting_glyph',
+                                             'ending_glyph',
+                                             'user_parameters', 
+                                             'style_parameters']
                                                       )
 
     interaction_example = Interaction(
-                                                                                      part1
-                                                                                      part2
-                                                                                      'Interaction Name'
-                                                                                      interaction_parameters
+                                      part1
+                                      part2
+                                      'Interaction Name'
+                                      interaction_parameters
                                               )
 </code></pre>
 
 <p>They are then passed to <code>Construct</code> in a list.</p>
 
 <pre><code>    interaction_list = [
-                                                    interaction1,
-                                                    interaction2
+                        interaction1,
+                        interaction2
     ] 
 
     construct = psv.Construct(
-                                                            part_list,
-                                                            renderer,
-                                                            interaction_list = interaction_list
+                              part_list,
+                              renderer,
+                              interaction_list = interaction_list
                        )
 </code></pre>
 
@@ -206,7 +206,7 @@ import matplotlib.pyplot as plt
 <span class="sd">`paraSBOLv` is a lightweight Python library designed to simplify the rendering of highly-customisable SBOL Visual glyphs and diagrams. To begin, perform the following essential imports:</span>
 
 <span class="sd">	import parasbolv as psv</span>
-<span class="sd">    import matplotlib.pyplot as plt</span>
+<span class="sd">	import matplotlib.pyplot as plt</span>
 
 <span class="sd">**Initialising `fig` and `ax`**</span>
 
@@ -241,25 +241,25 @@ import matplotlib.pyplot as plt
 <span class="sd">We can make use of the parameterised SVG files and customise our glyphs in many different ways. Here we draw a coding sequence glyph (CDS) that has been **widened** and **rotated** 90 degrees (π/2), with a **blue face** and **red edges**.</span>
 
 <span class="sd">	user_parameters = {</span>
-<span class="sd">					   &#39;width&#39; : 50</span>
+<span class="sd">			   &#39;width&#39; : 50</span>
 <span class="sd">	}</span>
 <span class="sd">	</span>
 <span class="sd">	user_style = {</span>
-<span class="sd">				  &#39;cds&#39; : {</span>
-<span class="sd">						   &#39;facecolor&#39;: (0,0,1),</span>
-<span class="sd">						   &#39;edgecolor&#39;: (1,0,0),</span>
-<span class="sd">					                  # (R,G,B)</span>
-<span class="sd">				  }</span>
+<span class="sd">		      &#39;cds&#39; : {</span>
+<span class="sd">		  	       &#39;facecolor&#39;: (0,0,1),</span>
+<span class="sd">			       &#39;edgecolor&#39;: (1,0,0),</span>
+<span class="sd">					  # (R,G,B)</span>
+<span class="sd">		      }</span>
 <span class="sd">	}</span>
 <span class="sd">	</span>
 <span class="sd">	bounds,end_point = renderer.draw_glyph(</span>
-<span class="sd">											ax,</span>
-<span class="sd">											&#39;CDS&#39;,</span>
-<span class="sd">											(0,0),</span>
-<span class="sd">											user_parameters = user_parameters,</span>
-<span class="sd">											user_style = user_style,</span>
-<span class="sd">											rotation = 3.14/2</span>
-<span class="sd">						)</span>
+<span class="sd">					       ax,</span>
+<span class="sd">					       &#39;CDS&#39;,</span>
+<span class="sd">					       (0,0),</span>
+<span class="sd">					       user_parameters = user_parameters</span>
+<span class="sd">					       user_style = user_style,</span>
+<span class="sd">					       rotation = 3.14/2</span>
+<span class="sd">	)</span>
 
 
 <span class="sd"> - Rotation and position are passed directly to the `draw_glyph` method.</span>
@@ -271,25 +271,25 @@ import matplotlib.pyplot as plt
 <span class="sd">The easiest way to plot many glyphs in succession is with the `Construct` class, which can apply parameters to and render  a `part_list`, an ordered list of glyphs. Glyphs in part lists are represented by `named_tuples` (https://bit.ly/2Tu8IMK) like so:</span>
 
 <span class="sd">	Part = namedtuple(</span>
-<span class="sd">				        	  &#39;part&#39;, [&#39;glyph_type&#39;,</span>
-<span class="sd">							               &#39;orientation&#39;,</span>
-<span class="sd">							               &#39;user_parameters&#39;, </span>
-<span class="sd">							               &#39;style_parameters&#39;]</span>
+<span class="sd">			  &#39;part&#39;, [&#39;glyph_type&#39;,</span>
+<span class="sd">				   &#39;orientation&#39;,</span>
+<span class="sd">				   &#39;user_parameters&#39;, </span>
+<span class="sd">				   &#39;style_parameters&#39;]</span>
 <span class="sd">	)</span>
 
 <span class="sd">	part_example = Part(</span>
-<span class="sd">				          		&#39;part_name&#39;,</span>
-<span class="sd">					            &#39;orientation&#39;, # Forward or Reverse</span>
-<span class="sd">					          	{user_parameters}, # Falsy object if there is none</span>
-<span class="sd">				          		{style_parameters} # Falsy object if there is none</span>
-<span class="sd">						)</span>
+<span class="sd">			    &#39;part_name&#39;,</span>
+<span class="sd">			    &#39;orientation&#39;, # Forward or Reverse</span>
+<span class="sd">			    {user_parameters}, # Falsy object if there is none</span>
+<span class="sd">			    {style_parameters} # Falsy object if there is none</span>
+<span class="sd">	)</span>
 <span class="sd">	</span>
 <span class="sd">and formatted in part lists:</span>
 
 <span class="sd">	part_list = [</span>
-<span class="sd">	            	cds_part,</span>
-<span class="sd">	             	promoter_part,</span>
-<span class="sd">	            	cds_part</span>
+<span class="sd">	             cds_part,</span>
+<span class="sd">	             promoter_part,</span>
+<span class="sd">	             cds_part</span>
 <span class="sd">	]</span>
 <span class="sd">	</span>
 <span class="sd">	# All parts in the part list are named tuple objects</span>
@@ -307,11 +307,11 @@ import matplotlib.pyplot as plt
 <span class="sd">Among the construct parameters that can be specified are the start position, space between glyphs, and rotation of constructs:</span>
 
 <span class="sd">	construct = psv.Construct(</span>
-<span class="sd">						            	  part_list,</span>
-<span class="sd">					              	  renderer,</span>
-<span class="sd">					              	  start_position = (9,6),</span>
-<span class="sd">							              gapsize = 8,</span>
-<span class="sd">							              rotation = 3.14/4,</span>
+<span class="sd">				  part_list,</span>
+<span class="sd">				  renderer,</span>
+<span class="sd">				  start_position = (9,6),</span>
+<span class="sd">				  gapsize = 8,</span>
+<span class="sd">				  rotation = 3.14/4,</span>
 <span class="sd">	)</span>
 
 <span class="sd">**Specifying interactions**</span>
@@ -319,30 +319,30 @@ import matplotlib.pyplot as plt
 <span class="sd">Finally, interactions between glyphs can be defined by passing an `interaction_list` to a construct. Interactions, like parts, are defined as named tuples.</span>
 
 <span class="sd">	Interaction = namedtuple(</span>
-<span class="sd">							             &#39;interaction&#39;, [&#39;starting_glyph&#39;,</span>
-<span class="sd">											                      &#39;ending_glyph&#39;,</span>
-<span class="sd">										                        &#39;user_parameters&#39;, </span>
-<span class="sd">										                        &#39;style_parameters&#39;]</span>
+<span class="sd">				 &#39;interaction&#39;, [&#39;starting_glyph&#39;,</span>
+<span class="sd">						 &#39;ending_glyph&#39;,</span>
+<span class="sd">						 &#39;user_parameters&#39;, </span>
+<span class="sd">						 &#39;style_parameters&#39;]</span>
 <span class="sd">							  )</span>
 
 <span class="sd">	interaction_example = Interaction(</span>
-<span class="sd">									                  part1</span>
-<span class="sd">									                  part2</span>
-<span class="sd">									                  &#39;Interaction Name&#39;</span>
-<span class="sd">									                  interaction_parameters</span>
+<span class="sd">					  part1</span>
+<span class="sd">					  part2</span>
+<span class="sd">					  &#39;Interaction Name&#39;</span>
+<span class="sd">					  interaction_parameters</span>
 <span class="sd">						  )</span>
 
 <span class="sd">They are then passed to `Construct` in a list.</span>
 
 <span class="sd">	interaction_list = [</span>
-<span class="sd">					          	interaction1,</span>
-<span class="sd">		          				interaction2</span>
+<span class="sd">			    interaction1,</span>
+<span class="sd">			    interaction2</span>
 <span class="sd">	] </span>
 
 <span class="sd">	construct = psv.Construct(</span>
-<span class="sd">					              		part_list,</span>
-<span class="sd">					              		renderer,</span>
-<span class="sd">						              	interaction_list = interaction_list</span>
+<span class="sd">				  part_list,</span>
+<span class="sd">				  renderer,</span>
+<span class="sd">				  interaction_list = interaction_list</span>
 <span class="sd">			   )</span>
 
 <span class="sd">Please see the rest of the documentation for detailed information on all possible parameters for `user_parameters`, `user_style`, `interaction_parameters`, and `Construct`.</span>
