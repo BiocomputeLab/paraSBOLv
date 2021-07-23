@@ -52,6 +52,7 @@ def load_part_list_from_gff (filename, chrom, type_map=gffsvgtype_map, region=No
         # Check for available elements and append to part list
         if len(gff_el[5]) == 0 or gff_el == None:
             part_list.append(Part(gff_el[1], 'forward', None, None))
+
         else:
             orientation = 'forward'
             if 'orientation' in gff_el[5]:
