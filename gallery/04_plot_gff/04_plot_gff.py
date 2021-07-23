@@ -36,6 +36,8 @@ def load_part_list_from_gff (filename, chrom, type_map=gffsvgtype_map, region=No
                 if len(key_value) == 2:
                     if key_value[0] == 'Name':
                         part_name = key_value[1]
+                    elif key_value[0] == 'orientation':
+                        part_attribs['orientation'] = key_value[1]
                     elif key_value[0] == 'user_parameters':
                         part_attribs['user_parameters'] = literal_eval(key_value[1])
                     elif key_value[0] == 'style_parameters':
@@ -46,16 +48,19 @@ def load_part_list_from_gff (filename, chrom, type_map=gffsvgtype_map, region=No
     part_list = []
     for gff_el in sorted(gff, key=itemgetter(3)):
         # Check for available elements and append to part list
-        if not gff_el[5]:
-            part_list.append([gff_el[1], None, None])
+        if len(gff_el[5]) == 1:
+            part_list.append([gff_el[1], 'forward', None, None])
         else:
-            if len(gff_el[5]) == 2:
-                part_list.append([gff_el[1], gff_el[5]['user_parameters'], gff_el[5]['style_parameters']])
+            orientation = 'forward'
+            if 'orientation' in gff_el[5]:
+                orientation = gff_el[5]['orientation']
+            if len(gff_el[5]) == 3:
+                part_list.append([gff_el[1], orientation, gff_el[5]['user_parameters'], gff_el[5]['style_parameters']])
             else:
                 if 'user_parameters' in gff_el[5]:
-                    part_list.append([gff_el[1], gff_el[5]['user_parameters'], None])
+                    part_list.append([gff_el[1], orientation, gff_el[5]['user_parameters'], None])
                 else:
-                    part_list.append([gff_el[1], None, gff_el[5]['style_parameters']])
+                    part_list.append([gff_el[1], orientation, None, gff_el[5]['style_parameters']])
 
     return part_list
 
