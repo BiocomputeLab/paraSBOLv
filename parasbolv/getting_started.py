@@ -75,9 +75,9 @@ The easiest way to plot many glyphs in succession is with the `Construct` class,
 
 	part_example = Part(
 			    'part_name',
-			    'orientation', # Forward or Reverse
-			    {user_parameters}, # Falsy object if there is none
-			    {style_parameters} # Falsy object if there is none
+			    'orientation', # forward or reverse
+			    {user_parameters}, # Falsy object if there are none
+			    {style_parameters} # Falsy object if there are none
 	)
 	
 and formatted in part lists:
