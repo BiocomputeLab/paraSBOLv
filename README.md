@@ -27,6 +27,16 @@ import parasbolv as psv
 
 Automatically generated documentation can be accessed at: [https://biocomputelab.github.io/paraSBOLv/index.html](https://biocomputelab.github.io/paraSBOLv/index.html)
 
+## Tools
+
+To inspire you to make your own, we created some simple plotting tools using paraSBOLv as a convenient foundation. 
+
+**[plot_gff](https://github.com/BiocomputeLab/paraSBOLv/tree/master/gallery/04_plot_gff)** - converts .gff files to SBOLv designs.
+
+**[genbank2sbolv](https://github.com/BiocomputeLab/paraSBOLv/tree/master/gallery/07_genbank2sbolv)** - converts .gb files to SBOLv designs.
+
+**[sbolv-cli](https://github.com/BiocomputeLab/paraSBOLv/tree/master/gallery/08_sbolv-cli)** - streamlined CLI version of paraSBOLv for rapid generation of designs
+
 ## Support
 
 If you use this tool to create diagrams or as a basis for new software please cite the following paper. Without citations that demonstrate use it becomes difficult to support this tool.
