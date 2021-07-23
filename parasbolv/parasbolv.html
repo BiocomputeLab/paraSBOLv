@@ -727,6 +727,7 @@ and provides a number of helper functions to handle part lists and interactions.
 <span class="sd">       additional_bounds_list: list</span>
 <span class="sd">       interaction_list: list</span>
 <span class="sd">       rotation: float</span>
+<span class="sd">       modify_axis: bool</span>
 <span class="sd">       bounds: tuple</span>
 <span class="sd">           Represents the bounds of the</span>
 <span class="sd">           construct, formatted as ((x1,y1), (x2,y2))</span>
@@ -746,7 +747,8 @@ and provides a number of helper functions to handle part lists and interactions.
                   <span class="n">start_position</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                   <span class="n">additional_bounds_list</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
                   <span class="n">interaction_list</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
-                  <span class="n">rotation</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+                  <span class="n">rotation</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                  <span class="n">modify_axis</span> <span class="o">=</span> <span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -790,6 +792,10 @@ and provides a number of helper functions to handle part lists and interactions.
 <span class="sd">        rotation: float, optional</span>
 <span class="sd">            Float representing the rotation of</span>
 <span class="sd">            the construct in radians.</span>
+<span class="sd">        modify_axis: bool, optional</span>
+<span class="sd">            Enable/disable the automatic resizing and</span>
+<span class="sd">            modification of the Matplotlib Axes object - useful</span>
+<span class="sd">            when wanting to modify it manually</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span> <span class="o">=</span> <span class="n">renderer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">padding</span> <span class="o">=</span> <span class="n">padding</span>
@@ -800,6 +806,7 @@ and provides a number of helper functions to handle part lists and interactions.
             <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start_position</span> <span class="o">=</span> <span class="n">start_position</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">additional_bounds_list</span> <span class="o">=</span> <span class="n">additional_bounds_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modify_axis</span> <span class="o">=</span> <span class="n">modify_axis</span>
 
         <span class="c1"># Data structure</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">part_list</span> <span class="o">=</span> <span class="n">part_list</span>
@@ -859,7 +866,8 @@ and provides a number of helper functions to handle part lists and interactions.
                                                                              <span class="n">start_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_position</span><span class="p">,</span>
                                                                              <span class="n">additional_bounds_list</span> <span class="o">=</span> <span class="n">bounds_to_add</span><span class="p">,</span>
                                                                              <span class="n">interaction_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interaction_list</span><span class="p">,</span>
-                                                                             <span class="n">rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="p">)</span>
+                                                                             <span class="n">rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="p">,</span>
+                                                                             <span class="n">modify_axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modify_axis</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">baseline_start</span><span class="p">,</span> <span class="n">baseline_end</span><span class="p">,</span> <span class="n">bounds</span>
         <span class="k">elif</span> <span class="n">draw_for_bounds</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
             <span class="c1"># Temporary rendering pathway to generate bounds</span>
@@ -873,7 +881,8 @@ and provides a number of helper functions to handle part lists and interactions.
                                                                              <span class="n">start_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_position</span><span class="p">,</span>
                                                                              <span class="n">additional_bounds_list</span> <span class="o">=</span> <span class="n">bounds_to_add</span><span class="p">,</span>
                                                                              <span class="n">interaction_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interaction_list</span><span class="p">,</span>
-                                                                             <span class="n">rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="p">)</span>
+                                                                             <span class="n">rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="p">,</span>
+                                                                             <span class="n">modify_axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modify_axis</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">baseline_start</span><span class="p">,</span> <span class="n">baseline_end</span><span class="p">,</span> <span class="n">bounds</span>
 
@@ -887,7 +896,8 @@ and provides a number of helper functions to handle part lists and interactions.
                       <span class="n">start_position</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                       <span class="n">additional_bounds_list</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
                       <span class="n">interaction_list</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
-                      <span class="n">rotation</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+                      <span class="n">rotation</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                      <span class="n">modify_axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Renders multiple glyphs in sequence.</span>
 
 <span class="sd">    NOTE: See parameters of the __init__</span>
@@ -909,21 +919,23 @@ and provides a number of helper functions to handle part lists and interactions.
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">fig</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">ax</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">modify_axis</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
     <span class="n">part_position</span> <span class="o">=</span> <span class="n">start_position</span>
     <span class="n">bounds_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">part_list</span><span class="p">:</span>
         <span class="n">orientation</span> <span class="o">=</span> <span class="n">part</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">user_parameters</span> <span class="o">=</span> <span class="n">part</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-        <span class="c1"># Pre-draw part_position adjustments (y_offset and orientation).</span>
+        <span class="c1"># Pre-draw part_position adjustments (vertical_offset and orientation).</span>
         <span class="k">if</span> <span class="n">user_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="c1"># TODO: Shouldn&#39;t this be relative to the rotation?</span>
-            <span class="k">if</span> <span class="s1">&#39;y_offset&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
-                <span class="n">part_position</span> <span class="o">=</span> <span class="p">(</span><span class="n">part_position</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">part_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;y_offset&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s1">&#39;vertical_offset&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
+                <span class="n">bearing</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="mf">3.142</span> <span class="o">-</span> <span class="n">rotation</span>
+                <span class="n">part_position</span> <span class="o">=</span> <span class="p">(</span><span class="n">part_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;vertical_offset&#39;</span><span class="p">])</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">bearing</span><span class="p">),</span>
+                                 <span class="n">part_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;vertical_offset&#39;</span><span class="p">])</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">bearing</span><span class="p">))</span>
         <span class="c1"># Draw the part</span>
         <span class="n">bounds</span><span class="p">,</span> <span class="n">part_position</span> <span class="o">=</span> <span class="n">renderer</span><span class="o">.</span><span class="n">draw_glyph</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span>
                                                     <span class="n">part</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
@@ -932,11 +944,12 @@ and provides a number of helper functions to handle part lists and interactions.
                                                     <span class="n">rotation</span><span class="o">=</span><span class="n">rotation</span><span class="p">,</span>
                                                     <span class="n">user_parameters</span><span class="o">=</span><span class="n">user_parameters</span><span class="p">,</span>
                                                     <span class="n">user_style</span><span class="o">=</span><span class="n">part</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
-        <span class="c1"># Post-draw part_position adjustments (y_offset, orientation, and gapsize)</span>
+        <span class="c1"># Post-draw part_position adjustments (vertical_offset, orientation, and gapsize)</span>
         <span class="k">if</span> <span class="n">user_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="c1"># TODO: Shouldn&#39;t this be relative to the rotation?</span>
-            <span class="k">if</span> <span class="s1">&#39;y_offset&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
-                <span class="n">part_position</span> <span class="o">=</span> <span class="p">(</span><span class="n">part_position</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">part_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;y_offset&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s1">&#39;vertical_offset&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
+                <span class="n">bearing</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="mf">3.142</span> <span class="o">-</span> <span class="n">rotation</span>
+                <span class="n">part_position</span> <span class="o">=</span> <span class="p">(</span><span class="n">part_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;vertical_offset&#39;</span><span class="p">])</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">bearing</span><span class="p">),</span>
+                                 <span class="n">part_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;vertical_offset&#39;</span><span class="p">])</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">bearing</span><span class="p">))</span>
             <span class="k">if</span> <span class="s1">&#39;trailing_gap_skew&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
                 <span class="n">trailing_gap_skew</span> <span class="o">=</span> <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;trailing_gap_skew&#39;</span><span class="p">]</span>
                 <span class="n">part_position</span> <span class="o">=</span> <span class="p">(</span><span class="n">part_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">trailing_gap_skew</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">rotation</span><span class="p">),</span>
@@ -961,9 +974,17 @@ and provides a number of helper functions to handle part lists and interactions.
                 <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">part_list</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">part</span> <span class="ow">is</span> <span class="n">interaction</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
                         <span class="n">receiving_bounds</span> <span class="o">=</span> <span class="n">bounds_list</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+                        <span class="n">receiving_part_orientation</span> <span class="o">=</span> <span class="n">part</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
                         <span class="k">break</span>
                     <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="c1"># Draw interactions</span>
+                <span class="c1"># If unspecified by the user, interactions with reverse orientation receiving parts are drawn in reverse direction</span>
+                <span class="k">if</span> <span class="n">receiving_part_orientation</span> <span class="o">==</span> <span class="s1">&#39;reverse&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">interaction</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="n">interaction</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;direction&#39;</span><span class="p">:</span><span class="s1">&#39;reverse&#39;</span><span class="p">}</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="s1">&#39;direction&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">interaction</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span>
+                            <span class="n">interaction</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="s1">&#39;direction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;reverse&#39;</span>
+                <span class="c1"># Draw interactions   </span>
                 <span class="n">bounds</span> <span class="o">=</span> <span class="n">draw_interaction</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span>
                                           <span class="n">sending_bounds</span><span class="p">,</span>
                                           <span class="n">receiving_bounds</span><span class="p">,</span>
@@ -986,9 +1007,10 @@ and provides a number of helper functions to handle part lists and interactions.
     <span class="n">pad</span> <span class="o">=</span> <span class="n">height</span><span class="o">*</span><span class="n">padding</span>
     <span class="n">width</span> <span class="o">=</span> <span class="n">width</span> <span class="o">+</span> <span class="p">(</span><span class="n">pad</span><span class="o">*</span><span class="mf">2.0</span><span class="p">)</span>
     <span class="n">height</span> <span class="o">=</span> <span class="n">height</span> <span class="o">+</span> <span class="p">(</span><span class="n">pad</span><span class="o">*</span><span class="mf">2.0</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="n">final_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">fig_pad</span><span class="p">,</span> <span class="n">final_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">fig_pad</span><span class="p">])</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="n">final_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">fig_pad</span><span class="p">,</span> <span class="n">final_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">fig_pad</span><span class="p">])</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="n">modify_axis</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="n">final_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">fig_pad</span><span class="p">,</span> <span class="n">final_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">fig_pad</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="n">final_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">fig_pad</span><span class="p">,</span> <span class="n">final_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">fig_pad</span><span class="p">])</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span> <span class="p">)</span>
     <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">start_position</span><span class="p">,</span> <span class="n">part_position</span><span class="p">,</span> <span class="n">final_bounds</span>
 
 
@@ -1042,7 +1064,7 @@ and provides a number of helper functions to handle part lists and interactions.
             <span class="k">if</span> <span class="p">(</span><span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">glyph</span><span class="p">[</span><span class="s1">&#39;defaults&#39;</span><span class="p">]</span> <span class="ow">and</span>
                 <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;label_parameters&#39;</span> <span class="ow">and</span>
                 <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;orientation&#39;</span> <span class="ow">and</span>
-                <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;y_offset&#39;</span> <span class="ow">and</span>
+                <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;vertical_offset&#39;</span> <span class="ow">and</span>
                 <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;trailing_gap_skew&#39;</span><span class="p">):</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;&quot;&quot;Parameter &#39;{key}&#39; is not valid for &#39;{glyph_type}&#39;.&quot;&quot;&quot;</span><span class="p">)</span>
             <span class="n">merged_parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
@@ -2674,6 +2696,7 @@ List containing bounds to find bounding box of.</li>
 <span class="sd">       additional_bounds_list: list</span>
 <span class="sd">       interaction_list: list</span>
 <span class="sd">       rotation: float</span>
+<span class="sd">       modify_axis: bool</span>
 <span class="sd">       bounds: tuple</span>
 <span class="sd">           Represents the bounds of the</span>
 <span class="sd">           construct, formatted as ((x1,y1), (x2,y2))</span>
@@ -2693,7 +2716,8 @@ List containing bounds to find bounding box of.</li>
                   <span class="n">start_position</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                   <span class="n">additional_bounds_list</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
                   <span class="n">interaction_list</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
-                  <span class="n">rotation</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+                  <span class="n">rotation</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                  <span class="n">modify_axis</span> <span class="o">=</span> <span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2737,6 +2761,10 @@ List containing bounds to find bounding box of.</li>
 <span class="sd">        rotation: float, optional</span>
 <span class="sd">            Float representing the rotation of</span>
 <span class="sd">            the construct in radians.</span>
+<span class="sd">        modify_axis: bool, optional</span>
+<span class="sd">            Enable/disable the automatic resizing and</span>
+<span class="sd">            modification of the Matplotlib Axes object - useful</span>
+<span class="sd">            when wanting to modify it manually</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span> <span class="o">=</span> <span class="n">renderer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">padding</span> <span class="o">=</span> <span class="n">padding</span>
@@ -2747,6 +2775,7 @@ List containing bounds to find bounding box of.</li>
             <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start_position</span> <span class="o">=</span> <span class="n">start_position</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">additional_bounds_list</span> <span class="o">=</span> <span class="n">additional_bounds_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modify_axis</span> <span class="o">=</span> <span class="n">modify_axis</span>
 
         <span class="c1"># Data structure</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">part_list</span> <span class="o">=</span> <span class="n">part_list</span>
@@ -2806,7 +2835,8 @@ List containing bounds to find bounding box of.</li>
                                                                              <span class="n">start_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_position</span><span class="p">,</span>
                                                                              <span class="n">additional_bounds_list</span> <span class="o">=</span> <span class="n">bounds_to_add</span><span class="p">,</span>
                                                                              <span class="n">interaction_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interaction_list</span><span class="p">,</span>
-                                                                             <span class="n">rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="p">)</span>
+                                                                             <span class="n">rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="p">,</span>
+                                                                             <span class="n">modify_axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modify_axis</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">baseline_start</span><span class="p">,</span> <span class="n">baseline_end</span><span class="p">,</span> <span class="n">bounds</span>
         <span class="k">elif</span> <span class="n">draw_for_bounds</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
             <span class="c1"># Temporary rendering pathway to generate bounds</span>
@@ -2820,7 +2850,8 @@ List containing bounds to find bounding box of.</li>
                                                                              <span class="n">start_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_position</span><span class="p">,</span>
                                                                              <span class="n">additional_bounds_list</span> <span class="o">=</span> <span class="n">bounds_to_add</span><span class="p">,</span>
                                                                              <span class="n">interaction_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interaction_list</span><span class="p">,</span>
-                                                                             <span class="n">rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="p">)</span>
+                                                                             <span class="n">rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="p">,</span>
+                                                                             <span class="n">modify_axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modify_axis</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">baseline_start</span><span class="p">,</span> <span class="n">baseline_end</span><span class="p">,</span> <span class="n">bounds</span>
 </pre></div>
@@ -2847,6 +2878,7 @@ __init__ docstring of this class.</p>
 <li><p><strong>additional_bounds_list</strong> (list):</p></li>
 <li><p><strong>interaction_list</strong> (list):</p></li>
 <li><p><strong>rotation</strong> (float):</p></li>
+<li><p><strong>modify_axis</strong> (bool):</p></li>
 <li><p><strong>bounds</strong> (tuple):
 Represents the bounds of the
 construct, formatted as ((x1,y1), (x2,y2))
@@ -2871,7 +2903,8 @@ coordinates of the top right vertex.</p></li>
     start_position=(0, 0),
     additional_bounds_list=None,
     interaction_list=None,
-    rotation=0.0
+    rotation=0.0,
+    modify_axis=True
 )</span>
     </div>
 
@@ -2887,7 +2920,8 @@ coordinates of the top right vertex.</p></li>
                   <span class="n">start_position</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                   <span class="n">additional_bounds_list</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
                   <span class="n">interaction_list</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
-                  <span class="n">rotation</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+                  <span class="n">rotation</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                  <span class="n">modify_axis</span> <span class="o">=</span> <span class="bp">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -2931,6 +2965,10 @@ coordinates of the top right vertex.</p></li>
 <span class="sd">        rotation: float, optional</span>
 <span class="sd">            Float representing the rotation of</span>
 <span class="sd">            the construct in radians.</span>
+<span class="sd">        modify_axis: bool, optional</span>
+<span class="sd">            Enable/disable the automatic resizing and</span>
+<span class="sd">            modification of the Matplotlib Axes object - useful</span>
+<span class="sd">            when wanting to modify it manually</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">renderer</span> <span class="o">=</span> <span class="n">renderer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">padding</span> <span class="o">=</span> <span class="n">padding</span>
@@ -2941,6 +2979,7 @@ coordinates of the top right vertex.</p></li>
             <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start_position</span> <span class="o">=</span> <span class="n">start_position</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">additional_bounds_list</span> <span class="o">=</span> <span class="n">additional_bounds_list</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">modify_axis</span> <span class="o">=</span> <span class="n">modify_axis</span>
 
         <span class="c1"># Data structure</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">part_list</span> <span class="o">=</span> <span class="n">part_list</span>
@@ -2996,6 +3035,10 @@ dictionary.</li>
 <li><strong>rotation</strong> (float, optional):
 Float representing the rotation of
 the construct in radians.</li>
+<li><strong>modify_axis</strong> (bool, optional):
+Enable/disable the automatic resizing and
+modification of the Matplotlib Axes object - useful
+when wanting to modify it manually</li>
 </ul>
 </div>
 
@@ -3094,7 +3137,8 @@ the construct in radians.</li>
                                                                              <span class="n">start_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_position</span><span class="p">,</span>
                                                                              <span class="n">additional_bounds_list</span> <span class="o">=</span> <span class="n">bounds_to_add</span><span class="p">,</span>
                                                                              <span class="n">interaction_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interaction_list</span><span class="p">,</span>
-                                                                             <span class="n">rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="p">)</span>
+                                                                             <span class="n">rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="p">,</span>
+                                                                             <span class="n">modify_axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modify_axis</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">baseline_start</span><span class="p">,</span> <span class="n">baseline_end</span><span class="p">,</span> <span class="n">bounds</span>
         <span class="k">elif</span> <span class="n">draw_for_bounds</span> <span class="ow">is</span> <span class="bp">True</span><span class="p">:</span>
             <span class="c1"># Temporary rendering pathway to generate bounds</span>
@@ -3108,7 +3152,8 @@ the construct in radians.</li>
                                                                              <span class="n">start_position</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_position</span><span class="p">,</span>
                                                                              <span class="n">additional_bounds_list</span> <span class="o">=</span> <span class="n">bounds_to_add</span><span class="p">,</span>
                                                                              <span class="n">interaction_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">interaction_list</span><span class="p">,</span>
-                                                                             <span class="n">rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="p">)</span>
+                                                                             <span class="n">rotation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotation</span><span class="p">,</span>
+                                                                             <span class="n">modify_axis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">modify_axis</span><span class="p">)</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">baseline_start</span><span class="p">,</span> <span class="n">baseline_end</span><span class="p">,</span> <span class="n">bounds</span>
 </pre></div>
@@ -3145,7 +3190,8 @@ attribute.</li>
     start_position=(0, 0),
     additional_bounds_list=None,
     interaction_list=None,
-    rotation=0.0
+    rotation=0.0,
+    modify_axis=1
 )</span>:
     </div>
 
@@ -3160,7 +3206,8 @@ attribute.</li>
                       <span class="n">start_position</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
                       <span class="n">additional_bounds_list</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
                       <span class="n">interaction_list</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span>
-                      <span class="n">rotation</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">):</span>
+                      <span class="n">rotation</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                      <span class="n">modify_axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Renders multiple glyphs in sequence.</span>
 
 <span class="sd">    NOTE: See parameters of the __init__</span>
@@ -3182,21 +3229,23 @@ attribute.</li>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">fig</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">ax</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
         <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">modify_axis</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
     <span class="n">part_position</span> <span class="o">=</span> <span class="n">start_position</span>
     <span class="n">bounds_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">part_list</span><span class="p">:</span>
         <span class="n">orientation</span> <span class="o">=</span> <span class="n">part</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">user_parameters</span> <span class="o">=</span> <span class="n">part</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-        <span class="c1"># Pre-draw part_position adjustments (y_offset and orientation).</span>
+        <span class="c1"># Pre-draw part_position adjustments (vertical_offset and orientation).</span>
         <span class="k">if</span> <span class="n">user_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="c1"># TODO: Shouldn&#39;t this be relative to the rotation?</span>
-            <span class="k">if</span> <span class="s1">&#39;y_offset&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
-                <span class="n">part_position</span> <span class="o">=</span> <span class="p">(</span><span class="n">part_position</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">part_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;y_offset&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s1">&#39;vertical_offset&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
+                <span class="n">bearing</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="mf">3.142</span> <span class="o">-</span> <span class="n">rotation</span>
+                <span class="n">part_position</span> <span class="o">=</span> <span class="p">(</span><span class="n">part_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;vertical_offset&#39;</span><span class="p">])</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">bearing</span><span class="p">),</span>
+                                 <span class="n">part_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;vertical_offset&#39;</span><span class="p">])</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">bearing</span><span class="p">))</span>
         <span class="c1"># Draw the part</span>
         <span class="n">bounds</span><span class="p">,</span> <span class="n">part_position</span> <span class="o">=</span> <span class="n">renderer</span><span class="o">.</span><span class="n">draw_glyph</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span>
                                                     <span class="n">part</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
@@ -3205,11 +3254,12 @@ attribute.</li>
                                                     <span class="n">rotation</span><span class="o">=</span><span class="n">rotation</span><span class="p">,</span>
                                                     <span class="n">user_parameters</span><span class="o">=</span><span class="n">user_parameters</span><span class="p">,</span>
                                                     <span class="n">user_style</span><span class="o">=</span><span class="n">part</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
-        <span class="c1"># Post-draw part_position adjustments (y_offset, orientation, and gapsize)</span>
+        <span class="c1"># Post-draw part_position adjustments (vertical_offset, orientation, and gapsize)</span>
         <span class="k">if</span> <span class="n">user_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="c1"># TODO: Shouldn&#39;t this be relative to the rotation?</span>
-            <span class="k">if</span> <span class="s1">&#39;y_offset&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
-                <span class="n">part_position</span> <span class="o">=</span> <span class="p">(</span><span class="n">part_position</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">part_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;y_offset&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s1">&#39;vertical_offset&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
+                <span class="n">bearing</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="mf">3.142</span> <span class="o">-</span> <span class="n">rotation</span>
+                <span class="n">part_position</span> <span class="o">=</span> <span class="p">(</span><span class="n">part_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;vertical_offset&#39;</span><span class="p">])</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="n">bearing</span><span class="p">),</span>
+                                 <span class="n">part_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;vertical_offset&#39;</span><span class="p">])</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">bearing</span><span class="p">))</span>
             <span class="k">if</span> <span class="s1">&#39;trailing_gap_skew&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
                 <span class="n">trailing_gap_skew</span> <span class="o">=</span> <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;trailing_gap_skew&#39;</span><span class="p">]</span>
                 <span class="n">part_position</span> <span class="o">=</span> <span class="p">(</span><span class="n">part_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">trailing_gap_skew</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="n">rotation</span><span class="p">),</span>
@@ -3234,9 +3284,17 @@ attribute.</li>
                 <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">part_list</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">part</span> <span class="ow">is</span> <span class="n">interaction</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
                         <span class="n">receiving_bounds</span> <span class="o">=</span> <span class="n">bounds_list</span><span class="p">[</span><span class="n">n</span><span class="p">]</span>
+                        <span class="n">receiving_part_orientation</span> <span class="o">=</span> <span class="n">part</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
                         <span class="k">break</span>
                     <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="c1"># Draw interactions</span>
+                <span class="c1"># If unspecified by the user, interactions with reverse orientation receiving parts are drawn in reverse direction</span>
+                <span class="k">if</span> <span class="n">receiving_part_orientation</span> <span class="o">==</span> <span class="s1">&#39;reverse&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">interaction</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                        <span class="n">interaction</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;direction&#39;</span><span class="p">:</span><span class="s1">&#39;reverse&#39;</span><span class="p">}</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="s1">&#39;direction&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">interaction</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span>
+                            <span class="n">interaction</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="s1">&#39;direction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;reverse&#39;</span>
+                <span class="c1"># Draw interactions   </span>
                 <span class="n">bounds</span> <span class="o">=</span> <span class="n">draw_interaction</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span>
                                           <span class="n">sending_bounds</span><span class="p">,</span>
                                           <span class="n">receiving_bounds</span><span class="p">,</span>
@@ -3259,9 +3317,10 @@ attribute.</li>
     <span class="n">pad</span> <span class="o">=</span> <span class="n">height</span><span class="o">*</span><span class="n">padding</span>
     <span class="n">width</span> <span class="o">=</span> <span class="n">width</span> <span class="o">+</span> <span class="p">(</span><span class="n">pad</span><span class="o">*</span><span class="mf">2.0</span><span class="p">)</span>
     <span class="n">height</span> <span class="o">=</span> <span class="n">height</span> <span class="o">+</span> <span class="p">(</span><span class="n">pad</span><span class="o">*</span><span class="mf">2.0</span><span class="p">)</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="n">final_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">fig_pad</span><span class="p">,</span> <span class="n">final_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">fig_pad</span><span class="p">])</span>
-    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="n">final_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">fig_pad</span><span class="p">,</span> <span class="n">final_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">fig_pad</span><span class="p">])</span>
-    <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="n">modify_axis</span><span class="p">:</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="n">final_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">fig_pad</span><span class="p">,</span> <span class="n">final_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="n">fig_pad</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="n">final_bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">fig_pad</span><span class="p">,</span> <span class="n">final_bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="n">fig_pad</span><span class="p">])</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">set_size_inches</span><span class="p">(</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span> <span class="p">)</span>
     <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span><span class="p">,</span> <span class="n">start_position</span><span class="p">,</span> <span class="n">part_position</span><span class="p">,</span> <span class="n">final_bounds</span>
 </pre></div>
 
@@ -3386,7 +3445,7 @@ containing the glyph.</li>
             <span class="k">if</span> <span class="p">(</span><span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">glyph</span><span class="p">[</span><span class="s1">&#39;defaults&#39;</span><span class="p">]</span> <span class="ow">and</span>
                 <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;label_parameters&#39;</span> <span class="ow">and</span>
                 <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;orientation&#39;</span> <span class="ow">and</span>
-                <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;y_offset&#39;</span> <span class="ow">and</span>
+                <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;vertical_offset&#39;</span> <span class="ow">and</span>
                 <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;trailing_gap_skew&#39;</span><span class="p">):</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;&quot;&quot;Parameter &#39;{key}&#39; is not valid for &#39;{glyph_type}&#39;.&quot;&quot;&quot;</span><span class="p">)</span>
             <span class="n">merged_parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
