@@ -5,33 +5,36 @@ Plot interactions to and from glyphs.
 
 import parasbolv as psv
 import matplotlib.pyplot as plt
+from collections import namedtuple
 
 part_list = []
-part_list.append( ['CDS',
-                   'forward', 
-                   None,
-                   {'cds': {'facecolor': (1,1,1), 'edgecolor': (0.75,0,0), 'linewidth': 2}}
-                  ] )
-part_list.append( ['Promoter',
-                   'forward', 
-                   None,
-                   None
-                  ] )
-part_list.append( ['CDS', 
-                   'forward', 
-                   None,
-                   {'cds': {'facecolor': (1,1,1), 'edgecolor': (0,0.75,0), 'linewidth': 2}}
-                  ] )
-part_list.append( ['CDS',
-                   'reverse', 
-                   None,
-                   {'cds': {'facecolor': (1,1,1), 'edgecolor': (0,0,0.75), 'linewidth': 2}}
-                  ] )
-part_list.append( ['Promoter', 
-                   'reverse', 
-                   None,
-                   None
-                  ] )
+Part = namedtuple('part', ['glyph_type', 'orientation',  'user_parameters', 'style_parameters'])
+
+part_list.append(Part('CDS',
+                     'forward', 
+                      None,
+                      {'cds': {'facecolor': (1,1,1), 'edgecolor': (0.75,0,0), 'linewidth': 2}}
+                      ) )
+part_list.append(Part('Promoter',
+                      'forward', 
+                      None,
+                      None
+                      ) )
+part_list.append(Part('CDS', 
+                      'forward', 
+                      None,
+                      {'cds': {'facecolor': (1,1,1), 'edgecolor': (0,0.75,0), 'linewidth': 2}}
+                      ) )
+part_list.append(Part('CDS',
+                      'reverse', 
+                      None,
+                      {'cds': {'facecolor': (1,1,1), 'edgecolor': (0,0,0.75), 'linewidth': 2}}
+                      ) )
+part_list.append(Part('Promoter', 
+                      'reverse', 
+                      None,
+                      None
+                      ) )
 
 
 # Create list of interactions to pass to render_part_list
@@ -54,3 +57,4 @@ ax.plot([baseline_start[0], baseline_end[0]], [baseline_start[1], baseline_end[1
 fig.savefig('06_draw_interactions.pdf', transparent=True, dpi=300)
 fig.savefig('06_draw_interactions.jpg', dpi=300)
 plt.show()
+

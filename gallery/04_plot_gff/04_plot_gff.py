@@ -8,6 +8,7 @@ import csv
 from operator import itemgetter
 import parasbolv as psv
 import matplotlib.pyplot as plt
+from collections import namedtuple
 
 # Mapping from GFF annotation type to parasbolv glyph
 gffsvgtype_map = {}
@@ -46,21 +47,23 @@ def load_part_list_from_gff (filename, chrom, type_map=gffsvgtype_map, region=No
                 gff.append([part_name, type_map[part_type], part_dir, start_bp, end_bp, part_attribs])
     # Convert to part list for parasbolv
     part_list = []
+    Part = namedtuple('part', ['glyph_type', 'orientation',  'user_parameters', 'style_parameters'])
     for gff_el in sorted(gff, key=itemgetter(3)):
         # Check for available elements and append to part list
-        if len(gff_el[5]) == 1:
-            part_list.append([gff_el[1], 'forward', None, None])
+        if len(gff_el[5]) == 0 or gff_el == None:
+            part_list.append(Part(gff_el[1], 'forward', None, None))
+
         else:
             orientation = 'forward'
             if 'orientation' in gff_el[5]:
                 orientation = gff_el[5]['orientation']
-            if len(gff_el[5]) == 3:
-                part_list.append([gff_el[1], orientation, gff_el[5]['user_parameters'], gff_el[5]['style_parameters']])
+            if len(gff_el[5]) == 2:
+                part_list.append(Part(gff_el[1], orientation, gff_el[5]['user_parameters'], gff_el[5]['style_parameters']))
             else:
                 if 'user_parameters' in gff_el[5]:
-                    part_list.append([gff_el[1], orientation, gff_el[5]['user_parameters'], None])
+                    part_list.append(Part(gff_el[1], orientation, gff_el[5]['user_parameters'], None))
                 else:
-                    part_list.append([gff_el[1], orientation, None, gff_el[5]['style_parameters']])
+                    part_list.append(Part(gff_el[1], orientation, None, gff_el[5]['style_parameters']))
 
     return part_list
 
@@ -75,3 +78,4 @@ ax.plot([baseline_start[0], baseline_end[0]], [baseline_start[1], baseline_end[1
 fig.savefig('04_plot_gff.pdf', transparent=True, dpi=300)
 fig.savefig('04_plot_gff.jpg', dpi=300)
 plt.show()
+
