@@ -61,4 +61,3 @@ plt.show()
 
 fig.savefig('10_integrated-plotting.pdf', transparent=True, dpi=300)
 fig.savefig('10_integrated-plotting.jpg', dpi=300)
-
