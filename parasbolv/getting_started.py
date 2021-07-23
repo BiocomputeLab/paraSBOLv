@@ -1,5 +1,4 @@
-# Getting started
-
+'''
 `paraSBOLv` is a lightweight Python library designed to simplify the rendering of highly-customisable SBOL Visual glyphs and diagrams. To begin, perform the following essential imports:
 
 	import parasbolv as psv
@@ -143,4 +142,4 @@ They are then passed to `Construct` in a list.
 			   )
 
 Please see the rest of the documentation for detailed information on all possible parameters for `user_parameters`, `user_style`, `interaction_parameters`, and `Construct`.
-
+'''
