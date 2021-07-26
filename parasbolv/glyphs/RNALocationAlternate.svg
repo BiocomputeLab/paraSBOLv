@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:parametric="https://parametric-svg.github.io/v0.2" version="1.1"
-     width="100" height="100" glyphtype="RNA Location" soterms="SO:0001236,SO:0000699"
+     width="100" height="100" glyphtype="RNA Location" terms="SO:0001236,SO:0000699"
      parametric:defaults="height=16;width=6">
 
     <rect class="bounding-box" id="bounding-box" parametric:x="{0}" x="0" parametric:y="{-height}" y="-16" parametric:width="{width}" width="6" parametric:height="{height}" height="16" style="fill:none;stroke:rgb(150,150,150);stroke-opacity:0.5;stroke-width:1pt;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:1.5,0.8" />
