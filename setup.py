@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(name='parasbolv',
 
-      version='0.2.0',
+      version='1.0.0',
 
       description='A lightweight Python library designed to simplify the rendering of ' +
                   'highly-customisable SBOL Visual glyphs and diagrams',
