@@ -95,6 +95,54 @@ class GlyphRenderer:
         return converted_val
 
 
+    def get_glyph_parameters(self, glyph_type=None, default_values=False):
+        """Returns the possible glyph parameters of a glyph.
+        If no glyph is specified, returns the possible parameters
+        for all glyphs.
+
+        Parameters
+        ----------
+        glyph_type: str
+            Type of glyph to get parameters for. If
+            unspecified, returns parameters for every
+            glyph.
+        default_values: bool
+            If true, also returns default values for
+            glyph parameters.
+        """
+        library = self.glyphs_library
+        if glyph_type:
+            try:
+                default_dictionary = library[glyph_type]['defaults']
+            except:
+                warnings.warn(f"""'{glyph_type}' is not a glyph type in the glyphs library.""")
+        else:
+            default_dictionary = None
+            all_default_dictionaries = {}
+            for key in library.keys():
+                all_default_dictionaries[key] = library[key]['defaults']
+        # Remove defaults
+        if not default_values:
+            if default_dictionary:
+                default_list = []
+                for key in default_dictionary.keys():
+                    default_list.append(key)
+                return default_list
+            else:
+                default_list_dict = {}
+                for key in all_default_dictionaries:
+                    glyph_defaults = all_default_dictionaries[key]
+                    default_list_dict[key] = []
+                    for default in glyph_defaults:
+                        default_list_dict[key].append(default)
+                return default_list_dict
+        else:
+            if default_dictionary:
+                return default_dictionary
+            else:
+                return all_default_dictionaries
+
+
     def __process_style (self, style_text):
         """Converts style text into a dictionary.
 
@@ -843,7 +891,7 @@ def render_part_list (part_list,
                     else:
                         if 'direction' not in interaction[3]:
                             interaction[3]['direction'] = 'reverse'
-                # Draw interactions   
+                # Draw interactions
                 bounds = draw_interaction(ax,
                                           sending_bounds,
                                           receiving_bounds,
