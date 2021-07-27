@@ -36,10 +36,6 @@ As an example, here are the `bounding-box` and `baseline` elements for the CDS g
 
 And that is it! With these additional elements the glyph is now usable by `paraSBOLv`.
 
-# Conventions
-
-
-
 # More information
 
 For more information regarding the parametric SVG format see: [http://parametric-svg.js.org](http://parametric-svg.js.org)
