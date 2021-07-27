@@ -71,14 +71,14 @@ The easiest way to plot many glyphs in succession is with the `Construct` class,
 			  'part', ['glyph_type',
 				   'orientation',
 				   'user_parameters', 
-				   'style_parameters']
+				   'user_style']
 	)
 
 	part_example = Part(
 			    'part_name',
 			    'orientation', # forward or reverse
 			    {user_parameters}, # Falsy object if there are none
-			    {style_parameters} # Falsy object if there are none
+			    {user_style} # Falsy object if there are none
 	)
 	
 and formatted in part lists:
@@ -118,15 +118,15 @@ Finally, interactions between glyphs can be defined by passing an `interaction_l
 	Interaction = namedtuple(
 				 'interaction', ['starting_glyph',
 						 'ending_glyph',
-						 'user_parameters', 
-						 'style_parameters']
+						 'interaction_type', 
+						 'interaction_parameters']
 							  )
 
 	interaction_example = Interaction(
-					  part1
-					  part2
-					  'Interaction Name'
-					  interaction_parameters
+					  part1,
+					  part2,
+					  'Interaction Name',
+					  interaction_parameters,
 						  )
 
 They are then passed to `Construct` in a list.
