@@ -37,9 +37,9 @@ Automatically generated documentation can be accessed at: [https://biocomputelab
 
 To inspire you to make your own, we created some simple plotting tools using paraSBOLv as a convenient foundation. 
 
-**[genbank2sbolv](gallery/07_genbank2sbolv)** - visualises the coding regions within a GenBank file.
+**[genbank2sbolv](gallery/genbank2sbolv)** - visualises the coding regions within a GenBank file.
 
-**[sbolv-cli](gallery/08_sbolv-cli)** - streamlined CLI version of paraSBOLv for rapid generation of designs from the command line.
+**[sbolv-cli](gallery/sbolv-cli)** - streamlined CLI version of paraSBOLv for rapid generation of designs from the command line.
 
 ## Support
 
