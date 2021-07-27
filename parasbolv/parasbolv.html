@@ -37,6 +37,9 @@
                                 <a class="function" href="#GlyphRenderer.__init__">GlyphRenderer</a>
                         </li>
                         <li>
+                                <a class="function" href="#GlyphRenderer.get_glyph_parameters">get_glyph_parameters</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#GlyphRenderer.load_glyph">load_glyph</a>
                         </li>
                         <li>
@@ -234,6 +237,54 @@ and provides a number of helper functions to handle part lists and interactions.
             <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                 <span class="n">converted_val</span> <span class="o">=</span> <span class="n">val</span>
         <span class="k">return</span> <span class="n">converted_val</span>
+
+
+    <span class="k">def</span> <span class="nf">get_glyph_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">glyph_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">default_values</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the possible glyph parameters of a glyph.</span>
+<span class="sd">        If no glyph is specified, returns the possible parameters</span>
+<span class="sd">        for all glyphs.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        glyph_type: str</span>
+<span class="sd">            Type of glyph to get parameters for. If</span>
+<span class="sd">            unspecified, returns parameters for every</span>
+<span class="sd">            glyph.</span>
+<span class="sd">        default_values: bool</span>
+<span class="sd">            If true, also returns default values for</span>
+<span class="sd">            glyph parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">library</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyphs_library</span>
+        <span class="k">if</span> <span class="n">glyph_type</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">default_dictionary</span> <span class="o">=</span> <span class="n">library</span><span class="p">[</span><span class="n">glyph_type</span><span class="p">][</span><span class="s1">&#39;defaults&#39;</span><span class="p">]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;&quot;&quot;&#39;{glyph_type}&#39; is not a glyph type in the glyphs library.&quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">default_dictionary</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">all_default_dictionaries</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">library</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">all_default_dictionaries</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">library</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;defaults&#39;</span><span class="p">]</span>
+        <span class="c1"># Remove defaults</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">default_values</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">default_dictionary</span><span class="p">:</span>
+                <span class="n">default_list</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">default_dictionary</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">default_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">default_list</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">default_list_dict</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">all_default_dictionaries</span><span class="p">:</span>
+                    <span class="n">glyph_defaults</span> <span class="o">=</span> <span class="n">all_default_dictionaries</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                    <span class="n">default_list_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">default</span> <span class="ow">in</span> <span class="n">glyph_defaults</span><span class="p">:</span>
+                        <span class="n">default_list_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">default</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">default_list_dict</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">default_dictionary</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">default_dictionary</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">all_default_dictionaries</span>
 
 
     <span class="k">def</span> <span class="nf">__process_style</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style_text</span><span class="p">):</span>
@@ -984,7 +1035,7 @@ and provides a number of helper functions to handle part lists and interactions.
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">if</span> <span class="s1">&#39;direction&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">interaction</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span>
                             <span class="n">interaction</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="s1">&#39;direction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;reverse&#39;</span>
-                <span class="c1"># Draw interactions   </span>
+                <span class="c1"># Draw interactions</span>
                 <span class="n">bounds</span> <span class="o">=</span> <span class="n">draw_interaction</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span>
                                           <span class="n">sending_bounds</span><span class="p">,</span>
                                           <span class="n">receiving_bounds</span><span class="p">,</span>
@@ -1587,6 +1638,54 @@ and provides a number of helper functions to handle part lists and interactions.
         <span class="k">return</span> <span class="n">converted_val</span>
 
 
+    <span class="k">def</span> <span class="nf">get_glyph_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">glyph_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">default_values</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the possible glyph parameters of a glyph.</span>
+<span class="sd">        If no glyph is specified, returns the possible parameters</span>
+<span class="sd">        for all glyphs.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        glyph_type: str</span>
+<span class="sd">            Type of glyph to get parameters for. If</span>
+<span class="sd">            unspecified, returns parameters for every</span>
+<span class="sd">            glyph.</span>
+<span class="sd">        default_values: bool</span>
+<span class="sd">            If true, also returns default values for</span>
+<span class="sd">            glyph parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">library</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyphs_library</span>
+        <span class="k">if</span> <span class="n">glyph_type</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">default_dictionary</span> <span class="o">=</span> <span class="n">library</span><span class="p">[</span><span class="n">glyph_type</span><span class="p">][</span><span class="s1">&#39;defaults&#39;</span><span class="p">]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;&quot;&quot;&#39;{glyph_type}&#39; is not a glyph type in the glyphs library.&quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">default_dictionary</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">all_default_dictionaries</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">library</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">all_default_dictionaries</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">library</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;defaults&#39;</span><span class="p">]</span>
+        <span class="c1"># Remove defaults</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">default_values</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">default_dictionary</span><span class="p">:</span>
+                <span class="n">default_list</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">default_dictionary</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">default_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">default_list</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">default_list_dict</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">all_default_dictionaries</span><span class="p">:</span>
+                    <span class="n">glyph_defaults</span> <span class="o">=</span> <span class="n">all_default_dictionaries</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                    <span class="n">default_list_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">default</span> <span class="ow">in</span> <span class="n">glyph_defaults</span><span class="p">:</span>
+                        <span class="n">default_list_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">default</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">default_list_dict</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">default_dictionary</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">default_dictionary</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">all_default_dictionaries</span>
+
+
     <span class="k">def</span> <span class="nf">__process_style</span> <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style_text</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Converts style text into a dictionary.</span>
 
@@ -2075,6 +2174,85 @@ and provides a number of helper functions to handle part lists and interactions.
 File path at which the glyph SVG files are stored,
 relative to the directory in which <a href="../parasbolv.html#py">parasbolv.py</a> is
 contained.</li>
+</ul>
+</div>
+
+
+                            </div>
+                            <div id="GlyphRenderer.get_glyph_parameters" class="classattr">
+                                        <div class="attr function"><a class="headerlink" href="#GlyphRenderer.get_glyph_parameters">#&nbsp;&nbsp</a>
+
+        
+            <span class="def">def</span>
+            <span class="name">get_glyph_parameters</span><span class="signature">(self, glyph_type=None, default_values=False)</span>:
+    </div>
+
+                <details>
+            <summary>View Source</summary>
+            <div class="codehilite"><pre><span></span>    <span class="k">def</span> <span class="nf">get_glyph_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">glyph_type</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">default_values</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns the possible glyph parameters of a glyph.</span>
+<span class="sd">        If no glyph is specified, returns the possible parameters</span>
+<span class="sd">        for all glyphs.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        glyph_type: str</span>
+<span class="sd">            Type of glyph to get parameters for. If</span>
+<span class="sd">            unspecified, returns parameters for every</span>
+<span class="sd">            glyph.</span>
+<span class="sd">        default_values: bool</span>
+<span class="sd">            If true, also returns default values for</span>
+<span class="sd">            glyph parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">library</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyphs_library</span>
+        <span class="k">if</span> <span class="n">glyph_type</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">default_dictionary</span> <span class="o">=</span> <span class="n">library</span><span class="p">[</span><span class="n">glyph_type</span><span class="p">][</span><span class="s1">&#39;defaults&#39;</span><span class="p">]</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;&quot;&quot;&#39;{glyph_type}&#39; is not a glyph type in the glyphs library.&quot;&quot;&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">default_dictionary</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">all_default_dictionaries</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">library</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">all_default_dictionaries</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">library</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s1">&#39;defaults&#39;</span><span class="p">]</span>
+        <span class="c1"># Remove defaults</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">default_values</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">default_dictionary</span><span class="p">:</span>
+                <span class="n">default_list</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">default_dictionary</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">default_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">default_list</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">default_list_dict</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">all_default_dictionaries</span><span class="p">:</span>
+                    <span class="n">glyph_defaults</span> <span class="o">=</span> <span class="n">all_default_dictionaries</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                    <span class="n">default_list_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">default</span> <span class="ow">in</span> <span class="n">glyph_defaults</span><span class="p">:</span>
+                        <span class="n">default_list_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">default</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">default_list_dict</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">default_dictionary</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">default_dictionary</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">all_default_dictionaries</span>
+</pre></div>
+
+        </details>
+
+            <div class="docstring"><p>Returns the possible glyph parameters of a glyph.
+If no glyph is specified, returns the possible parameters
+for all glyphs.</p>
+
+<h6 id="parameters">Parameters</h6>
+
+<ul>
+<li><strong>glyph_type</strong> (str):
+Type of glyph to get parameters for. If
+unspecified, returns parameters for every
+glyph.</li>
+<li><strong>default_values</strong> (bool):
+If true, also returns default values for
+glyph parameters.</li>
 </ul>
 </div>
 
@@ -3294,7 +3472,7 @@ attribute.</li>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="k">if</span> <span class="s1">&#39;direction&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">interaction</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span>
                             <span class="n">interaction</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="s1">&#39;direction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;reverse&#39;</span>
-                <span class="c1"># Draw interactions   </span>
+                <span class="c1"># Draw interactions</span>
                 <span class="n">bounds</span> <span class="o">=</span> <span class="n">draw_interaction</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span>
                                           <span class="n">sending_bounds</span><span class="p">,</span>
                                           <span class="n">receiving_bounds</span><span class="p">,</span>
