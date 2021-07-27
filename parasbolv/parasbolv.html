@@ -194,9 +194,9 @@ and provides a number of helper functions to handle part lists and interactions.
         <span class="bp">self</span><span class="o">.</span><span class="n">svg2mpl_style_map</span><span class="p">[</span><span class="s1">&#39;stroke&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;edgecolor&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">svg2mpl_style_map</span><span class="p">[</span><span class="s1">&#39;stroke-width&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;linewidth&#39;</span>
         <span class="k">if</span> <span class="n">glyph_path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">glyphs_library</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyph_soterm_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_package_glyphs</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">glyphs_library</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyph_term_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_package_glyphs</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">glyphs_library</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyph_soterm_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_glyphs_from_path</span><span class="p">(</span><span class="n">glyph_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">glyphs_library</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyph_term_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_glyphs_from_path</span><span class="p">(</span><span class="n">glyph_path</span><span class="p">)</span>
 
 
     <span class="nd">@staticmethod</span>
@@ -318,7 +318,7 @@ and provides a number of helper functions to handle part lists and interactions.
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">tag_details</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">tag_details</span><span class="p">[</span><span class="s1">&#39;glyphtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="n">tag_details</span><span class="p">[</span><span class="s1">&#39;soterms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tag_details</span><span class="p">[</span><span class="s1">&#39;terms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">tag_details</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="n">tag_details</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="n">tag_details</span><span class="p">[</span><span class="s1">&#39;defaults&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
@@ -328,8 +328,8 @@ and provides a number of helper functions to handle part lists and interactions.
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">tag_attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;glyphtype&#39;</span><span class="p">:</span>
                 <span class="n">tag_details</span><span class="p">[</span><span class="s1">&#39;glyphtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tag_attributes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;soterms&#39;</span><span class="p">:</span>
-                <span class="n">tag_details</span><span class="p">[</span><span class="s1">&#39;soterms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tag_attributes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;terms&#39;</span><span class="p">:</span>
+                <span class="n">tag_details</span><span class="p">[</span><span class="s1">&#39;terms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tag_attributes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;class&#39;</span><span class="p">:</span>
                 <span class="n">tag_details</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tag_attributes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span>
@@ -454,7 +454,7 @@ and provides a number of helper functions to handle part lists and interactions.
         <span class="n">root</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
         <span class="n">root_attributes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__extract_tag_details</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">)</span>
         <span class="n">glyph_type</span> <span class="o">=</span> <span class="n">root_attributes</span><span class="p">[</span><span class="s1">&#39;glyphtype&#39;</span><span class="p">]</span>
-        <span class="n">glyph_soterms</span> <span class="o">=</span> <span class="n">root_attributes</span><span class="p">[</span><span class="s1">&#39;soterms&#39;</span><span class="p">]</span>
+        <span class="n">glyph_terms</span> <span class="o">=</span> <span class="n">root_attributes</span><span class="p">[</span><span class="s1">&#39;terms&#39;</span><span class="p">]</span>
         <span class="n">glyph_data</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">glyph_data</span><span class="p">[</span><span class="s1">&#39;paths&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">glyph_data</span><span class="p">[</span><span class="s1">&#39;defaults&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">root_attributes</span><span class="p">[</span><span class="s1">&#39;defaults&#39;</span><span class="p">]</span>
@@ -462,7 +462,7 @@ and provides a number of helper functions to handle part lists and interactions.
             <span class="c1"># Cycle through and find all paths</span>
             <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">):</span>
                 <span class="n">glyph_data</span><span class="p">[</span><span class="s1">&#39;paths&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__extract_tag_details</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">attrib</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">glyph_type</span><span class="p">,</span> <span class="n">glyph_soterms</span><span class="p">,</span> <span class="n">glyph_data</span>
+        <span class="k">return</span> <span class="n">glyph_type</span><span class="p">,</span> <span class="n">glyph_terms</span><span class="p">,</span> <span class="n">glyph_data</span>
 
 
     <span class="k">def</span> <span class="nf">load_package_glyphs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -482,13 +482,13 @@ and provides a number of helper functions to handle part lists and interactions.
 <span class="sd">            Absolute file path of directory containing glyphs.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">glyphs_library</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">glyph_soterm_map</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">glyph_term_map</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">infile</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;*.svg&#39;</span><span class="p">)</span> <span class="p">):</span>
-            <span class="n">glyph_type</span><span class="p">,</span> <span class="n">glyph_soterms</span><span class="p">,</span> <span class="n">glyph_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_glyph</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
+            <span class="n">glyph_type</span><span class="p">,</span> <span class="n">glyph_terms</span><span class="p">,</span> <span class="n">glyph_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_glyph</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
             <span class="n">glyphs_library</span><span class="p">[</span><span class="n">glyph_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">glyph_data</span>
-            <span class="k">for</span> <span class="n">soterm</span> <span class="ow">in</span> <span class="n">glyph_soterms</span><span class="p">:</span>
-                <span class="n">glyph_soterm_map</span><span class="p">[</span><span class="n">soterm</span><span class="p">]</span> <span class="o">=</span> <span class="n">glyph_type</span>
-        <span class="k">return</span> <span class="n">glyphs_library</span><span class="p">,</span> <span class="n">glyph_soterm_map</span>
+            <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">glyph_terms</span><span class="p">:</span>
+                <span class="n">glyph_term_map</span><span class="p">[</span><span class="n">term</span><span class="p">]</span> <span class="o">=</span> <span class="n">glyph_type</span>
+        <span class="k">return</span> <span class="n">glyphs_library</span><span class="p">,</span> <span class="n">glyph_term_map</span>
 
 
     <span class="k">def</span> <span class="nf">draw_glyph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
@@ -1593,9 +1593,9 @@ and provides a number of helper functions to handle part lists and interactions.
         <span class="bp">self</span><span class="o">.</span><span class="n">svg2mpl_style_map</span><span class="p">[</span><span class="s1">&#39;stroke&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;edgecolor&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">svg2mpl_style_map</span><span class="p">[</span><span class="s1">&#39;stroke-width&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;linewidth&#39;</span>
         <span class="k">if</span> <span class="n">glyph_path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">glyphs_library</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyph_soterm_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_package_glyphs</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">glyphs_library</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyph_term_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_package_glyphs</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">glyphs_library</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyph_soterm_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_glyphs_from_path</span><span class="p">(</span><span class="n">glyph_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">glyphs_library</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyph_term_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_glyphs_from_path</span><span class="p">(</span><span class="n">glyph_path</span><span class="p">)</span>
 
 
     <span class="nd">@staticmethod</span>
@@ -1717,7 +1717,7 @@ and provides a number of helper functions to handle part lists and interactions.
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">tag_details</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">tag_details</span><span class="p">[</span><span class="s1">&#39;glyphtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="n">tag_details</span><span class="p">[</span><span class="s1">&#39;soterms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tag_details</span><span class="p">[</span><span class="s1">&#39;terms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">tag_details</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="n">tag_details</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
         <span class="n">tag_details</span><span class="p">[</span><span class="s1">&#39;defaults&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">None</span>
@@ -1727,8 +1727,8 @@ and provides a number of helper functions to handle part lists and interactions.
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">tag_attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;glyphtype&#39;</span><span class="p">:</span>
                 <span class="n">tag_details</span><span class="p">[</span><span class="s1">&#39;glyphtype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tag_attributes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;soterms&#39;</span><span class="p">:</span>
-                <span class="n">tag_details</span><span class="p">[</span><span class="s1">&#39;soterms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tag_attributes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;terms&#39;</span><span class="p">:</span>
+                <span class="n">tag_details</span><span class="p">[</span><span class="s1">&#39;terms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tag_attributes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;;&#39;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;class&#39;</span><span class="p">:</span>
                 <span class="n">tag_details</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">tag_attributes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span>
@@ -1853,7 +1853,7 @@ and provides a number of helper functions to handle part lists and interactions.
         <span class="n">root</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
         <span class="n">root_attributes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__extract_tag_details</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">)</span>
         <span class="n">glyph_type</span> <span class="o">=</span> <span class="n">root_attributes</span><span class="p">[</span><span class="s1">&#39;glyphtype&#39;</span><span class="p">]</span>
-        <span class="n">glyph_soterms</span> <span class="o">=</span> <span class="n">root_attributes</span><span class="p">[</span><span class="s1">&#39;soterms&#39;</span><span class="p">]</span>
+        <span class="n">glyph_terms</span> <span class="o">=</span> <span class="n">root_attributes</span><span class="p">[</span><span class="s1">&#39;terms&#39;</span><span class="p">]</span>
         <span class="n">glyph_data</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">glyph_data</span><span class="p">[</span><span class="s1">&#39;paths&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">glyph_data</span><span class="p">[</span><span class="s1">&#39;defaults&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">root_attributes</span><span class="p">[</span><span class="s1">&#39;defaults&#39;</span><span class="p">]</span>
@@ -1861,7 +1861,7 @@ and provides a number of helper functions to handle part lists and interactions.
             <span class="c1"># Cycle through and find all paths</span>
             <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">):</span>
                 <span class="n">glyph_data</span><span class="p">[</span><span class="s1">&#39;paths&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__extract_tag_details</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">attrib</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">glyph_type</span><span class="p">,</span> <span class="n">glyph_soterms</span><span class="p">,</span> <span class="n">glyph_data</span>
+        <span class="k">return</span> <span class="n">glyph_type</span><span class="p">,</span> <span class="n">glyph_terms</span><span class="p">,</span> <span class="n">glyph_data</span>
 
 
     <span class="k">def</span> <span class="nf">load_package_glyphs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1881,13 +1881,13 @@ and provides a number of helper functions to handle part lists and interactions.
 <span class="sd">            Absolute file path of directory containing glyphs.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">glyphs_library</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">glyph_soterm_map</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">glyph_term_map</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">infile</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;*.svg&#39;</span><span class="p">)</span> <span class="p">):</span>
-            <span class="n">glyph_type</span><span class="p">,</span> <span class="n">glyph_soterms</span><span class="p">,</span> <span class="n">glyph_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_glyph</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
+            <span class="n">glyph_type</span><span class="p">,</span> <span class="n">glyph_terms</span><span class="p">,</span> <span class="n">glyph_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_glyph</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
             <span class="n">glyphs_library</span><span class="p">[</span><span class="n">glyph_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">glyph_data</span>
-            <span class="k">for</span> <span class="n">soterm</span> <span class="ow">in</span> <span class="n">glyph_soterms</span><span class="p">:</span>
-                <span class="n">glyph_soterm_map</span><span class="p">[</span><span class="n">soterm</span><span class="p">]</span> <span class="o">=</span> <span class="n">glyph_type</span>
-        <span class="k">return</span> <span class="n">glyphs_library</span><span class="p">,</span> <span class="n">glyph_soterm_map</span>
+            <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">glyph_terms</span><span class="p">:</span>
+                <span class="n">glyph_term_map</span><span class="p">[</span><span class="n">term</span><span class="p">]</span> <span class="o">=</span> <span class="n">glyph_type</span>
+        <span class="k">return</span> <span class="n">glyphs_library</span><span class="p">,</span> <span class="n">glyph_term_map</span>
 
 
     <span class="k">def</span> <span class="nf">draw_glyph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
@@ -2160,9 +2160,9 @@ and provides a number of helper functions to handle part lists and interactions.
         <span class="bp">self</span><span class="o">.</span><span class="n">svg2mpl_style_map</span><span class="p">[</span><span class="s1">&#39;stroke&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;edgecolor&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">svg2mpl_style_map</span><span class="p">[</span><span class="s1">&#39;stroke-width&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;linewidth&#39;</span>
         <span class="k">if</span> <span class="n">glyph_path</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">glyphs_library</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyph_soterm_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_package_glyphs</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">glyphs_library</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyph_term_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_package_glyphs</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">glyphs_library</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyph_soterm_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_glyphs_from_path</span><span class="p">(</span><span class="n">glyph_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">glyphs_library</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">glyph_term_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_glyphs_from_path</span><span class="p">(</span><span class="n">glyph_path</span><span class="p">)</span>
 </pre></div>
 
         </details>
@@ -2280,7 +2280,7 @@ glyph parameters.</li>
         <span class="n">root</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
         <span class="n">root_attributes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__extract_tag_details</span><span class="p">(</span><span class="n">root</span><span class="o">.</span><span class="n">attrib</span><span class="p">)</span>
         <span class="n">glyph_type</span> <span class="o">=</span> <span class="n">root_attributes</span><span class="p">[</span><span class="s1">&#39;glyphtype&#39;</span><span class="p">]</span>
-        <span class="n">glyph_soterms</span> <span class="o">=</span> <span class="n">root_attributes</span><span class="p">[</span><span class="s1">&#39;soterms&#39;</span><span class="p">]</span>
+        <span class="n">glyph_terms</span> <span class="o">=</span> <span class="n">root_attributes</span><span class="p">[</span><span class="s1">&#39;terms&#39;</span><span class="p">]</span>
         <span class="n">glyph_data</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">glyph_data</span><span class="p">[</span><span class="s1">&#39;paths&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">glyph_data</span><span class="p">[</span><span class="s1">&#39;defaults&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">root_attributes</span><span class="p">[</span><span class="s1">&#39;defaults&#39;</span><span class="p">]</span>
@@ -2288,7 +2288,7 @@ glyph parameters.</li>
             <span class="c1"># Cycle through and find all paths</span>
             <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;path&#39;</span><span class="p">):</span>
                 <span class="n">glyph_data</span><span class="p">[</span><span class="s1">&#39;paths&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__extract_tag_details</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">attrib</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">glyph_type</span><span class="p">,</span> <span class="n">glyph_soterms</span><span class="p">,</span> <span class="n">glyph_data</span>
+        <span class="k">return</span> <span class="n">glyph_type</span><span class="p">,</span> <span class="n">glyph_terms</span><span class="p">,</span> <span class="n">glyph_data</span>
 </pre></div>
 
         </details>
@@ -2349,13 +2349,13 @@ Absolute file path of SVG file.</li>
 <span class="sd">            Absolute file path of directory containing glyphs.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">glyphs_library</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">glyph_soterm_map</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">glyph_term_map</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">infile</span> <span class="ow">in</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;*.svg&#39;</span><span class="p">)</span> <span class="p">):</span>
-            <span class="n">glyph_type</span><span class="p">,</span> <span class="n">glyph_soterms</span><span class="p">,</span> <span class="n">glyph_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_glyph</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
+            <span class="n">glyph_type</span><span class="p">,</span> <span class="n">glyph_terms</span><span class="p">,</span> <span class="n">glyph_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_glyph</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
             <span class="n">glyphs_library</span><span class="p">[</span><span class="n">glyph_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">glyph_data</span>
-            <span class="k">for</span> <span class="n">soterm</span> <span class="ow">in</span> <span class="n">glyph_soterms</span><span class="p">:</span>
-                <span class="n">glyph_soterm_map</span><span class="p">[</span><span class="n">soterm</span><span class="p">]</span> <span class="o">=</span> <span class="n">glyph_type</span>
-        <span class="k">return</span> <span class="n">glyphs_library</span><span class="p">,</span> <span class="n">glyph_soterm_map</span>
+            <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">glyph_terms</span><span class="p">:</span>
+                <span class="n">glyph_term_map</span><span class="p">[</span><span class="n">term</span><span class="p">]</span> <span class="o">=</span> <span class="n">glyph_type</span>
+        <span class="k">return</span> <span class="n">glyphs_library</span><span class="p">,</span> <span class="n">glyph_term_map</span>
 </pre></div>
 
         </details>
