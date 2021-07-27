@@ -3,7 +3,7 @@ A tool to quickly visualse genetic
 constructs using shorthand notation.
 
 Example command:
-python sbolv-cli.py --string "p black,r white,c l_blue,t black,s white,p black,p blue,r white,c l_orange,t black,s white,p blue,> l_orange,<c green,<r white,< l_orange,t black" --interaction "2,6,in,blue//8,12,co,orange//8,15,co,orange" --output sbolv-cli-example.pdf
+python sbolv-cli.py --string "p black,r white,c l_blue,t black,s white,p black,p blue,r white,c l_orange,t black,s white,p blue,<x l_orange,<c green,<r white,x l_orange,t black" --interaction "2,6,in,blue//8,12,co,orange//8,15,co,orange" --output sbolv-cli-example.pdf
 """
 
 import parasbolv as psv
@@ -117,8 +117,7 @@ def find_glyph(value, renderer):
         't': 'Terminator',
         's': 'InertDNASpacer',
         'o': 'Operator',
-        '>': 'Recombination Site',
-        '<': 'Recombination Site'
+        'x': 'Recombination Site',
     }
 
     if len(value) == 1 and value == '<':
