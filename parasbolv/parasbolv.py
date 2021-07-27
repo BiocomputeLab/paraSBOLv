@@ -50,9 +50,9 @@ class GlyphRenderer:
         self.svg2mpl_style_map['stroke'] = 'edgecolor'
         self.svg2mpl_style_map['stroke-width'] = 'linewidth'
         if glyph_path is None:
-            self.glyphs_library, self.glyph_soterm_map = self.load_package_glyphs()
+            self.glyphs_library, self.glyph_term_map = self.load_package_glyphs()
         else:
-            self.glyphs_library, self.glyph_soterm_map = self.load_glyphs_from_path(glyph_path)
+            self.glyphs_library, self.glyph_term_map = self.load_glyphs_from_path(glyph_path)
 
 
     @staticmethod
@@ -174,7 +174,7 @@ class GlyphRenderer:
         """
         tag_details = {}
         tag_details['glyphtype'] = None
-        tag_details['soterms'] = []
+        tag_details['terms'] = []
         tag_details['class'] = None
         tag_details['id'] = None
         tag_details['defaults'] = None
@@ -184,8 +184,8 @@ class GlyphRenderer:
         for key in tag_attributes.keys():
             if key == 'glyphtype':
                 tag_details['glyphtype'] = tag_attributes[key]
-            if key == 'soterms':
-                tag_details['soterms'] = tag_attributes[key].split(';')
+            if key == 'terms':
+                tag_details['terms'] = tag_attributes[key].split(';')
             if key == 'class':
                 tag_details['class'] = tag_attributes[key]
             if key == 'id':
@@ -310,7 +310,7 @@ class GlyphRenderer:
         root = tree.getroot()
         root_attributes = self.__extract_tag_details(root.attrib)
         glyph_type = root_attributes['glyphtype']
-        glyph_soterms = root_attributes['soterms']
+        glyph_terms = root_attributes['terms']
         glyph_data = {}
         glyph_data['paths'] = []
         glyph_data['defaults'] = root_attributes['defaults']
@@ -318,7 +318,7 @@ class GlyphRenderer:
             # Cycle through and find all paths
             if child.tag.endswith('path'):
                 glyph_data['paths'].append(self.__extract_tag_details(child.attrib))
-        return glyph_type, glyph_soterms, glyph_data
+        return glyph_type, glyph_terms, glyph_data
 
 
     def load_package_glyphs(self):
@@ -338,13 +338,13 @@ class GlyphRenderer:
             Absolute file path of directory containing glyphs.
         """
         glyphs_library = {}
-        glyph_soterm_map = {}
+        glyph_term_map = {}
         for infile in glob.glob( os.path.join(path, '*.svg') ):
-            glyph_type, glyph_soterms, glyph_data = self.load_glyph(infile)
+            glyph_type, glyph_terms, glyph_data = self.load_glyph(infile)
             glyphs_library[glyph_type] = glyph_data
-            for soterm in glyph_soterms:
-                glyph_soterm_map[soterm] = glyph_type
-        return glyphs_library, glyph_soterm_map
+            for term in glyph_terms:
+                glyph_term_map[term] = glyph_type
+        return glyphs_library, glyph_term_map
 
 
     def draw_glyph(self,
