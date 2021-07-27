@@ -29,19 +29,19 @@ Automatically generated documentation can be accessed at: [https://biocomputelab
 
 ## Tutorials
 
-- [Getting started with paraSBOLv]() - 
+- [Getting started with paraSBOLv](tutorials/getting_started.md) - 
 
-- [Creating parametric SVG glyph files]() - 
+- [Creating parametric SVG glyph files](creating_psvg_glyphs) - 
 
 ## Tools
 
 To inspire you to make your own, we created some simple plotting tools using paraSBOLv as a convenient foundation. 
 
-**[plot_gff](https://github.com/BiocomputeLab/paraSBOLv/tree/master/gallery/04_plot_gff)** - converts .gff files to SBOLv designs.
+**[plot_gff](gallery/04_plot_gff)** - converts .gff files to SBOLv designs.
 
-**[genbank2sbolv](https://github.com/BiocomputeLab/paraSBOLv/tree/master/gallery/07_genbank2sbolv)** - converts .gb files to SBOLv designs.
+**[genbank2sbolv](gallery/07_genbank2sbolv)** - converts .gb files to SBOLv designs.
 
-**[sbolv-cli](https://github.com/BiocomputeLab/paraSBOLv/tree/master/gallery/08_sbolv-cli)** - streamlined CLI version of paraSBOLv for rapid generation of designs
+**[sbolv-cli](gallery/08_sbolv-cli)** - streamlined CLI version of paraSBOLv for rapid generation of designs
 
 ## Support
 
