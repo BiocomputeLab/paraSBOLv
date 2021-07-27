@@ -256,6 +256,7 @@ def process_interactions(interaction, part_list):
         Formatted list of parts between which
         interactions will be drawn.
     """
+    Interaction = namedtuple('interaction', ['starting_glyph', 'ending_glyph', 'interaction_type', 'interaction_parameters'])
     if '//' in interaction:
         interaction_list = interaction.split('//')
         formatted_int_list = []
@@ -265,14 +266,14 @@ def process_interactions(interaction, part_list):
             ending_index = int(interaction_els[1])
             interaction_type = find_interaction_type(interaction_els[2])
             color = find_color(interaction_els[3])
-            formatted_int_list.append([part_list[starting_index], part_list[ending_index], interaction_type, {'color':color}])
+            formatted_int_list.append(Interaction(part_list[starting_index], part_list[ending_index], interaction_type, {'color':color}))
     else:
         interaction_els = interaction.split(',')
         starting_index = int(interaction_els[0])
         ending_index = int(interaction_els[1])
         interaction_type = find_interaction_type(interaction_els[2])
         color = find_color(interaction_els[3])
-        formatted_int_list = [[part_list[starting_index], part_list[ending_index], interaction_type, {'color':color}]]
+        formatted_int_list = [Interaction(part_list[starting_index], part_list[ending_index], interaction_type, {'color':color})]
     return formatted_int_list
 
 
