@@ -27,6 +27,12 @@ import parasbolv as psv
 
 Automatically generated documentation can be accessed at: [https://biocomputelab.github.io/paraSBOLv/index.html](https://biocomputelab.github.io/paraSBOLv/index.html)
 
+## Tutorials
+
+- [Getting started with paraSBOLv]() - 
+
+- [Creating parametric SVG glyph files]() - 
+
 ## Tools
 
 To inspire you to make your own, we created some simple plotting tools using paraSBOLv as a convenient foundation. 
