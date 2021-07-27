@@ -39,9 +39,12 @@ part_list.append(Part('Promoter',
 
 # Create list of interactions to pass to render_part_list
 interaction_list = []
-interaction_list.append([part_list[0], part_list[1], 'inhibition', {'color': (0.75,0,0)}])
-interaction_list.append([part_list[2], part_list[4], 'control', {'color': (0, 0.75, 0),
-                                                                 'direction':'reverse'}])
+Interaction = namedtuple('interaction', ['starting_glyph', 'ending_glyph', 'interaction_type', 'interaction_parameters'])
+
+
+interaction_list.append(Interaction(part_list[0], part_list[1], 'inhibition', {'color': (0.75,0,0)}))
+interaction_list.append(Interaction(part_list[2], part_list[4], 'control', {'color': (0, 0.75, 0),
+                                                                            'direction':'reverse'}))
 
 # Create renderer
 renderer = psv.GlyphRenderer()
