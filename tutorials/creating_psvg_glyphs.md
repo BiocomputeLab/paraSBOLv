@@ -30,7 +30,7 @@ In addition to parameterising the paths making up the glyph, some additional pat
 
 As an example, here are the `bounding-box` and `baseline` elements for the CDS glyph:
 
-    <rect class="bounding-box" id="bounding-box" parametric:x="{0}" x="0" parametric:y="{-height/2}" y="14.5" parametric:width="{width}" width="34" parametric:height="{height}" height="21.0" style="fill:none;stroke:rgb(150,150,150);stroke-opacity:0.5;stroke-width:1pt;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:1.5,0.8" />
+     <rect class="bounding-box" id="bounding-box" parametric:x="{0}" x="0" parametric:y="{-height/2}" y="14.5" parametric:width="{width}" width="34" parametric:height="{height}" height="21.0" style="fill:none;stroke:rgb(150,150,150);stroke-opacity:0.5;stroke-width:1pt;stroke-linecap:butt;stroke-linejoin:miter;stroke-dasharray:1.5,0.8" />
 
      <path class="baseline" id="baseline" parametric:d="M{0},{0} L{width},{0}" d="M0,25 L34,25" parametric:y="{0}" style="fill:none;stroke:black;stroke-width:1pt" />
 
