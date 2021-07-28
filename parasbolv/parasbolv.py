@@ -985,7 +985,8 @@ def collate_user_params (renderer, glyph_type, user_parameters):
                 key != 'label_parameters' and
                 key != 'orientation' and
                 key != 'vertical_offset' and
-                key != 'trailing_gap_skew'):
+                key != 'trailing_gap_skew' and
+                key != 'path_zorders'):
                 warnings.warn(f"""Parameter '{key}' is not valid for '{glyph_type}'.""")
             merged_parameters[key] = user_parameters[key]
     return merged_parameters, label_parameters
