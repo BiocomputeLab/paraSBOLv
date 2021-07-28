@@ -32,7 +32,7 @@ gffsvgtype_map['rbs'] = 'RibosomeEntrySite'
 @click.option('-c', '--chromosomes', default='chrom1', help='Chromosomes to draw.')
 @click.option('-m', '--map', default='', help='.gff features to be mapped to SBOLv parts.')
 @click.option('-v', '--vgap', default=50, help='Vertical gap size between chromosomes')
-@click.option('-h', '--hgap', default=10, help='Horizontal gap size between chromosomes')
+@click.option('-h', '--hgap', default=10, help='Horizontal gap size between parts')
 
 
 def recieve_input(path, chromosomes, map, vgap, hgap):
