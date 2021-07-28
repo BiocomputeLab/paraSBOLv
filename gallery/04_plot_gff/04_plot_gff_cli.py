@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 CLI for the gff plotting tool that supports specification of which chromosomes and features to draw.
 
