@@ -392,6 +392,7 @@ class GlyphRenderer:
                 if key not in path_ids:
                     warnings.warn(f"""'{key}' is not a valid path ID for the '{glyph_type}' glyph.""")
         paths_to_draw = []
+        path_zorders = None
         if user_parameters is not None:
             if 'path_zorders' in user_parameters:
                 path_zorders = user_parameters['path_zorders']
