@@ -536,6 +536,11 @@ and provides a number of helper functions to handle part lists and interactions.
                 <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">path_ids</span><span class="p">:</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;&quot;&quot;&#39;{key}&#39; is not a valid path ID for the &#39;{glyph_type}&#39; glyph.&quot;&quot;&quot;</span><span class="p">)</span>
         <span class="n">paths_to_draw</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">path_zorders</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">user_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;path_zorders&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
+                <span class="n">path_zorders</span> <span class="o">=</span> <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;path_zorders&#39;</span><span class="p">]</span>
+        <span class="n">zorders_to_use</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">glyph</span><span class="p">[</span><span class="s1">&#39;paths&#39;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">path</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;baseline&#39;</span><span class="p">,</span> <span class="s1">&#39;bounding-box&#39;</span><span class="p">]:</span>
                 <span class="n">merged_style</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s1">&#39;style&#39;</span><span class="p">]</span>
@@ -553,6 +558,15 @@ and provides a number of helper functions to handle part lists and interactions.
                             <span class="n">merged_style</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">style_el</span><span class="p">)</span>
                             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;&quot;&quot;Style parameter &#39;{style_el}&#39; is not valid for &#39;{path[&quot;id&quot;]}&#39;.&quot;&quot;&quot;</span><span class="p">)</span>
                 <span class="n">svg_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__eval_svg_data</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">],</span> <span class="n">merged_parameters</span><span class="p">)</span>
+                <span class="c1"># Handle user-inputted path zorders</span>
+                <span class="k">if</span> <span class="n">path_zorders</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">path</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">path_zorders</span><span class="p">:</span>
+                        <span class="n">zorder</span> <span class="o">=</span> <span class="n">path_zorders</span><span class="p">[</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span>
+                        <span class="n">zorders_to_use</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">zorder</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">zorders_to_use</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">zorders_to_use</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
                 <span class="c1"># Call to svgpath2mpl</span>
                 <span class="n">paths_to_draw</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">parse_path</span><span class="p">(</span><span class="n">svg_text</span><span class="p">),</span> <span class="n">merged_style</span><span class="p">])</span>
         <span class="c1"># Draw glyph to the axis with correct styling parameters</span>
@@ -560,16 +574,16 @@ and provides a number of helper functions to handle part lists and interactions.
         <span class="n">all_y_flipped_paths</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">position</span> <span class="o">=</span> <span class="n">adjust_position_for_orientation</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">merged_parameters</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">],</span> <span class="n">rotation</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths_to_draw</span><span class="p">:</span>
+            <span class="n">path_index</span> <span class="o">=</span> <span class="n">paths_to_draw</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
             <span class="n">y_flipped_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__flip_position_rotate_glyph</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                                                                <span class="n">baseline_y</span><span class="p">,</span>
                                                                <span class="n">position</span><span class="p">,</span>
                                                                <span class="n">orientation</span><span class="p">,</span>
                                                                <span class="n">rotation</span><span class="p">)</span>
             <span class="n">all_y_flipped_paths</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">y_flipped_path</span><span class="p">])</span>
-            <span class="n">patch</span> <span class="o">=</span> <span class="n">patches</span><span class="o">.</span><span class="n">PathPatch</span><span class="p">(</span><span class="n">y_flipped_path</span><span class="p">,</span> <span class="o">**</span><span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">patch</span> <span class="o">=</span> <span class="n">patches</span><span class="o">.</span><span class="n">PathPatch</span><span class="p">(</span><span class="n">y_flipped_path</span><span class="p">,</span> <span class="o">**</span><span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">zorder</span><span class="o">=</span><span class="n">zorders_to_use</span><span class="p">[</span><span class="n">path_index</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">patch</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="n">user_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">label_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="c1"># Draw label</span>
@@ -1116,7 +1130,8 @@ and provides a number of helper functions to handle part lists and interactions.
                 <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;label_parameters&#39;</span> <span class="ow">and</span>
                 <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;orientation&#39;</span> <span class="ow">and</span>
                 <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;vertical_offset&#39;</span> <span class="ow">and</span>
-                <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;trailing_gap_skew&#39;</span><span class="p">):</span>
+                <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;trailing_gap_skew&#39;</span> <span class="ow">and</span>
+                <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;path_zorders&#39;</span><span class="p">):</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;&quot;&quot;Parameter &#39;{key}&#39; is not valid for &#39;{glyph_type}&#39;.&quot;&quot;&quot;</span><span class="p">)</span>
             <span class="n">merged_parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">merged_parameters</span><span class="p">,</span> <span class="n">label_parameters</span>
@@ -1935,6 +1950,11 @@ and provides a number of helper functions to handle part lists and interactions.
                 <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">path_ids</span><span class="p">:</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;&quot;&quot;&#39;{key}&#39; is not a valid path ID for the &#39;{glyph_type}&#39; glyph.&quot;&quot;&quot;</span><span class="p">)</span>
         <span class="n">paths_to_draw</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">path_zorders</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">user_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;path_zorders&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
+                <span class="n">path_zorders</span> <span class="o">=</span> <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;path_zorders&#39;</span><span class="p">]</span>
+        <span class="n">zorders_to_use</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">glyph</span><span class="p">[</span><span class="s1">&#39;paths&#39;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">path</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;baseline&#39;</span><span class="p">,</span> <span class="s1">&#39;bounding-box&#39;</span><span class="p">]:</span>
                 <span class="n">merged_style</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s1">&#39;style&#39;</span><span class="p">]</span>
@@ -1952,6 +1972,15 @@ and provides a number of helper functions to handle part lists and interactions.
                             <span class="n">merged_style</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">style_el</span><span class="p">)</span>
                             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;&quot;&quot;Style parameter &#39;{style_el}&#39; is not valid for &#39;{path[&quot;id&quot;]}&#39;.&quot;&quot;&quot;</span><span class="p">)</span>
                 <span class="n">svg_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__eval_svg_data</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">],</span> <span class="n">merged_parameters</span><span class="p">)</span>
+                <span class="c1"># Handle user-inputted path zorders</span>
+                <span class="k">if</span> <span class="n">path_zorders</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">path</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">path_zorders</span><span class="p">:</span>
+                        <span class="n">zorder</span> <span class="o">=</span> <span class="n">path_zorders</span><span class="p">[</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span>
+                        <span class="n">zorders_to_use</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">zorder</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">zorders_to_use</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">zorders_to_use</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
                 <span class="c1"># Call to svgpath2mpl</span>
                 <span class="n">paths_to_draw</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">parse_path</span><span class="p">(</span><span class="n">svg_text</span><span class="p">),</span> <span class="n">merged_style</span><span class="p">])</span>
         <span class="c1"># Draw glyph to the axis with correct styling parameters</span>
@@ -1959,16 +1988,16 @@ and provides a number of helper functions to handle part lists and interactions.
         <span class="n">all_y_flipped_paths</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">position</span> <span class="o">=</span> <span class="n">adjust_position_for_orientation</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">merged_parameters</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">],</span> <span class="n">rotation</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths_to_draw</span><span class="p">:</span>
+            <span class="n">path_index</span> <span class="o">=</span> <span class="n">paths_to_draw</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
             <span class="n">y_flipped_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__flip_position_rotate_glyph</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                                                                <span class="n">baseline_y</span><span class="p">,</span>
                                                                <span class="n">position</span><span class="p">,</span>
                                                                <span class="n">orientation</span><span class="p">,</span>
                                                                <span class="n">rotation</span><span class="p">)</span>
             <span class="n">all_y_flipped_paths</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">y_flipped_path</span><span class="p">])</span>
-            <span class="n">patch</span> <span class="o">=</span> <span class="n">patches</span><span class="o">.</span><span class="n">PathPatch</span><span class="p">(</span><span class="n">y_flipped_path</span><span class="p">,</span> <span class="o">**</span><span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">patch</span> <span class="o">=</span> <span class="n">patches</span><span class="o">.</span><span class="n">PathPatch</span><span class="p">(</span><span class="n">y_flipped_path</span><span class="p">,</span> <span class="o">**</span><span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">zorder</span><span class="o">=</span><span class="n">zorders_to_use</span><span class="p">[</span><span class="n">path_index</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">patch</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="n">user_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">label_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="c1"># Draw label</span>
@@ -2436,6 +2465,11 @@ Absolute file path of directory containing glyphs.</li>
                 <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">path_ids</span><span class="p">:</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;&quot;&quot;&#39;{key}&#39; is not a valid path ID for the &#39;{glyph_type}&#39; glyph.&quot;&quot;&quot;</span><span class="p">)</span>
         <span class="n">paths_to_draw</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">path_zorders</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="k">if</span> <span class="n">user_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;path_zorders&#39;</span> <span class="ow">in</span> <span class="n">user_parameters</span><span class="p">:</span>
+                <span class="n">path_zorders</span> <span class="o">=</span> <span class="n">user_parameters</span><span class="p">[</span><span class="s1">&#39;path_zorders&#39;</span><span class="p">]</span>
+        <span class="n">zorders_to_use</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">glyph</span><span class="p">[</span><span class="s1">&#39;paths&#39;</span><span class="p">]:</span>
             <span class="k">if</span> <span class="n">path</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;baseline&#39;</span><span class="p">,</span> <span class="s1">&#39;bounding-box&#39;</span><span class="p">]:</span>
                 <span class="n">merged_style</span> <span class="o">=</span> <span class="n">path</span><span class="p">[</span><span class="s1">&#39;style&#39;</span><span class="p">]</span>
@@ -2453,6 +2487,15 @@ Absolute file path of directory containing glyphs.</li>
                             <span class="n">merged_style</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">style_el</span><span class="p">)</span>
                             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;&quot;&quot;Style parameter &#39;{style_el}&#39; is not valid for &#39;{path[&quot;id&quot;]}&#39;.&quot;&quot;&quot;</span><span class="p">)</span>
                 <span class="n">svg_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__eval_svg_data</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;d&#39;</span><span class="p">],</span> <span class="n">merged_parameters</span><span class="p">)</span>
+                <span class="c1"># Handle user-inputted path zorders</span>
+                <span class="k">if</span> <span class="n">path_zorders</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">path</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">path_zorders</span><span class="p">:</span>
+                        <span class="n">zorder</span> <span class="o">=</span> <span class="n">path_zorders</span><span class="p">[</span><span class="n">path</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span>
+                        <span class="n">zorders_to_use</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">zorder</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">zorders_to_use</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">zorders_to_use</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
                 <span class="c1"># Call to svgpath2mpl</span>
                 <span class="n">paths_to_draw</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">parse_path</span><span class="p">(</span><span class="n">svg_text</span><span class="p">),</span> <span class="n">merged_style</span><span class="p">])</span>
         <span class="c1"># Draw glyph to the axis with correct styling parameters</span>
@@ -2460,16 +2503,16 @@ Absolute file path of directory containing glyphs.</li>
         <span class="n">all_y_flipped_paths</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">position</span> <span class="o">=</span> <span class="n">adjust_position_for_orientation</span><span class="p">(</span><span class="n">position</span><span class="p">,</span> <span class="n">orientation</span><span class="p">,</span> <span class="n">merged_parameters</span><span class="p">[</span><span class="s1">&#39;width&#39;</span><span class="p">],</span> <span class="n">rotation</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths_to_draw</span><span class="p">:</span>
+            <span class="n">path_index</span> <span class="o">=</span> <span class="n">paths_to_draw</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
             <span class="n">y_flipped_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__flip_position_rotate_glyph</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
                                                                <span class="n">baseline_y</span><span class="p">,</span>
                                                                <span class="n">position</span><span class="p">,</span>
                                                                <span class="n">orientation</span><span class="p">,</span>
                                                                <span class="n">rotation</span><span class="p">)</span>
             <span class="n">all_y_flipped_paths</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">y_flipped_path</span><span class="p">])</span>
-            <span class="n">patch</span> <span class="o">=</span> <span class="n">patches</span><span class="o">.</span><span class="n">PathPatch</span><span class="p">(</span><span class="n">y_flipped_path</span><span class="p">,</span> <span class="o">**</span><span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">patch</span> <span class="o">=</span> <span class="n">patches</span><span class="o">.</span><span class="n">PathPatch</span><span class="p">(</span><span class="n">y_flipped_path</span><span class="p">,</span> <span class="o">**</span><span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">zorder</span><span class="o">=</span><span class="n">zorders_to_use</span><span class="p">[</span><span class="n">path_index</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">ax</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">ax</span><span class="o">.</span><span class="n">add_patch</span><span class="p">(</span><span class="n">patch</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="n">user_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">label_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="c1"># Draw label</span>
@@ -3624,7 +3667,8 @@ containing the glyph.</li>
                 <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;label_parameters&#39;</span> <span class="ow">and</span>
                 <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;orientation&#39;</span> <span class="ow">and</span>
                 <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;vertical_offset&#39;</span> <span class="ow">and</span>
-                <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;trailing_gap_skew&#39;</span><span class="p">):</span>
+                <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;trailing_gap_skew&#39;</span> <span class="ow">and</span>
+                <span class="n">key</span> <span class="o">!=</span> <span class="s1">&#39;path_zorders&#39;</span><span class="p">):</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;&quot;&quot;Parameter &#39;{key}&#39; is not valid for &#39;{glyph_type}&#39;.&quot;&quot;&quot;</span><span class="p">)</span>
             <span class="n">merged_parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">merged_parameters</span><span class="p">,</span> <span class="n">label_parameters</span>
