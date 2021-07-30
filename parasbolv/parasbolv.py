@@ -392,6 +392,11 @@ class GlyphRenderer:
                 if key not in path_ids:
                     warnings.warn(f"""'{key}' is not a valid path ID for the '{glyph_type}' glyph.""")
         paths_to_draw = []
+        path_zorders = None
+        if user_parameters is not None:
+            if 'path_zorders' in user_parameters:
+                path_zorders = user_parameters['path_zorders']
+        zorders_to_use = []
         for path in glyph['paths']:
             if path['class'] not in ['baseline', 'bounding-box']:
                 merged_style = path['style']
@@ -409,6 +414,15 @@ class GlyphRenderer:
                             merged_style.pop(style_el)
                             warnings.warn(f"""Style parameter '{style_el}' is not valid for '{path["id"]}'.""")
                 svg_text = self.__eval_svg_data(path['d'], merged_parameters)
+                # Handle user-inputted path zorders
+                if path_zorders is not None:
+                    if path['id'] in path_zorders:
+                        zorder = path_zorders[path['id']]
+                        zorders_to_use.append(zorder)
+                    else:
+                        zorders_to_use.append(None)
+                else:
+                    zorders_to_use.append(None)
                 # Call to svgpath2mpl
                 paths_to_draw.append([parse_path(svg_text), merged_style])
         # Draw glyph to the axis with correct styling parameters
@@ -416,16 +430,16 @@ class GlyphRenderer:
         all_y_flipped_paths = []
         position = adjust_position_for_orientation(position, orientation, merged_parameters['width'], rotation)
         for path in paths_to_draw:
+            path_index = paths_to_draw.index(path)
             y_flipped_path = self.__flip_position_rotate_glyph(path[0],
                                                                baseline_y,
                                                                position,
                                                                orientation,
                                                                rotation)
             all_y_flipped_paths.append([y_flipped_path])
-            patch = patches.PathPatch(y_flipped_path, **path[1])
+            patch = patches.PathPatch(y_flipped_path, **path[1], zorder=zorders_to_use[path_index])
             if ax is not None:
                 ax.add_patch(patch)
-
         if user_parameters is not None:
             if label_parameters is not None:
                 # Draw label
@@ -972,7 +986,8 @@ def collate_user_params (renderer, glyph_type, user_parameters):
                 key != 'label_parameters' and
                 key != 'orientation' and
                 key != 'vertical_offset' and
-                key != 'trailing_gap_skew'):
+                key != 'trailing_gap_skew' and
+                key != 'path_zorders'):
                 warnings.warn(f"""Parameter '{key}' is not valid for '{glyph_type}'.""")
             merged_parameters[key] = user_parameters[key]
     return merged_parameters, label_parameters
