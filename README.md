@@ -35,7 +35,7 @@ Automatically generated documentation can be accessed at: [https://biocomputelab
 
 ## Tools
 
-To inspire you to make your own, we created some simple plotting tools using paraSBOLv as a convenient foundation. 
+To inspire you to make your own tools, we created some simple plotting tools using paraSBOLv as a convenient foundation. 
 
 **[genbank2sbolv](gallery/genbank2sbolv)** - visualises the coding regions within a GenBank file.
 
@@ -45,4 +45,4 @@ To inspire you to make your own, we created some simple plotting tools using par
 
 If you use this tool to create diagrams or as a basis for new software please cite the following paper. Without citations that demonstrate use it becomes difficult to support this tool.
 
-`Clark C.J., Scott-Brown J. & Gorochowski T.E. "paraSBOLv: a foundation for standard-compliant genetic design visualisation tools" (in revision)`
+`Clark C.J., Scott-Brown J. & Gorochowski T.E. "paraSBOLv: a foundation for standard-compliant genetic design visualisation tools", Synthetic Biology, 2021`
