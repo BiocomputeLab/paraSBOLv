@@ -45,4 +45,4 @@ To inspire you to make your own tools, we created some simple plotting tools usi
 
 If you use this tool to create diagrams or as a basis for new software please cite the following paper. Without citations that demonstrate use it becomes difficult to support this tool.
 
-`Clark C.J., Scott-Brown J. & Gorochowski T.E. "paraSBOLv: a foundation for standard-compliant genetic design visualisation tools", Synthetic Biology, 2021`
+`Clark C.J., Scott-Brown J. & Gorochowski T.E. "paraSBOLv: a foundation for standard-compliant genetic design visualisation tools", Synthetic Biology, 2021` doi:[10.1093/synbio/ysab022](https://dx.doi.org/10.1093/synbio/ysab022)
